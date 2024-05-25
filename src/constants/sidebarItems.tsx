@@ -1,5 +1,6 @@
 import {
   CrownOutlined,
+  CustomerServiceOutlined,
   ProductOutlined,
   QuestionCircleOutlined,
   ReconciliationOutlined,
@@ -18,8 +19,6 @@ import { LuWebhook } from "react-icons/lu";
 import { ENUM_USER_ROLE } from "./role";
 
 const sidebarItems = (role: string) => {
-  console.log(role);
-
   const defaultSidebarItems: MenuProps["items"] = [
     {
       label: "Profile",
@@ -124,7 +123,7 @@ const sidebarItems = (role: string) => {
     {
       label: "Manage customers",
       key: "customer",
-      icon: <LiaSellcast />,
+      icon: <CustomerServiceOutlined />,
       children: [
         {
           label: <Link href={`/${role}/add-customers`}>Add customers</Link>,
