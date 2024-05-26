@@ -29,7 +29,12 @@ const PosBreadcrumb = ({
     }),
   ]
 
-  return <Breadcrumb items={breadcrumbItems}></Breadcrumb>
+  return (
+    <Breadcrumb
+      style={{ margin: '10px 0' }}
+      items={breadcrumbItems}
+    ></Breadcrumb>
+  )
 }
 
 export default PosBreadcrumb

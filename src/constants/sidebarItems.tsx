@@ -1,6 +1,7 @@
 import {
   CrownOutlined,
   CustomerServiceOutlined,
+  HomeOutlined,
   ProductOutlined,
   QuestionCircleOutlined,
   ReconciliationOutlined,
@@ -8,21 +9,21 @@ import {
   SettingOutlined,
   UserOutlined,
   UsergroupAddOutlined,
-} from "@ant-design/icons";
-import type { MenuProps } from "antd";
-import Link from "next/link";
-import { BiPurchaseTag } from "react-icons/bi";
-import { FaArrowRightLong } from "react-icons/fa6";
-import { LiaSellcast } from "react-icons/lia";
-import { LuWebhook } from "react-icons/lu";
+} from '@ant-design/icons'
+import type { MenuProps } from 'antd'
+import Link from 'next/link'
+import { BiPurchaseTag } from 'react-icons/bi'
+import { FaArrowRightLong } from 'react-icons/fa6'
+import { LiaSellcast } from 'react-icons/lia'
+import { LuWebhook } from 'react-icons/lu'
 
-import { ENUM_USER_ROLE } from "./role";
+import { ENUM_USER_ROLE } from './role'
 
 const sidebarItems = (role: string) => {
-  const defaultSidebarItems: MenuProps["items"] = [
+  const defaultSidebarItems: MenuProps['items'] = [
     {
-      label: "Profile",
-      key: "profile",
+      label: 'Profile',
+      key: 'profile',
       icon: <UserOutlined />,
       children: [
         {
@@ -37,11 +38,19 @@ const sidebarItems = (role: string) => {
         },
       ],
     },
-  ];
-  const myPurchase: MenuProps["items"] = [
+  ]
+  const defaultHomePage: MenuProps['items'] = [
     {
-      label: "Profile",
-      key: "profile",
+      label: <Link href={`/home`}>Home</Link>,
+      key: 'home',
+      icon: <HomeOutlined />,
+    },
+  ]
+
+  const myPurchase: MenuProps['items'] = [
+    {
+      label: 'Profile',
+      key: 'profile',
       icon: <UserOutlined />,
       children: [
         {
@@ -56,13 +65,13 @@ const sidebarItems = (role: string) => {
         },
       ],
     },
-  ];
+  ]
 
   // Add product
-  const manageProductItems: MenuProps["items"] = [
+  const manageProductItems: MenuProps['items'] = [
     {
-      label: "Products",
-      key: "product",
+      label: 'Products',
+      key: 'product',
       icon: <ProductOutlined />,
       children: [
         {
@@ -77,12 +86,12 @@ const sidebarItems = (role: string) => {
         },
       ],
     },
-  ];
+  ]
   // Add purchase
-  const managePurchaseItems: MenuProps["items"] = [
+  const managePurchaseItems: MenuProps['items'] = [
     {
-      label: "Purchases",
-      key: "purchase",
+      label: 'Purchases',
+      key: 'purchase',
       icon: <BiPurchaseTag />,
       children: [
         {
@@ -97,12 +106,12 @@ const sidebarItems = (role: string) => {
         },
       ],
     },
-  ];
+  ]
   // Add sell
-  const manageSellItems: MenuProps["items"] = [
+  const manageSellItems: MenuProps['items'] = [
     {
-      label: "Sells",
-      key: "sell",
+      label: 'Sells',
+      key: 'sell',
       icon: <LiaSellcast />,
       children: [
         {
@@ -117,12 +126,12 @@ const sidebarItems = (role: string) => {
         },
       ],
     },
-  ];
+  ]
   // Add Customer
-  const manageCustomersItems: MenuProps["items"] = [
+  const manageCustomersItems: MenuProps['items'] = [
     {
-      label: "Manage customers",
-      key: "customer",
+      label: 'Manage customers',
+      key: 'customer',
       icon: <CustomerServiceOutlined />,
       children: [
         {
@@ -137,12 +146,12 @@ const sidebarItems = (role: string) => {
         },
       ],
     },
-  ];
+  ]
   // Add User
-  const manageUsersItems: MenuProps["items"] = [
+  const manageUsersItems: MenuProps['items'] = [
     {
-      label: "Manage users",
-      key: "user",
+      label: 'Manage users',
+      key: 'user',
       icon: <UsergroupAddOutlined />,
       children: [
         {
@@ -157,12 +166,12 @@ const sidebarItems = (role: string) => {
         },
       ],
     },
-  ];
+  ]
   // Add return
-  const manageReturnItems: MenuProps["items"] = [
+  const manageReturnItems: MenuProps['items'] = [
     {
-      label: "Return",
-      key: "return",
+      label: 'Return',
+      key: 'return',
       icon: <RetweetOutlined />,
       children: [
         {
@@ -177,12 +186,12 @@ const sidebarItems = (role: string) => {
         },
       ],
     },
-  ];
+  ]
   // Add Supplier
-  const manageSupplierItems: MenuProps["items"] = [
+  const manageSupplierItems: MenuProps['items'] = [
     {
-      label: "Supplier",
-      key: "supplier",
+      label: 'Supplier',
+      key: 'supplier',
       icon: <LiaSellcast />,
       children: [
         {
@@ -197,12 +206,12 @@ const sidebarItems = (role: string) => {
         },
       ],
     },
-  ];
+  ]
   // Add Warranty
-  const manageWarrantyItems: MenuProps["items"] = [
+  const manageWarrantyItems: MenuProps['items'] = [
     {
-      label: "Warranty",
-      key: "warranty",
+      label: 'Warranty',
+      key: 'warranty',
       icon: <CrownOutlined />,
       children: [
         {
@@ -217,12 +226,12 @@ const sidebarItems = (role: string) => {
         },
       ],
     },
-  ];
+  ]
   // Add Transaction
-  const manageTransactionItems: MenuProps["items"] = [
+  const manageTransactionItems: MenuProps['items'] = [
     {
-      label: "Transaction",
-      key: "transaction",
+      label: 'Transaction',
+      key: 'transaction',
       icon: <LiaSellcast />,
       children: [
         {
@@ -234,35 +243,35 @@ const sidebarItems = (role: string) => {
         },
         {
           label: (
-            <Link href={`/${role}/transaction-weekly`}>Weekly Transaction</Link>
+            <Link href={`/${role}/weekly-transaction`}>Weekly Transaction</Link>
           ),
-          key: `/${role}/transaction-weekly`,
+          key: `/${role}/weekly-transaction`,
           icon: <FaArrowRightLong />,
         },
         {
           label: (
-            <Link href={`/${role}/transaction-monthly`}>
+            <Link href={`/${role}/monthly-transaction`}>
               Monthly Transaction
             </Link>
           ),
-          key: `/${role}/transaction-weekly`,
+          key: `/${role}/monthly-transaction`,
           icon: <FaArrowRightLong />,
         },
         {
           label: (
-            <Link href={`/${role}/transaction-yearly`}>Yearly Transaction</Link>
+            <Link href={`/${role}/yearly-transaction`}>Yearly Transaction</Link>
           ),
-          key: `/${role}/transaction-yearly`,
+          key: `/${role}/yearly-transaction`,
           icon: <FaArrowRightLong />,
         },
       ],
     },
-  ];
+  ]
   // Add reports
-  const manageReportItems: MenuProps["items"] = [
+  const manageReportItems: MenuProps['items'] = [
     {
-      label: "Manage reports",
-      key: "report",
+      label: 'Manage reports',
+      key: 'report',
       icon: <ReconciliationOutlined />,
       children: [
         {
@@ -279,12 +288,12 @@ const sidebarItems = (role: string) => {
         },
       ],
     },
-  ];
+  ]
   // Add others
-  const manageOthersItems: MenuProps["items"] = [
+  const manageOthersItems: MenuProps['items'] = [
     {
-      label: "Others",
-      key: "others",
+      label: 'Others',
+      key: 'others',
       icon: <QuestionCircleOutlined />,
       children: [
         {
@@ -299,12 +308,12 @@ const sidebarItems = (role: string) => {
         },
       ],
     },
-  ];
+  ]
   // Add Settings
-  const manageSettingItems: MenuProps["items"] = [
+  const manageSettingItems: MenuProps['items'] = [
     {
-      label: "Setting",
-      key: "setting",
+      label: 'Setting',
+      key: 'setting',
       icon: <SettingOutlined />,
       children: [
         {
@@ -319,12 +328,12 @@ const sidebarItems = (role: string) => {
         },
       ],
     },
-  ];
+  ]
   // Add Settings
-  const manageThemeSettingsItems: MenuProps["items"] = [
+  const manageThemeSettingsItems: MenuProps['items'] = [
     {
-      label: "Theme Setting",
-      key: "theme-setting",
+      label: 'Theme Setting',
+      key: 'theme-setting',
       icon: <LuWebhook />,
       children: [
         {
@@ -339,10 +348,11 @@ const sidebarItems = (role: string) => {
         },
       ],
     },
-  ];
+  ]
 
   // Role bass routing
   const manageSuperAdmin = [
+    ...defaultHomePage,
     ...manageTransactionItems,
     ...manageProductItems,
     ...managePurchaseItems,
@@ -356,9 +366,10 @@ const sidebarItems = (role: string) => {
     ...manageOthersItems,
     ...manageSettingItems,
     ...manageThemeSettingsItems,
-  ];
+  ]
 
   const manageAdmin = [
+    ...defaultHomePage,
     ...manageTransactionItems,
     ...manageProductItems,
     ...managePurchaseItems,
@@ -371,37 +382,43 @@ const sidebarItems = (role: string) => {
     ...manageOthersItems,
     ...manageSettingItems,
     ...manageThemeSettingsItems,
-  ];
+  ]
 
   const manageModerator = [
+    ...defaultHomePage,
     ...manageSellItems,
     ...manageCustomersItems,
     ...manageWarrantyItems,
     ...manageReportItems,
     ...manageOthersItems,
     ...manageSettingItems,
-  ];
+  ]
   const contentManager = [
+    ...defaultHomePage,
     ...manageReportItems,
     ...manageSettingItems,
     ...manageThemeSettingsItems,
-  ];
-  const marketingManager = [...manageReportItems, ...manageOthersItems];
-  const user = [...defaultSidebarItems, ...myPurchase];
+  ]
+  const marketingManager = [
+    ...defaultHomePage,
+    ...manageReportItems,
+    ...manageOthersItems,
+  ]
+  const user = [...defaultHomePage, ...defaultSidebarItems, ...myPurchase]
 
   if (role === ENUM_USER_ROLE.SUPER_ADMIN) {
-    return manageSuperAdmin;
+    return manageSuperAdmin
   } else if (role === ENUM_USER_ROLE.ADMIN) {
-    return manageAdmin;
+    return manageAdmin
   } else if (role === ENUM_USER_ROLE.MODERATOR) {
-    return manageModerator;
+    return manageModerator
   } else if (role === ENUM_USER_ROLE.CONTENT_MANAGER) {
-    return contentManager;
+    return contentManager
   } else if (role === ENUM_USER_ROLE.MARKETING_MANAGER) {
-    return marketingManager;
+    return marketingManager
   } else {
-    return user;
+    return user
   }
-};
+}
 
-export default sidebarItems;
+export default sidebarItems

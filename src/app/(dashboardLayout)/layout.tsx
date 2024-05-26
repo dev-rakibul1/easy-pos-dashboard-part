@@ -33,7 +33,10 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
   return (
     <Layout hasSider>
       <Sidebar />
-      <Contents>{children}</Contents>
+
+      <Contents>
+        <div style={{ padding: '15px' }}>{children} </div>
+      </Contents>
     </Layout>
   )
 }
