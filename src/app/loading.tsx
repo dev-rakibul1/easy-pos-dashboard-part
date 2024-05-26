@@ -1,5 +1,11 @@
-const LoadingPage = () => {
-  return <div>Loading...</div>;
-};
+import { Spin } from 'antd'
 
-export default LoadingPage;
+const LoadingPage = () => {
+  return (
+    <div style={{ display: 'grid', placeItems: 'center', minHeight: '100vh' }}>
+      <Spin size="small" />
+    </div>
+  )
+}
+
+export default LoadingPage

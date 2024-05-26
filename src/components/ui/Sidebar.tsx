@@ -1,26 +1,26 @@
-"use client";
+'use client'
 
-import { ENUM_USER_ROLE } from "@/constants/role";
-import sidebarItems from "@/constants/sidebarItems";
-import { Layout, Menu } from "antd";
-import { useState } from "react";
-const { Sider } = Layout;
+import sidebarItems from '@/constants/sidebarItems'
+import { getUserInfo } from '@/services/auth.services'
+import { Layout, Menu } from 'antd'
+import { useState } from 'react'
+const { Sider } = Layout
 
 const Sidebar = () => {
-  const [collapsed, setCollapsed] = useState(false);
+  const [collapsed, setCollapsed] = useState(false)
 
-  const role = ENUM_USER_ROLE.MODERATOR;
+  const { role } = getUserInfo() as any
 
   return (
     <Sider
       collapsible
       collapsed={collapsed}
-      onCollapse={(value) => setCollapsed(value)}
+      onCollapse={value => setCollapsed(value)}
       width={250}
       style={{
-        overflow: "auto",
-        height: "100vh",
-        position: "sticky",
+        overflow: 'auto',
+        height: '100vh',
+        position: 'sticky',
         left: 0,
         top: 0,
         bottom: 0,
@@ -28,12 +28,12 @@ const Sidebar = () => {
     >
       <div
         style={{
-          color: "#fff",
-          fontSize: "19px",
-          textAlign: "center",
+          color: '#fff',
+          fontSize: '19px',
+          textAlign: 'center',
           fontWeight: 500,
-          textTransform: "uppercase",
-          padding: "15px",
+          textTransform: 'uppercase',
+          padding: '15px',
         }}
       >
         Easy pos
@@ -41,12 +41,13 @@ const Sidebar = () => {
       <div className="demo-logo-vertical" />
       <Menu
         theme="dark"
-        defaultSelectedKeys={["1"]}
+        defaultSelectedKeys={['1']}
         mode="inline"
+        // style={{ background: 'none' }}
         items={sidebarItems(role)}
       />
     </Sider>
-  );
-};
+  )
+}
 
-export default Sidebar;
+export default Sidebar
