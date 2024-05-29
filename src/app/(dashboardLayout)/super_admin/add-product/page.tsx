@@ -5,12 +5,19 @@ import Form from '@/components/form/Form'
 import FormInput from '@/components/form/FormInput'
 import InputSelect from '@/components/form/InputSelect'
 import ActionBar from '@/components/ui/ActionBar'
-import { brandName } from '@/constants/global'
+import UploadImage from '@/components/ui/UploadImage'
+import { brandName, category, unit } from '@/constants/global'
+import BrandModal from '@/modals/brand/Brand'
+import CategoryModals from '@/modals/category/CategoryModals'
+import UnitModals from '@/modals/unit/UnitModals'
+import { createProductYupValidation } from '@/schemas/productSchema/productSchema'
 import { getUserInfo } from '@/services/auth.services'
 import CustomButton from '@/utils/Button'
 import { PlusOutlined } from '@ant-design/icons'
+import { yupResolver } from '@hookform/resolvers/yup'
 import { Col, Row } from 'antd'
 import dynamic from 'next/dynamic'
+import { useState } from 'react'
 import {
   Controller,
   FormProvider,
@@ -61,6 +68,48 @@ const AddProduct = () => {
     }
   }
 
+  // -----------Brand modal-----------
+  const [isBrandModal, setIsBrandModal] = useState(false)
+  const showBrandModal = () => {
+    setIsBrandModal(true)
+  }
+
+  const handleBrandOk = () => {
+    setIsBrandModal(false)
+  }
+
+  const handleBrandCancel = () => {
+    setIsBrandModal(false)
+  }
+
+  // -----------Unit modal-----------
+  const [isUnitModal, setIsUnitModal] = useState(false)
+  const showUnitModal = () => {
+    setIsUnitModal(true)
+  }
+
+  const handleUnitOk = () => {
+    setIsUnitModal(false)
+  }
+
+  const handleUnitCancel = () => {
+    setIsUnitModal(false)
+  }
+
+  // -----------Category modal-----------
+  const [isCategoryModal, setIsCategoryModal] = useState(false)
+  const showCategoryModal = () => {
+    setIsCategoryModal(true)
+  }
+
+  const handleCategoryOk = () => {
+    setIsCategoryModal(false)
+  }
+
+  const handleCategoryCancel = () => {
+    setIsCategoryModal(false)
+  }
+
   return (
     <FormProvider {...methods}>
       <div>
@@ -70,11 +119,46 @@ const AddProduct = () => {
               label: `${role}`,
               link: `/${role}`,
             },
+            {
+              label: `Product`,
+              link: `/${role}/add-product`,
+            },
           ]}
         />
+
+        {/* Start Crate a brand */}
+        <BrandModal
+          handleBrandOk={handleBrandOk}
+          showBrandModal={showBrandModal}
+          handleBrandCancel={handleBrandCancel}
+          isBrandModal={isBrandModal}
+          setIsBrandModal={setIsBrandModal}
+        />
+
+        {/* Start Crate a Unit */}
+        <UnitModals
+          handleUnitOk={handleUnitOk}
+          showUnitModal={showUnitModal}
+          handleUnitCancel={handleUnitCancel}
+          isUnitModal={isUnitModal}
+          setIsUnitModal={setIsUnitModal}
+        />
+
+        {/* Start Create a category */}
+        <CategoryModals
+          handleCategoryOk={handleCategoryOk}
+          showCategoryModal={showCategoryModal}
+          handleCategoryCancel={handleCategoryCancel}
+          isCategoryModal={isCategoryModal}
+          setIsCategoryModal={setIsCategoryModal}
+        />
+
         <ActionBar title="Create a new product" />
         <div style={{ border: '1px solid #ddd', padding: '15px' }}>
-          <Form submitHandler={onSubmit}>
+          <Form
+            submitHandler={onSubmit}
+            resolver={yupResolver(createProductYupValidation)}
+          >
             <Row gutter={{ xs: 24, sm: 16, md: 24, lg: 24 }}>
               <Col
                 style={{ marginTop: '15px' }}
@@ -104,9 +188,7 @@ const AddProduct = () => {
                   label="Brand name"
                   options={brandName}
                   size="large"
-                  addonAfter={
-                    <PlusOutlined onClick={() => alert('Add new category')} />
-                  }
+                  addonAfter={<PlusOutlined onClick={showBrandModal} />}
                 />
               </Col>
               <Col
@@ -150,11 +232,9 @@ const AddProduct = () => {
                 <InputSelect
                   name="unit"
                   label="Unit"
-                  options={brandName}
+                  options={unit}
                   size="large"
-                  addonAfter={
-                    <PlusOutlined onClick={() => alert('Add new category')} />
-                  }
+                  addonAfter={<PlusOutlined onClick={showUnitModal} />}
                 />
               </Col>
               <Col
@@ -168,11 +248,9 @@ const AddProduct = () => {
                 <InputSelect
                   name="category"
                   label="Category"
-                  options={brandName}
+                  options={category}
                   size="large"
-                  addonAfter={
-                    <PlusOutlined onClick={() => alert('Add new category')} />
-                  }
+                  addonAfter={<PlusOutlined onClick={showCategoryModal} />}
                 />
               </Col>
               <Col
@@ -199,12 +277,7 @@ const AddProduct = () => {
                 md={{ span: 8 }}
                 lg={{ span: 6 }}
               >
-                <FormInput
-                  type="text"
-                  name="productImage"
-                  size="large"
-                  label="Product Image"
-                />
+                <UploadImage />
               </Col>
               <Col
                 style={{ marginTop: '15px' }}

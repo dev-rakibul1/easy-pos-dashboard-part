@@ -1,5 +1,6 @@
 'use client'
 
+import { GetErrorMessageByPropertyName } from '@/utils/schemaValidator'
 import { Input } from 'antd'
 import { Controller, useFormContext } from 'react-hook-form'
 
@@ -33,7 +34,12 @@ const FormInput = ({
   label,
   addonAfter,
 }: IInput) => {
-  const { control } = useFormContext()
+  const {
+    control,
+    formState: { errors },
+  } = useFormContext()
+
+  const errorMessage = GetErrorMessageByPropertyName(errors, name)
 
   return (
     <>
@@ -49,7 +55,7 @@ const FormInput = ({
               placeholder={placeholder}
               {...field}
               value={value ? value : field.value}
-              style={inputStyle}
+              // style={inputStyle}
             />
           ) : addonAfter ? (
             <Input
@@ -59,7 +65,7 @@ const FormInput = ({
               placeholder={placeholder}
               {...field}
               value={value ? value : field.value}
-              style={inputStyle}
+              // style={inputStyle}
               addonAfter={addonAfter}
             />
           ) : (
@@ -70,11 +76,12 @@ const FormInput = ({
               placeholder={placeholder}
               {...field}
               value={value ? value : field.value}
-              style={inputStyle}
+              // style={inputStyle}
             />
           )
         }
       />
+      <small style={{ color: 'red' }}>{errorMessage}</small>
     </>
   )
 }

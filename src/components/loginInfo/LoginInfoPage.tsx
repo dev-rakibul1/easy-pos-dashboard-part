@@ -3,9 +3,11 @@
 import Form from '@/components/form/Form'
 import FormInput from '@/components/form/FormInput'
 import { useUserLoginMutation } from '@/redux/api/authApi'
+import { CreateLoginAuthValidation } from '@/schemas/authSchema/login'
 import { storeUserInfo } from '@/services/auth.services'
 import CustomButton from '@/utils/Button'
-import { Col, Divider, Row, Typography } from 'antd'
+import { yupResolver } from '@hookform/resolvers/yup'
+import { Col, Divider, Row, Typography, message } from 'antd'
 import { useRouter } from 'next/navigation'
 import { SubmitHandler } from 'react-hook-form'
 
@@ -28,10 +30,14 @@ const LoginInfoPage = () => {
       storeUserInfo(res)
 
       if (res?.accessToken) {
+        message.success('Login success!')
         router.push('/home')
+      } else {
+        message.error('Login fail!')
       }
     } catch (error: any) {
       console.error(error.message)
+      message.error('Invalid unique id and password.')
     }
   }
 
@@ -44,7 +50,10 @@ const LoginInfoPage = () => {
           lg={8}
           style={{ border: '1px solid #ddd', padding: '15px' }}
         >
-          <Form submitHandler={onSubmit}>
+          <Form
+            submitHandler={onSubmit}
+            resolver={yupResolver(CreateLoginAuthValidation)}
+          >
             <Title
               style={{
                 textAlign: 'center',
@@ -57,17 +66,6 @@ const LoginInfoPage = () => {
             </Title>
 
             <Divider style={{ fontSize: '18px' }}>Login</Divider>
-
-            {/* <div>
-              <FormInput
-                name="text"
-                type="text"
-                placeholder="uniqueId"
-                size="large"
-                label="Addon"
-                addonAfter={<SettingOutlined onClick={handleSettingsClick} />}
-              />
-            </div> */}
 
             <div>
               <FormInput

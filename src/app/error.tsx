@@ -1,11 +1,11 @@
-"use client";
+'use client'
 
 const ErrorPage = () => {
   return (
-    <div>
-      <h1>Something went wrong...!</h1>
+    <div style={{ display: 'grid', placeItems: 'center', minHeight: '100vh' }}>
+      Offfs | Something went wrong...
     </div>
-  );
-};
+  )
+}
 
-export default ErrorPage;
+export default ErrorPage

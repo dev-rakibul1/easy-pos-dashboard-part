@@ -1,5 +1,6 @@
 'use client'
 
+import { GetErrorMessageByPropertyName } from '@/utils/schemaValidator'
 import { Select } from 'antd'
 import { Controller, useFormContext } from 'react-hook-form'
 
@@ -38,7 +39,11 @@ const InputSelect = ({
   optionFilterProp = 'label',
   addonAfter,
 }: ISelectFieldProps) => {
-  const { control } = useFormContext()
+  const {
+    control,
+    formState: { errors },
+  } = useFormContext()
+  const errorMessage = GetErrorMessageByPropertyName(errors, name)
 
   const filterOption = (
     input: string,
@@ -60,7 +65,8 @@ const InputSelect = ({
             }}
           >
             <Select
-              style={inputStyle}
+              // style={inputStyle}
+              style={{ width: '100%' }}
               showSearch
               size={size}
               placeholder={placeholder}
@@ -90,6 +96,7 @@ const InputSelect = ({
           </div>
         )}
       />
+      <small style={{ color: 'red' }}>{errorMessage}</small>
     </div>
   )
 }
