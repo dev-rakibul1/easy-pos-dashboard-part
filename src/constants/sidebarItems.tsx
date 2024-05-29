@@ -306,6 +306,11 @@ const sidebarItems = (role: string) => {
           key: `/${role}/vats`,
           icon: <FaArrowRightLong />,
         },
+        {
+          label: <Link href={`/${role}/unit-lists`}>Units</Link>,
+          key: 'units',
+          icon: <FaArrowRightLong />,
+        },
       ],
     },
   ]

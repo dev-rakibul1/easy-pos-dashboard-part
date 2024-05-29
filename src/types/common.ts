@@ -19,3 +19,10 @@ export type IGenericErrorResponse = {
   message: string
   errorMessages: IGenericErrorMessage[]
 }
+
+export type IUnitDataResponse = {
+  id: string
+  unitName: string
+  createdAt: string
+  updatedAt: string
+}

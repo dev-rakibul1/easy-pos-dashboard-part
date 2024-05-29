@@ -6,12 +6,14 @@ import FormInput from '@/components/form/FormInput'
 import InputSelect from '@/components/form/InputSelect'
 import ActionBar from '@/components/ui/ActionBar'
 import UploadImage from '@/components/ui/UploadImage'
-import { brandName, category, unit } from '@/constants/global'
+import { brandName, category } from '@/constants/global'
 import BrandModal from '@/modals/brand/Brand'
 import CategoryModals from '@/modals/category/CategoryModals'
 import UnitModals from '@/modals/unit/UnitModals'
+import { useGetAllUnitQuery } from '@/redux/api/unitApi/unitApi'
 import { createProductYupValidation } from '@/schemas/productSchema/productSchema'
 import { getUserInfo } from '@/services/auth.services'
+import { IUnitDataResponse } from '@/types'
 import CustomButton from '@/utils/Button'
 import { PlusOutlined } from '@ant-design/icons'
 import { yupResolver } from '@hookform/resolvers/yup'
@@ -67,6 +69,20 @@ const AddProduct = () => {
       console.error(error.message)
     }
   }
+
+  // Unit options
+  const { data } = useGetAllUnitQuery({ limit: 100, page: 1 })
+  // @ts-ignore
+  const units: IUnitDataResponse[] = data?.units
+
+  const unitOptions = units?.map((unit: IUnitDataResponse) => {
+    return {
+      label: unit?.unitName,
+      value: unit?.unitName,
+    }
+  })
+
+  console.log(unitOptions)
 
   // -----------Brand modal-----------
   const [isBrandModal, setIsBrandModal] = useState(false)
@@ -232,7 +248,7 @@ const AddProduct = () => {
                 <InputSelect
                   name="unit"
                   label="Unit"
-                  options={unit}
+                  options={unitOptions}
                   size="large"
                   addonAfter={<PlusOutlined onClick={showUnitModal} />}
                 />
