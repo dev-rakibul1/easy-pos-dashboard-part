@@ -311,6 +311,16 @@ const sidebarItems = (role: string) => {
           key: 'units',
           icon: <FaArrowRightLong />,
         },
+        {
+          label: <Link href={`/${role}/brand-lists`}>Brand</Link>,
+          key: 'brand',
+          icon: <FaArrowRightLong />,
+        },
+        {
+          label: <Link href={`/${role}/category-lists`}>Category</Link>,
+          key: 'category',
+          icon: <FaArrowRightLong />,
+        },
       ],
     },
   ]

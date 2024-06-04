@@ -4,25 +4,21 @@ import PosBreadcrumb from '@/components/breadcrumb/PosBreadcrumb'
 import DeleteModal from '@/components/deleteModal/DeleteModal'
 import ActionBar from '@/components/ui/ActionBar'
 import POSTable from '@/components/ui/POSTable'
+import BrandModal from '@/modals/brand/Brand'
 import {
-  useDeleteProductMutation,
-  useGetAllProductQuery,
-} from '@/redux/api/productApi/productApi'
+  useDeleteBrandMutation,
+  useGetAllBrandQuery,
+} from '@/redux/api/brandApi/brandApi'
 import { useDebounced } from '@/redux/hooks'
 import { getUserInfo } from '@/services/auth.services'
-import { IProduct } from '@/types'
-import {
-  DeleteOutlined,
-  EditOutlined,
-  EyeOutlined,
-  ReloadOutlined,
-} from '@ant-design/icons'
-import { Button, Input, Tooltip, message } from 'antd'
+import { IBrandResponse } from '@/types'
+import { DeleteOutlined, EditOutlined, ReloadOutlined } from '@ant-design/icons'
+import { Button, Input, message } from 'antd'
 import dayjs from 'dayjs'
 import Link from 'next/link'
 import { useState } from 'react'
 
-const ProductListPage = () => {
+const BrandLists = () => {
   const { role } = getUserInfo() as any
   const [page, setPage] = useState<number>(1)
   const [limit, setLimit] = useState<number>(10)
@@ -45,40 +41,28 @@ const ProductListPage = () => {
     searchTerm: debouncedSearchTerm,
   }
 
-  const { isLoading, data } = useGetAllProductQuery(query)
+  const { isLoading, data } = useGetAllBrandQuery(query)
   const meta = data?.meta
-  const products = data?.products
+  const brands = data?.brands
 
-  console.log(products)
-
-  // Reset filter
-  const resetFilters = () => {
-    setSortBy('')
-    setSortOrder('')
-    setSearchTerm('')
+  const truncateDescription = (description: string, maxLength: number) => {
+    if (description.length > maxLength) {
+      return description.substring(0, maxLength) + '...'
+    }
+    return description
   }
-  const shouldShowResetButton = !!sortBy || !!sortOrder || !!searchTerm
 
   const columns = [
-    {
-      title: 'Unique id',
-      dataIndex: 'uniqueId',
-    },
-    {
-      title: 'Product Name',
-      dataIndex: 'productName',
-    },
     {
       title: 'Brand Name',
       dataIndex: 'brandName',
     },
     {
-      title: 'Model Name',
-      dataIndex: 'modelName',
-    },
-    {
-      title: 'Product Stock',
-      dataIndex: 'productStock',
+      title: 'Summery',
+      dataIndex: 'description',
+      render: (data: any) => {
+        return data ? truncateDescription(data, 15) : ''
+      },
     },
     {
       title: 'Created At',
@@ -89,35 +73,31 @@ const ProductListPage = () => {
       },
     },
     {
+      title: 'Updated At',
+      dataIndex: 'updatedAt',
+      render: (data: any) => {
+        return data && dayjs(data).format('D MMM, YYYY hh:mm A')
+      },
+    },
+    {
       title: 'Action',
       render: (data: any) => {
         return (
           <>
-            <Tooltip title="Details">
-              <Link href={`/${role}/product-list/details/${data.id}`}>
-                <Button style={{ margin: '0 3px' }} size="small" type="text">
-                  <EyeOutlined />
-                </Button>
-              </Link>
-            </Tooltip>
-            <Tooltip title="Edit">
-              <Link href={`/${role}/product-list/edit/${data.id}`}>
-                <Button style={{ margin: '0 3px' }} size="small" type="text">
-                  <EditOutlined />
-                </Button>
-              </Link>
-            </Tooltip>
-            <Tooltip title="Delete">
-              <Button
-                style={{ margin: '0 3px' }}
-                onClick={() => handleDeleteClick(data)}
-                size="small"
-                type="text"
-                danger
-              >
-                <DeleteOutlined />
+            <Button
+              style={{ margin: '0 3px' }}
+              onClick={() => handleDeleteClick(data)}
+              size="small"
+              type="text"
+              danger
+            >
+              <DeleteOutlined />
+            </Button>
+            <Link href={`/${role}/brand-lists/edit/${data.id}`}>
+              <Button style={{ margin: '0 3px' }} size="small" type="text">
+                <EditOutlined />
               </Button>
-            </Tooltip>
+            </Link>
           </>
         )
       },
@@ -137,10 +117,34 @@ const ProductListPage = () => {
     setSortOrder(order === 'ascend' ? 'asc' : 'desc')
   }
 
+  // Reset filter
+  const resetFilters = () => {
+    setSortBy('')
+    setSortOrder('')
+    setSearchTerm('')
+  }
+  const shouldShowResetButton = !!sortBy || !!sortOrder || !!searchTerm
+
+  // -----------Brand modal-----------
+  const [isBrandModal, setIsBrandModal] = useState(false)
+  const showBrandModal = () => {
+    setIsBrandModal(true)
+  }
+
+  const handleBrandOk = () => {
+    setIsBrandModal(false)
+  }
+
+  const handleBrandCancel = () => {
+    setIsBrandModal(false)
+  }
+
   // -----------Delete modal-----------
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
-  const [selectedRecord, setSelectedRecord] = useState<IProduct | null>(null)
-  const [deleteRecord] = useDeleteProductMutation()
+  const [selectedRecord, setSelectedRecord] = useState<IBrandResponse | null>(
+    null
+  )
+  const [deleteRecord] = useDeleteBrandMutation()
 
   type IRecord = {
     name?: string
@@ -148,11 +152,11 @@ const ProductListPage = () => {
   }
 
   const recordPayloads: IRecord = {
-    name: selectedRecord?.productName,
+    name: selectedRecord?.brandName,
     id: selectedRecord?.id,
   }
 
-  const handleDeleteClick = (record: IProduct) => {
+  const handleDeleteClick = (record: IBrandResponse) => {
     setSelectedRecord(record)
     setIsDeleteModalOpen(true)
   }
@@ -192,11 +196,32 @@ const ProductListPage = () => {
         isOpen={isDeleteModalOpen}
         onClose={() => setIsDeleteModalOpen(false)}
         onConfirm={handleConfirmDelete}
-        entityType="Product"
+        entityType="Brand"
         entityName={recordPayloads}
       />
+      <PosBreadcrumb
+        items={[
+          {
+            label: `${role}`,
+            link: `/${role}`,
+          },
+          {
+            label: `Brand list`,
+            link: `/${role}/brand-lists`,
+          },
+        ]}
+      />
 
-      <ActionBar title="Product list">
+      {/* Start Crate a brand */}
+      <BrandModal
+        handleBrandOk={handleBrandOk}
+        showBrandModal={showBrandModal}
+        handleBrandCancel={handleBrandCancel}
+        isBrandModal={isBrandModal}
+        setIsBrandModal={setIsBrandModal}
+      />
+
+      <ActionBar title="Brand list">
         <Input
           type="text"
           size="large"
@@ -211,31 +236,18 @@ const ProductListPage = () => {
               <ReloadOutlined />
             </Button>
           ) : (
-            <Link href={`/${role}/add-product`}>
-              <Button type="primary">Create</Button>
-            </Link>
+            <Button type="primary" onClick={showBrandModal}>
+              Create
+            </Button>
           )}
         </div>
       </ActionBar>
-
-      <PosBreadcrumb
-        items={[
-          {
-            label: `${role}`,
-            link: `/${role}`,
-          },
-          {
-            label: `Product list`,
-            link: `/${role}/product-lists`,
-          },
-        ]}
-      />
 
       <div style={{ marginTop: '15px' }}>
         <POSTable
           loading={isLoading}
           columns={columns}
-          dataSource={products}
+          dataSource={brands}
           pageSize={limit}
           totalPages={meta?.total ? Number(meta.total) : 0}
           showSizeChanger={true}
@@ -247,4 +259,4 @@ const ProductListPage = () => {
   )
 }
 
-export default ProductListPage
+export default BrandLists

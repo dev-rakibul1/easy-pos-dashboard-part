@@ -1,60 +1,58 @@
 'use client'
 
-import { useDeleteUnitMutation } from '@/redux/api/unitApi/unitApi'
-import { Modal, message } from 'antd'
-import { useState } from 'react'
+import { Button, Modal } from 'antd'
+import React from 'react'
 
-const DeleteModal = ({
-  setIsDeleteModal,
-  isDeleteModal,
-  handleDeleteOk,
-  handleDeleteCancel,
-  deleteId: id,
-}: any) => {
-  const [deleteUnit] = useDeleteUnitMutation()
-  const [isDeleting, setIsDeleting] = useState(false)
+type IRecord = {
+  name?: string
+  id?: string
+}
 
-  const handleOk = async () => {
-    setIsDeleting(true)
-    try {
-      message.loading({ content: 'Deleting...', key: 'deleting' })
+interface DeleteModalProps {
+  isOpen: boolean
+  onClose: () => void
+  onConfirm: () => void
+  entityType: string
+  entityName: IRecord
+}
 
-      // @ts-ignore
-      const res = await deleteUnit(id)
-
-      if (res) {
-        message.success({
-          content: 'Deleted successfully!',
-          key: 'deleting',
-          duration: 2,
-        })
-      } else {
-        message.error({
-          content: 'Delete failed!',
-          key: 'deleting',
-          duration: 2,
-        })
-      }
-    } catch (error: any) {
-      message.error({ content: 'Delete failed!', key: 'deleting', duration: 2 })
-    } finally {
-      setIsDeleting(false)
-      setIsDeleteModal(false)
-      handleDeleteOk()
-    }
-  }
-
+const DeleteModal: React.FC<DeleteModalProps> = ({
+  isOpen,
+  onClose,
+  onConfirm,
+  entityType,
+  entityName,
+}) => {
   return (
     <Modal
-      title="Confirm Deletion"
-      open={isDeleteModal}
-      onOk={handleOk}
-      confirmLoading={isDeleting}
-      onCancel={handleDeleteCancel}
+      title={`Delete ${entityType}`}
+      visible={isOpen}
+      onCancel={onClose}
       okText="Yes, delete it"
-      cancelText="Cancel"
+      footer={[
+        <Button key="cancel" onClick={onClose}>
+          Cancel
+        </Button>,
+        <Button key="delete" type="primary" danger onClick={onConfirm}>
+          Yes, delete it
+        </Button>,
+      ]}
     >
-      <p>Are you sure you want to delete this item?</p>
+      <p>
+        Are you sure you want to delete{' '}
+        <span
+          style={{
+            display: 'inline-block',
+            background: 'pink',
+            padding: '0px 5px',
+            borderRadius: '3px',
+            cursor: 'pointer',
+          }}
+        >
+          {entityName?.name}
+        </span>
+        ?
+      </p>
     </Modal>
   )
 }

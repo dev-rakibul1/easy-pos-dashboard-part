@@ -5,23 +5,18 @@ import Form from '@/components/form/Form'
 import FormInput from '@/components/form/FormInput'
 import InputSelect from '@/components/form/InputSelect'
 import ActionBar from '@/components/ui/ActionBar'
-import UploadImage from '@/components/ui/UploadImage'
-import BrandModal from '@/modals/brand/Brand'
-import CategoryModals from '@/modals/category/CategoryModals'
-import UnitModals from '@/modals/unit/UnitModals'
 import { useGetAllBrandQuery } from '@/redux/api/brandApi/brandApi'
 import { useGetAllCategoryQuery } from '@/redux/api/categoryApi/categoryApi'
-import { useAddANewProductMutation } from '@/redux/api/productApi/productApi'
+import {
+  useGetSingleProductQuery,
+  useUpdateProductMutation,
+} from '@/redux/api/productApi/productApi'
 import { useGetAllUnitQuery } from '@/redux/api/unitApi/unitApi'
-import { createProductYupValidation } from '@/schemas/productSchema/productSchema'
 import { getUserInfo } from '@/services/auth.services'
 import { IBrandResponse, ICategoryResponse, IUnitDataResponse } from '@/types'
-import CustomButton from '@/utils/Button'
-import { PlusOutlined } from '@ant-design/icons'
-import { yupResolver } from '@hookform/resolvers/yup'
-import { Col, Row } from 'antd'
+import { Button, Col, Row, message } from 'antd'
 import dynamic from 'next/dynamic'
-import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import {
   Controller,
   FormProvider,
@@ -60,33 +55,34 @@ const FormSunEditor = ({ name, label }: any) => {
   )
 }
 
-const AddProduct = () => {
+const ProductEditPage = ({ params }: any) => {
   const { role } = getUserInfo() as any
   const methods = useForm()
-  const [addANewProduct] = useAddANewProductMutation()
+
+  const { id } = params
+  const { data } = useGetSingleProductQuery(id)
+  const [updateProduct] = useUpdateProductMutation()
+  const router = useRouter()
 
   const onSubmit = async (values: any) => {
-    const obj = { ...values }
-    const file = obj['file']
-    delete obj['file']
-    const data = JSON.stringify(obj)
-    const formData = new FormData()
-    formData.append('file', file as Blob)
-    formData.append('data', data)
-    // console.log(file)
+    console.log(values)
+    message.loading({ content: 'Updating product...', key: 'updating' })
     try {
-      const res = await addANewProduct(formData)
-      //  console.log(res)
-      // console.log('from login page', data)
+      const res = await updateProduct({ id, body: values })
+
+      if (res.data) {
+        message.success('Product updated success!')
+        router.push(`/${role}/product-list`)
+      }
     } catch (error: any) {
-      console.error(error.message)
+      message.error(error.message)
     }
   }
 
   // Unit options
-  const { data } = useGetAllUnitQuery({ limit: 100, page: 1 })
+  const { data: getUnits } = useGetAllUnitQuery({ limit: 100, page: 1 })
   // @ts-ignore
-  const units: IUnitDataResponse[] = data?.units
+  const units: IUnitDataResponse[] = getUnits?.units
 
   const unitOptions = units?.map((unit: IUnitDataResponse) => {
     return {
@@ -119,46 +115,16 @@ const AddProduct = () => {
     }
   })
 
-  // -----------Brand modal-----------
-  const [isBrandModal, setIsBrandModal] = useState(false)
-  const showBrandModal = () => {
-    setIsBrandModal(true)
-  }
-
-  const handleBrandOk = () => {
-    setIsBrandModal(false)
-  }
-
-  const handleBrandCancel = () => {
-    setIsBrandModal(false)
-  }
-
-  // -----------Unit modal-----------
-  const [isUnitModal, setIsUnitModal] = useState(false)
-  const showUnitModal = () => {
-    setIsUnitModal(true)
-  }
-
-  const handleUnitOk = () => {
-    setIsUnitModal(false)
-  }
-
-  const handleUnitCancel = () => {
-    setIsUnitModal(false)
-  }
-
-  // -----------Category modal-----------
-  const [isCategoryModal, setIsCategoryModal] = useState(false)
-  const showCategoryModal = () => {
-    setIsCategoryModal(true)
-  }
-
-  const handleCategoryOk = () => {
-    setIsCategoryModal(false)
-  }
-
-  const handleCategoryCancel = () => {
-    setIsCategoryModal(false)
+  // Default value
+  const defaultValue = {
+    productName: data?.productName || '',
+    brandName: data?.brandName || '',
+    modelName: data?.modelName || '',
+    processor: data?.processor || '',
+    unit: data?.unit || '',
+    category: data?.category || '',
+    reOrderAlert: data?.reOrderAlert || 0,
+    description: data?.description || '',
   }
 
   return (
@@ -178,38 +144,10 @@ const AddProduct = () => {
         />
 
         {/* Start Crate a brand */}
-        <BrandModal
-          handleBrandOk={handleBrandOk}
-          showBrandModal={showBrandModal}
-          handleBrandCancel={handleBrandCancel}
-          isBrandModal={isBrandModal}
-          setIsBrandModal={setIsBrandModal}
-        />
-
-        {/* Start Crate a Unit */}
-        <UnitModals
-          handleUnitOk={handleUnitOk}
-          showUnitModal={showUnitModal}
-          handleUnitCancel={handleUnitCancel}
-          isUnitModal={isUnitModal}
-          setIsUnitModal={setIsUnitModal}
-        />
-
-        {/* Start Create a category */}
-        <CategoryModals
-          handleCategoryOk={handleCategoryOk}
-          showCategoryModal={showCategoryModal}
-          handleCategoryCancel={handleCategoryCancel}
-          isCategoryModal={isCategoryModal}
-          setIsCategoryModal={setIsCategoryModal}
-        />
 
         <ActionBar title="Create a new product" />
         <div style={{ border: '1px solid #ddd', padding: '15px' }}>
-          <Form
-            submitHandler={onSubmit}
-            resolver={yupResolver(createProductYupValidation)}
-          >
+          <Form submitHandler={onSubmit} defaultValues={defaultValue}>
             <Row gutter={{ xs: 24, sm: 16, md: 24, lg: 24 }}>
               <Col
                 style={{ marginTop: '15px' }}
@@ -239,7 +177,6 @@ const AddProduct = () => {
                   label="Brand name"
                   options={brandOptions}
                   size="large"
-                  addonAfter={<PlusOutlined onClick={showBrandModal} />}
                 />
               </Col>
               <Col
@@ -280,12 +217,12 @@ const AddProduct = () => {
                 md={{ span: 8 }}
                 lg={{ span: 6 }}
               >
+                {/* <FormInput type="text" name="unit" size="large" label="Unit" /> */}
                 <InputSelect
                   name="unit"
                   label="Unit"
                   options={unitOptions}
                   size="large"
-                  addonAfter={<PlusOutlined onClick={showUnitModal} />}
                 />
               </Col>
               <Col
@@ -301,7 +238,6 @@ const AddProduct = () => {
                   label="Category"
                   options={catagoriesOption}
                   size="large"
-                  addonAfter={<PlusOutlined onClick={showCategoryModal} />}
                 />
               </Col>
               <Col
@@ -319,31 +255,14 @@ const AddProduct = () => {
                   label="Re-order alert"
                 />
               </Col>
-
-              <Col
-                style={{ marginTop: '15px' }}
-                className="gutter-row"
-                xs={{ span: 24 }}
-                sm={{ span: 24 }}
-                md={{ span: 12 }}
-                lg={{ span: 12 }}
-              >
-                <UploadImage name="file" label="Product Image" />
-              </Col>
-              <Col
-                style={{ marginTop: '15px' }}
-                className="gutter-row"
-                xs={{ span: 24 }}
-                sm={{ span: 24 }}
-                md={{ span: 24 }}
-                lg={{ span: 24 }}
-              >
-                <FormSunEditor name="description" label="Description" />
-              </Col>
             </Row>
-            <CustomButton type="primary" htmlType="submit">
-              Submit
-            </CustomButton>
+            <Button
+              type="primary"
+              htmlType="submit"
+              style={{ marginTop: '10px' }}
+            >
+              Updated
+            </Button>
           </Form>
         </div>
       </div>
@@ -351,4 +270,4 @@ const AddProduct = () => {
   )
 }
 
-export default AddProduct
+export default ProductEditPage

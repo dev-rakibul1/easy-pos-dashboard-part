@@ -176,7 +176,7 @@ const AddCustomers = () => {
                 md={{ span: 8 }}
                 lg={{ span: 6 }}
               >
-                <UploadImage />
+                <UploadImage name="file" />
               </Col>
             </Row>
             <CustomButton type="primary" htmlType="submit">

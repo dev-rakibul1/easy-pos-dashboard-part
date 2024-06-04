@@ -5,11 +5,15 @@ import DeleteModal from '@/components/deleteModal/DeleteModal'
 import ActionBar from '@/components/ui/ActionBar'
 import POSTable from '@/components/ui/POSTable'
 import UnitModals from '@/modals/unit/UnitModals'
-import { useGetAllUnitQuery } from '@/redux/api/unitApi/unitApi'
+import {
+  useDeleteUnitMutation,
+  useGetAllUnitQuery,
+} from '@/redux/api/unitApi/unitApi'
 import { useDebounced } from '@/redux/hooks'
 import { getUserInfo } from '@/services/auth.services'
+import { IUnitDataResponse } from '@/types'
 import { DeleteOutlined, EditOutlined, ReloadOutlined } from '@ant-design/icons'
-import { Button, Input } from 'antd'
+import { Button, Input, message } from 'antd'
 import dayjs from 'dayjs'
 import Link from 'next/link'
 import { useState } from 'react'
@@ -67,7 +71,7 @@ const UnitLists = () => {
           <>
             <Button
               style={{ margin: '0 3px' }}
-              onClick={() => showDeleteModal(data.id)}
+              onClick={() => handleDeleteClick(data)}
               size="small"
               type="text"
               danger
@@ -113,18 +117,52 @@ const UnitLists = () => {
   }
 
   // -----------Delete modal-----------
-  const [isDeleteModal, setIsDeleteModal] = useState(false)
-  const showDeleteModal = (id: string) => {
-    setDeleteId(id)
-    setIsDeleteModal(true)
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
+  const [selectedRecord, setSelectedRecord] =
+    useState<IUnitDataResponse | null>(null)
+  const [deleteRecord] = useDeleteUnitMutation()
+
+  type IRecord = {
+    name?: string
+    id?: string
   }
 
-  const handleDeleteOk = () => {
-    setIsDeleteModal(false)
+  const recordPayloads: IRecord = {
+    name: selectedRecord?.unitName,
+    id: selectedRecord?.id,
   }
 
-  const handleDeleteCancel = () => {
-    setIsDeleteModal(false)
+  const handleDeleteClick = (record: IUnitDataResponse) => {
+    setSelectedRecord(record)
+    setIsDeleteModalOpen(true)
+  }
+
+  // Confirm button for delete
+  const handleConfirmDelete = async () => {
+    if (selectedRecord) {
+      message.loading({ content: 'Deleting...', key: 'deleting' })
+      const id = selectedRecord.id
+      try {
+        const res = await deleteRecord(id)
+        if (res) {
+          message.success({
+            content: 'Deleted successfully!',
+            key: 'deleting',
+            duration: 2,
+          })
+        } else {
+          message.error({
+            content: 'Delete failed!',
+            key: 'deleting',
+            duration: 2,
+          })
+        }
+      } catch (error: any) {
+        console.error(error)
+      } finally {
+        setIsDeleteModalOpen(false)
+      }
+    }
   }
 
   // Reset filter
@@ -137,12 +175,13 @@ const UnitLists = () => {
 
   return (
     <div>
+      {/* Delete modal */}
       <DeleteModal
-        handleDeleteOk={handleDeleteOk}
-        handleDeleteCancel={handleDeleteCancel}
-        isDeleteModal={isDeleteModal}
-        setIsDeleteModal={setIsDeleteModal}
-        deleteId={deleteId}
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        onConfirm={handleConfirmDelete}
+        entityType="Unit"
+        entityName={recordPayloads}
       />
       <PosBreadcrumb
         items={[
