@@ -5,8 +5,8 @@ const VariantModal = ({
   openVariantModal,
   setOpenVariantModal,
   count,
-  variants,
-  setVariants,
+  productId,
+  onFormSubmit,
 }: any) => {
   return (
     <>
@@ -15,14 +15,14 @@ const VariantModal = ({
         centered
         visible={openVariantModal}
         onCancel={() => setOpenVariantModal(false)}
-        width={1000}
+        width={700}
         footer={null}
       >
         <DynamicForm
           count={count}
           setOpenVariantModal={setOpenVariantModal}
-          setVariants={setVariants}
-          variants={variants}
+          productId={productId}
+          onFormSubmit={onFormSubmit}
         />
       </Modal>
     </>

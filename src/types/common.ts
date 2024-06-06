@@ -270,14 +270,12 @@ export type ISupplierPayment = {
 }
 
 export type IGenericVariant = {
+  concat(values: IGenericVariant): IGenericVariant[]
   imeiNumber: string
-  ram: string
-  rom: string
-  color: string
-  purchaseRate: string
-  sellingPrice: string
-  vats: string
-  discounts: string
+  ram?: string
+  rom?: string
+  color?: string
+  productId: string
 }
 
 export type IPurchaseFormData = {
@@ -292,4 +290,6 @@ export type IPurchaseFormData = {
   color: string
   productStock?: number
   othersStock?: number
+  ram: string
+  room: string
 }

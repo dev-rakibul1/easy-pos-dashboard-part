@@ -67,5 +67,8 @@ export const supplierApi = baseApi.injectEndpoints({
   overrideExisting: false,
 })
 
-export const { useAddANewSupplierMutation, useGetAllSupplierQuery } =
-  supplierApi
+export const {
+  useAddANewSupplierMutation,
+  useGetAllSupplierQuery,
+  useGetSingleSupplierQuery,
+} = supplierApi

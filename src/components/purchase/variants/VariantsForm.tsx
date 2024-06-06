@@ -12,68 +12,34 @@ import {
   Typography,
   message,
 } from 'antd'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 
 const { Text } = Typography
 const { Item } = Form
 
-type Variant = {
-  imeiNumber: string
-  ram: string
-  rom: string
-  color: string
-  purchaseRate: string
-  sellingPrice: string
-  vats: string
-  discounts: string
-}
-
-interface DynamicFormProps {
-  count: number
-  setOpenVariantModal: (isOpen: boolean) => void
-  variants: Variant[]
-  setVariants: React.Dispatch<React.SetStateAction<Variant[]>>
-}
-
 const DynamicForm = ({
   count,
+  onFormSubmit,
   setOpenVariantModal,
-  variants,
-  setVariants,
-}: DynamicFormProps) => {
+  productId,
+}: any) => {
   const [form] = Form.useForm()
   const [productColors, setProductColors] = useState<string[]>(
     Array(count).fill('')
   )
 
-  useEffect(() => {
-    const initialValues = Array.from({ length: count }, () => ({
-      imeiNumber: '',
-      ram: '',
-      rom: '',
-      color: '',
-      purchaseRate: '',
-      sellingPrice: '',
-      vats: '',
-      discounts: '',
+  const handleFinish = (values: any) => {
+    const groupedValues = Array.from({ length: count }, (_, index) => ({
+      imeiNumber: values[`imeiNumber_${index}`],
+      ram: values[`ram_${index}`],
+      rom: values[`rom_${index}`],
+      color: productColors[index],
+      productId: productId,
     }))
-    setVariants(initialValues)
-  }, [count, setVariants])
-
-  const handleFinish = () => {
+    onFormSubmit(groupedValues)
     form.resetFields()
     setOpenVariantModal(false)
     message.success('Variant added successfully!')
-  }
-
-  const handleColorChange = (index: number, value: string) => {
-    const newProductColors = [...productColors]
-    newProductColors[index] = value
-    setProductColors(newProductColors)
-
-    const newFormData = [...variants]
-    newFormData[index] = { ...newFormData[index], color: value }
-    setVariants(newFormData)
   }
 
   // Filter `option.label` match the user type `input`
@@ -82,22 +48,18 @@ const DynamicForm = ({
     option?: { label: string; value: string }
   ) => (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
 
+  const handleColorChange = (index: number, value: string) => {
+    const newProductColors = [...productColors]
+    newProductColors[index] = value
+    setProductColors(newProductColors)
+  }
+
   const onSearch = (value: string) => {
     console.log('search:', value)
   }
 
-  const handleInputChange = (
-    index: number,
-    fieldName: keyof Variant,
-    value: string
-  ) => {
-    const newFormData = [...variants]
-    newFormData[index] = { ...newFormData[index], [fieldName]: value }
-    setVariants(newFormData)
-  }
-
   const renderFormItems = () => {
-    return variants.map((data, index) => (
+    return Array.from({ length: count }, (_, index) => (
       <Row
         gutter={16}
         key={index}
@@ -110,7 +72,7 @@ const DynamicForm = ({
               name={`imeiNumber_${index}`}
               label="IMEI Number"
               rules={[
-                { required: true, message: 'Please input IMEI Number!' },
+                { required: true, message: 'Require IMEI Number!' },
                 {
                   pattern: /^(?!\s*$).+/,
                   message: 'Please enter a valid IMEI Number!',
@@ -119,37 +81,27 @@ const DynamicForm = ({
               labelCol={{ span: 24 }}
               wrapperCol={{ span: 24 }}
             >
-              <Input
-                onChange={e =>
-                  handleInputChange(index, 'imeiNumber', e.target.value)
-                }
-              />
+              <Input />
             </Item>
           </Col>
           <Col xs={24} sm={12} md={8} lg={6}>
             <Item
               name={`ram_${index}`}
               label="RAM"
-              rules={[{ required: true, message: 'Please input RAM!' }]}
               labelCol={{ span: 24 }}
               wrapperCol={{ span: 24 }}
             >
-              <Input
-                onChange={e => handleInputChange(index, 'ram', e.target.value)}
-              />
+              <Input />
             </Item>
           </Col>
           <Col xs={24} sm={12} md={8} lg={6}>
             <Item
               name={`rom_${index}`}
               label="ROM"
-              rules={[{ required: true, message: 'Please input ROM!' }]}
               labelCol={{ span: 24 }}
               wrapperCol={{ span: 24 }}
             >
-              <Input
-                onChange={e => handleInputChange(index, 'rom', e.target.value)}
-              />
+              <Input />
             </Item>
           </Col>
           <Col xs={24} sm={12} md={8} lg={6}>
@@ -174,66 +126,6 @@ const DynamicForm = ({
                   <PlusOutlined />
                 </div>
               </div>
-            </Item>
-          </Col>
-          <Col xs={24} sm={12} md={8} lg={6}>
-            <Item
-              name={`purchaseRate_${index}`}
-              label="Purchase Rate"
-              rules={[
-                { required: true, message: 'Please input Purchase Rate!' },
-              ]}
-              labelCol={{ span: 24 }}
-              wrapperCol={{ span: 24 }}
-            >
-              <Input
-                onChange={e =>
-                  handleInputChange(index, 'purchaseRate', e.target.value)
-                }
-              />
-            </Item>
-          </Col>
-          <Col xs={24} sm={12} md={8} lg={6}>
-            <Item
-              name={`sellingPrice_${index}`}
-              label="Selling Price"
-              rules={[
-                { required: true, message: 'Please input Selling Price!' },
-              ]}
-              labelCol={{ span: 24 }}
-              wrapperCol={{ span: 24 }}
-            >
-              <Input
-                onChange={e =>
-                  handleInputChange(index, 'sellingPrice', e.target.value)
-                }
-              />
-            </Item>
-          </Col>
-          <Col xs={24} sm={12} md={8} lg={6}>
-            <Item
-              name={`vats_${index}`}
-              label="Vats"
-              labelCol={{ span: 24 }}
-              wrapperCol={{ span: 24 }}
-            >
-              <Input
-                onChange={e => handleInputChange(index, 'vats', e.target.value)}
-              />
-            </Item>
-          </Col>
-          <Col xs={24} sm={12} md={8} lg={6}>
-            <Item
-              name={`discounts_${index}`}
-              label="Discounts"
-              labelCol={{ span: 24 }}
-              wrapperCol={{ span: 24 }}
-            >
-              <Input
-                onChange={e =>
-                  handleInputChange(index, 'discounts', e.target.value)
-                }
-              />
             </Item>
           </Col>
         </div>

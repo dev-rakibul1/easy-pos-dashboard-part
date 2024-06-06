@@ -1,21 +1,63 @@
 'use client'
 
 import { color } from '@/constants/global'
-import { useGetAllProductQuery } from '@/redux/api/productApi/productApi'
+import {
+  useGetAllProductQuery,
+  useGetSingleProductQuery,
+} from '@/redux/api/productApi/productApi'
 import { useGetAllSupplierQuery } from '@/redux/api/supplierApi/supplierApi'
+import { getUserInfo } from '@/services/auth.services'
 import { IGenericVariant, IPurchaseFormData } from '@/types'
 import { PlusOutlined } from '@ant-design/icons'
-import { Button, Col, Form, Input, Row, Select, message } from 'antd'
+import {
+  Button,
+  Col,
+  Form,
+  Input,
+  Row,
+  Select,
+  Typography,
+  message,
+} from 'antd'
+import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { inputFormStyle, inputPlusBtnStyle } from '../styles/style'
+import ActionBar from '../ui/ActionBar'
+import PurchaseTable from './PurchaseTable'
+import UserInfo from './UserInfo'
 import VariantModal from './variants/VariantModal'
 const { Item } = Form
 const { Option } = Select
+const { Text } = Typography
 
-const PurchaseForm = ({ isChecked }: any) => {
+export interface IFormValues {
+  amount: number
+  paymentMethod: string
+}
+
+const PurchaseForm = ({ isChecked, userData }: any) => {
+  const { role } = getUserInfo() as any
+  const router = useRouter()
   const [form] = Form.useForm()
   const [subTotal, setSubtotal] = useState<number>(0)
   const [openVariantModal, setOpenVariantModal] = useState(false)
+  const [payPayloads, setPayPayloads] = useState({})
+  const [formValues, setFormValues] = useState<IFormValues>({
+    amount: 0,
+    paymentMethod: '',
+  })
+
+  // Handle pay amount from user
+  const handlePayChange = (
+    changedValues: Partial<IFormValues>,
+    allValues: IFormValues
+  ) => {
+    setFormValues(allValues)
+  }
+
+  const handleFinish = (values: IFormValues) => {
+    setPayPayloads(values)
+  }
 
   const [formData, setFormData] = useState<IPurchaseFormData>({
     supplierId: '',
@@ -29,13 +71,21 @@ const PurchaseForm = ({ isChecked }: any) => {
     productStock: 0,
     othersStock: 0,
     color: '',
+    ram: '',
+    room: '',
   })
   const [supplierId, setSupplierId] = useState<string>('')
   const [productId, setProductId] = useState<string>('')
   const [productColor, setProductColor] = useState<string>('')
   const [productStock, setProductStock] = useState<number>(0)
   const [othersStock, setOthersStock] = useState<number>(0)
-  const [variants, setVariants] = useState<IGenericVariant[]>([])
+  const [storeVariants, setStoreVariants] = useState<IGenericVariant[]>([])
+  const [purchaseData, setPurchaseData] = useState<any[]>([])
+  const [payloads, setPayloads] = useState({})
+
+  const onFormSubmit = (values: IGenericVariant) => {
+    setStoreVariants((prevData: IGenericVariant[]) => prevData.concat(values))
+  }
 
   // Supplier options
   const { data } = useGetAllSupplierQuery({ limit: 100, page: 1 })
@@ -47,6 +97,7 @@ const PurchaseForm = ({ isChecked }: any) => {
       value: supplier?.id,
     }
   })
+
   // Product options
   const { data: products } = useGetAllProductQuery({ limit: 100, page: 1 })
   // @ts-ignore
@@ -59,8 +110,12 @@ const PurchaseForm = ({ isChecked }: any) => {
     }
   })
 
-  const onFinishFailed = (errorInfo: string) => {
-    console.log('Failed:', errorInfo)
+  // Redirect
+  const handleAddSupplier = () => {
+    router.push(`/${role}/add-supplier`)
+  }
+  const handleAddProduct = () => {
+    router.push(`/${role}/add-product`)
   }
 
   const onChangeProductId = (value: string) => {
@@ -79,75 +134,141 @@ const PurchaseForm = ({ isChecked }: any) => {
   useEffect(() => {}, [productColor])
 
   const onSearch = (value: string) => {
-    console.log('search:', value)
+    // console.log('search:', value)
   }
 
   const onFormValuesChange = (
     changedValues: any,
     allValues: IPurchaseFormData
   ) => {
-    console.log('Form Values Changed:', allValues)
     setFormData(allValues)
 
     // Update productStock and othersStock values in the state
     if ('productStock' in changedValues) {
-      setProductStock(changedValues['productStock'])
+      setProductStock(parseInt(changedValues['productStock']) || 0)
     }
-    if ('otherStock' in changedValues) {
-      setOthersStock(changedValues['otherStock'])
+    if ('othersStock' in changedValues) {
+      setOthersStock(parseInt(changedValues['othersStock']) || 0)
     }
   }
 
   // Others stock calculation
   useEffect(() => {
     const vatRate = formData?.vats || 0
-    const amount = formData?.sellingPrice || 0
-    const vatAmount = amount * (vatRate / 100)
+    const productStockAmount = productStock || 0
+    const otherStockAmount = othersStock || 0
+
+    // Calculate the purchase rate amount considering the stock
+    const stockAmount = isChecked ? productStockAmount : otherStockAmount
+    const purchaseRateAmount = (formData?.purchaseRate || 0) * stockAmount
+
+    const vatAmount = purchaseRateAmount * (vatRate / 100)
 
     const discountRate = formData?.discounts || 0
-    const discountAmount = amount * (discountRate / 100)
+    const discountAmount = purchaseRateAmount * (discountRate / 100)
 
-    const totalPrice = formData?.sellingPrice || 0
-
-    const subTotalPrice = totalPrice - discountAmount + vatAmount
+    const subTotalPrice = purchaseRateAmount - discountAmount + vatAmount
 
     setSubtotal(subTotalPrice)
-  }, [formData])
+  }, [formData, isChecked, productStock, othersStock])
+
+  formData.userId = userData?.id
 
   useEffect(() => {
-    formData.supplierId = supplierId
-    formData.productId = productId
-    formData.totalPrice = subTotal
-    formData.color = productColor
-    formData.othersStock = formData.othersStock
-    formData.productStock = formData.productStock
+    setFormData(prevState => ({
+      ...prevState,
+      supplierId,
+      productId,
+      totalPrice: subTotal,
+      color: productColor,
+      othersStock,
+      productStock,
+    }))
   }, [
     supplierId,
     productId,
-    formData,
     subTotal,
     productColor,
-    formData.othersStock,
-    formData.productStock,
+    othersStock,
+    productStock,
+    formData.totalPrice,
   ])
 
-  const supplierAndUser = {
-    totalPay: 100,
-    supplierId: supplierId,
-    userId: '24387dbd-9ed8-45c1-80ff-fc2b4bdab360',
-  }
+  const id = productId
+  const { data: singleProduct } = useGetSingleProductQuery(id)
 
-  const purchaseInformation = {
-    supplierPayment: supplierAndUser,
-    variants: variants,
-    purchase: formData,
-  }
+  // Combine the previous purchase data with the new product data
 
   const onFinish = (values: any) => {
-    console.log('Success:', purchaseInformation)
-  }
+    // if (isChecked) {
+    //   if (storeVariants.length !== formData.productStock) {
+    //     message.error(
+    //       `Expected ${formData.productStock} variants, but got ${storeVariants.length}.`
+    //     )
+    //     return
+    //   }
+    // }
 
-  console.log(purchaseInformation)
+    // @ts-ignore
+    formData.discounts = parseFloat(formData?.discounts)
+    // @ts-ignore
+    formData.vats = parseFloat(formData?.vats)
+    // @ts-ignore
+    formData.sellingPrice = parseFloat(formData?.sellingPrice)
+    // @ts-ignore
+    formData.purchaseRate = parseFloat(formData?.purchaseRate)
+
+    const newPurchaseData = [formData, ...purchaseData].map(item => {
+      const newItem = { ...item }
+
+      if (item !== formData) {
+        newItem.productName = item?.productName
+        newItem.brandName = item?.brandName
+      } else {
+        newItem.productName = singleProduct?.productName
+        newItem.brandName = singleProduct?.brandName
+      }
+
+      return newItem
+    })
+
+    // const newPurchaseData = [formData, ...purchaseData]
+    // newPurchaseData.forEach(item => {
+    //   item.productName = singleProduct.productName
+    //   item.brandName = singleProduct.brandName
+    // })
+
+    setPurchaseData(newPurchaseData)
+    setPayloads({
+      supplierPayment: {
+        totalPay: formValues.amount,
+        supplierId: supplierId,
+        userId: userData?.id,
+      },
+      variants: storeVariants,
+      purchase: newPurchaseData, // Use the updated purchaseData
+    })
+    // reset form data after submit
+    form.resetFields() // Reset Ant Design form fields
+    setFormData({
+      // Reset formData state
+      supplierId: '',
+      productId: '',
+      userId: '',
+      purchaseRate: 0,
+      sellingPrice: 0,
+      discounts: 0,
+      vats: 0,
+      totalPrice: 0,
+      productStock: 0,
+      othersStock: 0,
+      color: '',
+      ram: '',
+      room: '',
+    })
+    setProductId('')
+    setProductColor('')
+  }
 
   // Filter `option.label` match the user type `input`
   const filterOption = (
@@ -156,228 +277,290 @@ const PurchaseForm = ({ isChecked }: any) => {
   ) => (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
 
   // variant condition
-  const imeiCount = isChecked ? formData.productStock : 0
+  const imeiCount = isChecked
+    ? formData.productStock && formData.productStock > 100
+      ? message.warning('Max 100 products per addition')
+      : formData.productStock
+    : 0
 
   return (
-    <div style={{ padding: '20px', background: '#f0f2f5' }}>
+    <div style={{ background: '#f0f2f5' }}>
       {/* variant modals */}
       <VariantModal
         setOpenVariantModal={setOpenVariantModal}
         openVariantModal={openVariantModal}
         count={imeiCount}
-        variants={variants}
-        setVariants={setVariants}
+        productId={productId}
+        onFormSubmit={onFormSubmit}
       />
 
-      <Form
-        form={form}
-        name="purchaseForm"
-        layout="vertical"
-        onFinish={onFinish}
-        onValuesChange={onFormValuesChange}
-      >
-        <Row gutter={16}>
-          {/* Supplier  */}
-          <Col xs={24} sm={12} md={8} lg={6}>
-            <Form.Item label="Supplier">
-              <div style={inputFormStyle}>
-                <Select
-                  showSearch
-                  optionFilterProp="children"
-                  onChange={onChangeSupplierId}
-                  onSearch={onSearch}
-                  size="large"
-                  style={{ width: '100%' }}
-                  filterOption={filterOption}
-                  options={supplierOptions}
-                >
-                  {supplierOptions?.map(option => (
-                    <Option key={option.value} value={option.value}>
-                      {option.label}
-                    </Option>
-                  ))}
-                </Select>
-                <div style={inputPlusBtnStyle}>
-                  <PlusOutlined />
+      <div style={{ border: '1px solid #ddd', padding: '15px' }}>
+        <Form
+          form={form}
+          name="purchaseForm"
+          layout="vertical"
+          onFinish={onFinish}
+          onValuesChange={onFormValuesChange}
+        >
+          <Row gutter={16}>
+            {/* Supplier  */}
+            <Col xs={24} sm={12} md={8} lg={6}>
+              <Form.Item label="Supplier">
+                <div style={inputFormStyle}>
+                  <Select
+                    showSearch
+                    optionFilterProp="children"
+                    onChange={onChangeSupplierId}
+                    onSearch={onSearch}
+                    size="large"
+                    style={{ width: '100%' }}
+                    filterOption={filterOption}
+                    options={supplierOptions}
+                  >
+                    {supplierOptions?.map(option => (
+                      <Option key={option.value} value={option.value}>
+                        {option.label}
+                      </Option>
+                    ))}
+                  </Select>
+                  <div style={inputPlusBtnStyle} onClick={handleAddSupplier}>
+                    <PlusOutlined />
+                  </div>
                 </div>
-              </div>
-            </Form.Item>
-          </Col>
-          {/* Product  */}
-          <Col xs={24} sm={12} md={8} lg={6}>
-            <Form.Item label="Product">
-              <div style={inputFormStyle}>
-                <Select
-                  showSearch
-                  optionFilterProp="children"
-                  onChange={onChangeProductId}
-                  onSearch={onSearch}
-                  size="large"
-                  style={{ width: '100%' }}
-                  filterOption={filterOption}
-                  options={productOptions}
-                >
-                  {productOptions?.map(option => (
-                    <Option key={option.value} value={option.value}>
-                      {option.label}
-                    </Option>
-                  ))}
-                </Select>
-                <div style={inputPlusBtnStyle}>
-                  <PlusOutlined />
+              </Form.Item>
+            </Col>
+            {/* Product  */}
+            <Col xs={24} sm={12} md={8} lg={6}>
+              <Form.Item label="Product">
+                <div style={inputFormStyle}>
+                  <Select
+                    showSearch
+                    optionFilterProp="children"
+                    onChange={onChangeProductId}
+                    onSearch={onSearch}
+                    size="large"
+                    style={{ width: '100%' }}
+                    filterOption={filterOption}
+                    options={productOptions}
+                  >
+                    {productOptions?.map(option => (
+                      <Option key={option.value} value={option.value}>
+                        {option.label}
+                      </Option>
+                    ))}
+                  </Select>
+                  <div style={inputPlusBtnStyle} onClick={handleAddProduct}>
+                    <PlusOutlined />
+                  </div>
                 </div>
-              </div>
-            </Form.Item>
-          </Col>
+              </Form.Item>
+            </Col>
 
-          {/* Stock count */}
-          <Col xs={24} sm={12} md={8} lg={6}>
-            <Form.Item
-              label={!isChecked ? 'Stock' : 'IMEI Stock'}
-              labelAlign="left"
-              wrapperCol={{ span: 24 }}
-              style={{ marginBottom: 0 }}
-            >
-              <div style={inputFormStyle}>
+            <Col xs={24} sm={12} md={8} lg={6}>
+              <Form.Item
+                name="purchaseRate"
+                label="Purchase Rate"
+                rules={[
+                  {
+                    required: true,
+                    message: 'Please input the purchase rate!',
+                  },
+                ]}
+              >
                 <Input
                   size="large"
-                  name={!isChecked ? 'otherStock' : 'productStock'}
-                  onChange={e => {
-                    const { name, value } = e.target
-                    setFormData(prevState => ({
-                      ...prevState,
-                      [name]: value,
-                    }))
-                  }}
-                />
-                <div
-                  style={{
-                    ...inputPlusBtnStyle,
-                    opacity: isChecked ? '1' : '0.5',
-                    cursor: isChecked ? 'pointer' : 'not-allowed',
-                  }}
-                  onClick={() =>
-                    isChecked
-                      ? !imeiCount
-                        ? message.warning({
-                            content: 'Variants count is require!',
-                            type: 'warning',
-                          })
-                        : setOpenVariantModal(true)
-                      : setOpenVariantModal(false)
-                  }
-                >
-                  <PlusOutlined />
-                </div>
-              </div>
-            </Form.Item>
-          </Col>
-
-          <Col xs={24} sm={12} md={8} lg={6}>
-            <Form.Item
-              name="purchaseRate"
-              label="Purchase Rate"
-              rules={[
-                { required: true, message: 'Please input the purchase rate!' },
-              ]}
-            >
-              <Input
-                size="large"
-                min={0}
-                step={0.01}
-                style={{ width: '100%' }}
-                type="number"
-              />
-            </Form.Item>
-          </Col>
-          <Col xs={24} sm={12} md={8} lg={6}>
-            <Form.Item
-              name="sellingPrice"
-              label="Selling Price"
-              rules={[
-                { required: true, message: 'Please input the selling price!' },
-              ]}
-            >
-              <Input
-                size="large"
-                min={0}
-                step={0.01}
-                style={{ width: '100%' }}
-                type="number"
-              />
-            </Form.Item>
-          </Col>
-
-          <Col xs={24} sm={12} md={8} lg={6}>
-            <Form.Item name="discounts" label="Discount">
-              <Input
-                size="large"
-                min={0}
-                step={0.01}
-                style={{ width: '100%' }}
-                type="number"
-              />
-            </Form.Item>
-          </Col>
-          <Col xs={24} sm={12} md={8} lg={6}>
-            <Form.Item name="vats" label="Vats">
-              <Input
-                size="large"
-                min={0}
-                step={0.01}
-                style={{ width: '100%' }}
-                type="number"
-              />
-            </Form.Item>
-          </Col>
-          <Col xs={24} sm={12} md={8} lg={6}>
-            <Form.Item label="Total Price">
-              <Input
-                size="large"
-                min={0}
-                step={0.01}
-                style={{ width: '100%' }}
-                type="number"
-                value={subTotal}
-              />
-            </Form.Item>
-          </Col>
-          <Col xs={24} sm={12} md={8} lg={6}>
-            <Form.Item
-              label="Color"
-              labelAlign="left"
-              wrapperCol={{ span: 24 }}
-              style={{ marginBottom: 0 }}
-            >
-              <div style={inputFormStyle}>
-                <Select
-                  showSearch
-                  placeholder="Select a color"
-                  optionFilterProp="children"
-                  onChange={handleColorChange}
-                  onSearch={onSearch}
-                  size="large"
+                  min={0}
+                  step={0.01}
                   style={{ width: '100%' }}
-                  filterOption={filterOption}
-                  options={color}
-                ></Select>
-                <div style={inputPlusBtnStyle}>
-                  <PlusOutlined />
-                </div>
-              </div>
-            </Form.Item>
-          </Col>
-        </Row>
+                  type="number"
+                />
+              </Form.Item>
+            </Col>
+            <Col xs={24} sm={12} md={8} lg={6}>
+              <Form.Item
+                name="sellingPrice"
+                label="Selling Price"
+                rules={[
+                  {
+                    required: true,
+                    message: 'Please input the selling price!',
+                  },
+                ]}
+              >
+                <Input
+                  size="large"
+                  min={0}
+                  step={0.01}
+                  style={{ width: '100%' }}
+                  type="number"
+                />
+              </Form.Item>
+            </Col>
 
-        <Button
-          type="primary"
-          htmlType="submit"
-          size="large"
-          style={{ marginTop: '15px' }}
-        >
-          Add to cart
-        </Button>
-      </Form>
+            {/* Stock count */}
+            <Col xs={24} sm={12} md={8} lg={6}>
+              <Form.Item
+                label={!isChecked ? 'Stock' : 'IMEI Stock'}
+                labelAlign="left"
+                wrapperCol={{ span: 24 }}
+                style={{ marginBottom: 0 }}
+                name={!isChecked ? 'othersStock' : 'productStock'}
+                rules={[{ required: true, message: 'Please input the stock!' }]}
+              >
+                <div style={inputFormStyle}>
+                  <Input size="large" type="number" min={0} />
+                  <div
+                    style={{
+                      ...inputPlusBtnStyle,
+                      opacity: isChecked ? '1' : '0.5',
+                      cursor: isChecked ? 'pointer' : 'not-allowed',
+                    }}
+                    onClick={() =>
+                      isChecked
+                        ? !imeiCount ||
+                          (formData.productStock && formData.productStock > 100)
+                          ? message.warning({
+                              content: !imeiCount
+                                ? 'Variant number is required'
+                                : 'Can only add 1 to 100 products at a time.',
+                              type: 'warning',
+                            })
+                          : setOpenVariantModal(true)
+                        : setOpenVariantModal(false)
+                    }
+                  >
+                    <PlusOutlined />
+                  </div>
+                </div>
+              </Form.Item>
+            </Col>
+
+            <Col xs={24} sm={12} md={8} lg={6}>
+              <Form.Item
+                name="ram"
+                label="Ram"
+                rules={[{ required: true, message: 'Please input the ram!' }]}
+              >
+                <Input
+                  size="large"
+                  min={0}
+                  step={0.01}
+                  style={{ width: '100%' }}
+                  type="text"
+                />
+              </Form.Item>
+            </Col>
+            <Col xs={24} sm={12} md={8} lg={6}>
+              <Form.Item
+                name="room"
+                label="Room"
+                rules={[{ required: true, message: 'Please input the room!' }]}
+              >
+                <Input
+                  size="large"
+                  min={0}
+                  step={0.01}
+                  style={{ width: '100%' }}
+                  type="text"
+                />
+              </Form.Item>
+            </Col>
+            <Col xs={24} sm={12} md={8} lg={6}>
+              <Form.Item name="discounts" label="Discount">
+                <Input
+                  size="large"
+                  min={0}
+                  step={0.01}
+                  style={{ width: '100%' }}
+                  type="number"
+                />
+              </Form.Item>
+            </Col>
+            <Col xs={24} sm={12} md={8} lg={6}>
+              <Form.Item name="vats" label="Vats">
+                <Input
+                  size="large"
+                  min={0}
+                  step={0.01}
+                  style={{ width: '100%' }}
+                  type="number"
+                />
+              </Form.Item>
+            </Col>
+
+            <Col xs={24} sm={12} md={8} lg={6}>
+              <Form.Item
+                label="Color"
+                labelAlign="left"
+                wrapperCol={{ span: 24 }}
+                style={{ marginBottom: 0 }}
+              >
+                <div style={inputFormStyle}>
+                  <Select
+                    showSearch
+                    placeholder="Select a color"
+                    optionFilterProp="children"
+                    onChange={handleColorChange}
+                    onSearch={onSearch}
+                    size="large"
+                    style={{ width: '100%' }}
+                    filterOption={filterOption}
+                    options={color}
+                  ></Select>
+                  <div style={inputPlusBtnStyle}>
+                    <PlusOutlined />
+                  </div>
+                </div>
+              </Form.Item>
+            </Col>
+
+            <Col xs={24} sm={12} md={8} lg={6}>
+              <Form.Item label="Total Price">
+                <Input
+                  size="large"
+                  min={0}
+                  step={0.01}
+                  style={{ width: '100%' }}
+                  type="number"
+                  value={subTotal}
+                  readOnly
+                />
+              </Form.Item>
+            </Col>
+          </Row>
+
+          <Button
+            type="primary"
+            htmlType="submit"
+            style={{ marginTop: '15px' }}
+          >
+            Add to cart
+          </Button>
+        </Form>
+      </div>
+      {purchaseData.length && (
+        <div style={{ marginTop: '15px' }}>
+          {/* @ts-ignore */}
+          <PurchaseTable payloads={payloads} formValues={formValues} />
+        </div>
+      )}
+
+      {/* User payment info */}
+      {supplierId && (
+        <div style={{ marginTop: '15px' }}>
+          <ActionBar title="User payment information"></ActionBar>
+          <UserInfo
+            supplierId={supplierId}
+            userData={userData}
+            formValues={formValues}
+            setFormValues={setFormValues}
+            handlePayChange={handlePayChange}
+            handleFinish={handleFinish}
+            payloads={payloads}
+            setPayloads={setPayloads}
+          />
+        </div>
+      )}
     </div>
   )
 }

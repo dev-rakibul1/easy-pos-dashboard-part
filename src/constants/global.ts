@@ -110,5 +110,15 @@ export const discounts = [
     value: '2',
   },
 ]
+export const payments = [
+  {
+    label: 'Bank payment',
+    value: 'back payment',
+  },
+  {
+    label: 'hand cash',
+    value: 'hand cash',
+  },
+]
 
 export const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
