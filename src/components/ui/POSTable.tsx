@@ -28,7 +28,7 @@ const POSTable = ({
     ? {
         pageSize: pageSize,
         total: totalPages,
-        pageSizeOptions: [2, 5, 10],
+        pageSizeOptions: [5, 10, 20, 50, 100],
         showSizeChanger: showSizeChanger,
         onChange: onPaginationChange,
       }
@@ -41,6 +41,7 @@ const POSTable = ({
       dataSource={dataSource}
       pagination={paginationConfig}
       onChange={onTableChange}
+      bordered
     />
   )
 }

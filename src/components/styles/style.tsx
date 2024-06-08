@@ -30,3 +30,9 @@ export const userInfoSupplierPay: CSSProperties = {
   display: 'flex',
   flexDirection: 'column',
 }
+export const colorPickerStyle: CSSProperties = {
+  width: '100%',
+  display: 'flex',
+  justifyContent: 'start',
+  alignItems: 'start',
+}

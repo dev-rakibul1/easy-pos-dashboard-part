@@ -1,13 +1,24 @@
 'use client'
 
-import { color } from '@/constants/global'
+import ColorModal from '@/modals/color/ColorModal'
+import DiscountsModal from '@/modals/discounts/DiscountsModal'
+import VatsModal from '@/modals/vats/VatsModal'
+import { useGetAllColorQuery } from '@/redux/api/colorApi/colorApi'
+import { useGetAllDiscountQuery } from '@/redux/api/discountApi/discountApi'
 import {
   useGetAllProductQuery,
   useGetSingleProductQuery,
 } from '@/redux/api/productApi/productApi'
 import { useGetAllSupplierQuery } from '@/redux/api/supplierApi/supplierApi'
+import { useGetAllVatsQuery } from '@/redux/api/vatApi/vatApi'
 import { getUserInfo } from '@/services/auth.services'
-import { IGenericVariant, IPurchaseFormData } from '@/types'
+import {
+  IColor,
+  IDiscounts,
+  IGenericVariant,
+  IPurchaseFormData,
+  IVats,
+} from '@/types'
 import { PlusOutlined } from '@ant-design/icons'
 import {
   Button,
@@ -77,6 +88,8 @@ const PurchaseForm = ({ isChecked, userData }: any) => {
   const [supplierId, setSupplierId] = useState<string>('')
   const [productId, setProductId] = useState<string>('')
   const [productColor, setProductColor] = useState<string>('')
+  const [selectVats, setSelectVats] = useState<number>(0)
+  const [selectDiscounts, setSelectDiscounts] = useState<number>(0)
   const [productStock, setProductStock] = useState<number>(0)
   const [othersStock, setOthersStock] = useState<number>(0)
   const [storeVariants, setStoreVariants] = useState<IGenericVariant[]>([])
@@ -93,7 +106,9 @@ const PurchaseForm = ({ isChecked, userData }: any) => {
   const suppliers: ISupplier[] = data?.suppliers
   const supplierOptions = suppliers?.map((supplier: any) => {
     return {
-      label: `${supplier?.firstName} ${supplier?.middleName} ${supplier?.lastName}`,
+      label: `${supplier?.firstName} ${
+        supplier?.middleName === null ? '' : supplier?.middleName
+      } ${supplier?.lastName}`,
       value: supplier?.id,
     }
   })
@@ -128,14 +143,33 @@ const PurchaseForm = ({ isChecked, userData }: any) => {
   const handleColorChange = (value: string) => {
     setProductColor(value)
   }
+  const handleVatsChange = (value: number) => {
+    setSelectVats(value)
+  }
+  const handleDiscountsChange = (value: number) => {
+    setSelectDiscounts(value)
+  }
 
   useEffect(() => {}, [supplierId])
   useEffect(() => {}, [productId])
   useEffect(() => {}, [productColor])
+  useEffect(() => {}, [selectVats])
+  useEffect(() => {}, [selectDiscounts])
 
   const onSearch = (value: string) => {
     // console.log('search:', value)
   }
+
+  // Reset form fields when isChecked changes
+  useEffect(() => {
+    if (isChecked) {
+      form.setFieldsValue({ othersStock: 0 })
+      setOthersStock(0)
+    } else {
+      form.setFieldsValue({ productStock: 0 })
+      setProductStock(0)
+    }
+  }, [isChecked, form])
 
   const onFormValuesChange = (
     changedValues: any,
@@ -183,6 +217,8 @@ const PurchaseForm = ({ isChecked, userData }: any) => {
       color: productColor,
       othersStock,
       productStock,
+      vats: selectVats,
+      discounts: selectDiscounts,
     }))
   }, [
     supplierId,
@@ -192,6 +228,8 @@ const PurchaseForm = ({ isChecked, userData }: any) => {
     othersStock,
     productStock,
     formData.totalPrice,
+    selectVats,
+    selectDiscounts,
   ])
 
   const id = productId
@@ -249,9 +287,8 @@ const PurchaseForm = ({ isChecked, userData }: any) => {
       purchase: newPurchaseData, // Use the updated purchaseData
     })
     // reset form data after submit
-    form.resetFields() // Reset Ant Design form fields
+    form.resetFields()
     setFormData({
-      // Reset formData state
       supplierId: '',
       productId: '',
       userId: '',
@@ -266,14 +303,13 @@ const PurchaseForm = ({ isChecked, userData }: any) => {
       ram: '',
       room: '',
     })
-    setProductId('')
     setProductColor('')
   }
 
   // Filter `option.label` match the user type `input`
   const filterOption = (
     input: string,
-    option?: { label: string; value: string }
+    option?: { label: string; value: string | number }
   ) => (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
 
   // variant condition
@@ -283,8 +319,116 @@ const PurchaseForm = ({ isChecked, userData }: any) => {
       : formData.productStock
     : 0
 
+  useEffect(() => {
+    if (isChecked) {
+      form.resetFields(['othersStock'])
+    } else {
+      form.resetFields(['productStock'])
+    }
+  }, [isChecked, form])
+
+  // Fetch options for selects
+  const { data: vatsData } = useGetAllVatsQuery({ limit: 100, page: 1 })
+  // @ts-ignore
+  const vats: IVats[] = vatsData?.vats || []
+
+  const { data: discountsData } = useGetAllDiscountQuery({
+    limit: 100,
+    page: 1,
+  })
+  // @ts-ignore
+  const discountsArray: IDiscounts[] = discountsData?.discounts || []
+
+  const { data: colorData } = useGetAllColorQuery({
+    limit: 100,
+    page: 1,
+  })
+  // @ts-ignore
+  const colorArray: IColor[] = colorData?.colors || []
+
+  // Options
+  const vatsOptions = vats.map(vat => ({
+    label: `${vat.name} ${vat.vatValue} ${vat.vatType} `,
+    value: vat.vatValue,
+  }))
+
+  const discountsOptions = discountsArray?.map(discount => ({
+    label: `${discount.name} ${discount.discountValue} ${discount.discountType} `,
+    value: discount.discountValue,
+  }))
+
+  const colorOptions = colorArray?.map(color => ({
+    label: `${color.name} ${color.colorCode}`,
+    value: `${color.name} ${color.colorCode}`,
+  }))
+
+  // -----------Vats modal-----------
+  const [isVatsModal, setIsVatsModal] = useState(false)
+  const showVatsModal = () => {
+    setIsVatsModal(true)
+  }
+
+  const handleVatOk = () => {
+    setIsVatsModal(false)
+  }
+
+  const handleVatsCancel = () => {
+    setIsVatsModal(false)
+  }
+  // -----------Discounts modal-----------
+  const [isDiscountsModal, setIsDiscountsModal] = useState(false)
+  const showDiscountsModal = () => {
+    setIsDiscountsModal(true)
+  }
+
+  const handleDiscountsOk = () => {
+    setIsDiscountsModal(false)
+  }
+
+  const handleDiscountsCancel = () => {
+    setIsDiscountsModal(false)
+  }
+  // -----------Color modal-----------
+  const [isColorModal, setIsColorModal] = useState(false)
+  const showColorModal = () => {
+    setIsColorModal(true)
+  }
+
+  const handleColorOk = () => {
+    setIsColorModal(false)
+  }
+
+  const handleColorCancel = () => {
+    setIsColorModal(false)
+  }
+
   return (
     <div style={{ background: '#f0f2f5' }}>
+      {/* Start Crate a vats */}
+      <VatsModal
+        handleVatOk={handleVatOk}
+        showVatsModal={showVatsModal}
+        handleVatsCancel={handleVatsCancel}
+        isVatsModal={isVatsModal}
+        setIsVatsModal={setIsVatsModal}
+      />
+      {/* Start Crate a discounts */}
+      <DiscountsModal
+        handleDiscountsOk={handleDiscountsOk}
+        showDiscountsModal={showDiscountsModal}
+        handleDiscountsCancel={handleDiscountsCancel}
+        isDiscountsModal={isDiscountsModal}
+        setIsDiscountsModal={setIsDiscountsModal}
+      />
+      {/* Start Crate a color */}
+      <ColorModal
+        handleColorOk={handleColorOk}
+        showColorModal={showColorModal}
+        handleColorCancel={handleColorCancel}
+        isColorModal={isColorModal}
+        setIsColorModal={setIsColorModal}
+      />
+
       {/* variant modals */}
       <VariantModal
         setOpenVariantModal={setOpenVariantModal}
@@ -398,42 +542,71 @@ const PurchaseForm = ({ isChecked, userData }: any) => {
             </Col>
 
             {/* Stock count */}
-            <Col xs={24} sm={12} md={8} lg={6}>
-              <Form.Item
-                label={!isChecked ? 'Stock' : 'IMEI Stock'}
-                labelAlign="left"
-                wrapperCol={{ span: 24 }}
-                style={{ marginBottom: 0 }}
-                name={!isChecked ? 'othersStock' : 'productStock'}
-                rules={[{ required: true, message: 'Please input the stock!' }]}
-              >
-                <div style={inputFormStyle}>
-                  <Input size="large" type="number" min={0} />
-                  <div
-                    style={{
-                      ...inputPlusBtnStyle,
-                      opacity: isChecked ? '1' : '0.5',
-                      cursor: isChecked ? 'pointer' : 'not-allowed',
-                    }}
-                    onClick={() =>
-                      isChecked
-                        ? !imeiCount ||
-                          (formData.productStock && formData.productStock > 100)
-                          ? message.warning({
-                              content: !imeiCount
-                                ? 'Variant number is required'
-                                : 'Can only add 1 to 100 products at a time.',
-                              type: 'warning',
-                            })
-                          : setOpenVariantModal(true)
-                        : setOpenVariantModal(false)
-                    }
-                  >
-                    <PlusOutlined />
+            {isChecked ? (
+              <Col xs={24} sm={12} md={8} lg={6}>
+                <Form.Item
+                  label="IMEI Stock"
+                  labelAlign="left"
+                  wrapperCol={{ span: 24 }}
+                  style={{ marginBottom: 0 }}
+                  name="productStock"
+                  rules={[
+                    {
+                      required: true,
+                      message: 'Please input the product stock!',
+                    },
+                  ]}
+                >
+                  <div style={inputFormStyle}>
+                    <Input size="large" type="number" min={0} />
+                    <div
+                      style={{
+                        ...inputPlusBtnStyle,
+                        opacity: isChecked ? '1' : '0.5',
+                        cursor: isChecked ? 'pointer' : 'not-allowed',
+                      }}
+                      onClick={() =>
+                        isChecked
+                          ? !imeiCount ||
+                            (formData.productStock &&
+                              formData.productStock > 100)
+                            ? message.warning({
+                                content: !imeiCount
+                                  ? 'Variant number is required'
+                                  : 'Can only add 1 to 100 products at a time.',
+                                type: 'warning',
+                              })
+                            : setOpenVariantModal(true)
+                          : setOpenVariantModal(false)
+                      }
+                    >
+                      <PlusOutlined />
+                    </div>
                   </div>
-                </div>
-              </Form.Item>
-            </Col>
+                </Form.Item>
+              </Col>
+            ) : (
+              <Col xs={24} sm={12} md={8} lg={6}>
+                <Form.Item
+                  name="othersStock"
+                  label="Stock"
+                  rules={[
+                    {
+                      required: true,
+                      message: 'Please input the others stock!',
+                    },
+                  ]}
+                >
+                  <Input
+                    size="large"
+                    min={0}
+                    step={0.01}
+                    style={{ width: '100%' }}
+                    type="number"
+                  />
+                </Form.Item>
+              </Col>
+            )}
 
             <Col xs={24} sm={12} md={8} lg={6}>
               <Form.Item
@@ -466,25 +639,52 @@ const PurchaseForm = ({ isChecked, userData }: any) => {
               </Form.Item>
             </Col>
             <Col xs={24} sm={12} md={8} lg={6}>
-              <Form.Item name="discounts" label="Discount">
-                <Input
-                  size="large"
-                  min={0}
-                  step={0.01}
-                  style={{ width: '100%' }}
-                  type="number"
-                />
+              <Form.Item
+                label="Discounts"
+                labelAlign="left"
+                wrapperCol={{ span: 24 }}
+                style={{ marginBottom: 0 }}
+              >
+                <div style={inputFormStyle}>
+                  <Select
+                    showSearch
+                    optionFilterProp="children"
+                    onChange={handleDiscountsChange}
+                    onSearch={onSearch}
+                    size="large"
+                    style={{ width: '100%' }}
+                    filterOption={filterOption}
+                    options={discountsOptions}
+                  ></Select>
+                  <div style={inputPlusBtnStyle} onClick={showDiscountsModal}>
+                    <PlusOutlined />
+                  </div>
+                </div>
               </Form.Item>
             </Col>
+
             <Col xs={24} sm={12} md={8} lg={6}>
-              <Form.Item name="vats" label="Vats">
-                <Input
-                  size="large"
-                  min={0}
-                  step={0.01}
-                  style={{ width: '100%' }}
-                  type="number"
-                />
+              <Form.Item
+                label="Vats"
+                labelAlign="left"
+                wrapperCol={{ span: 24 }}
+                style={{ marginBottom: 0 }}
+              >
+                <div style={inputFormStyle}>
+                  <Select
+                    showSearch
+                    optionFilterProp="children"
+                    onChange={handleVatsChange}
+                    onSearch={onSearch}
+                    size="large"
+                    style={{ width: '100%' }}
+                    filterOption={filterOption}
+                    options={vatsOptions}
+                  ></Select>
+                  <div style={inputPlusBtnStyle} onClick={showVatsModal}>
+                    <PlusOutlined />
+                  </div>
+                </div>
               </Form.Item>
             </Col>
 
@@ -498,16 +698,15 @@ const PurchaseForm = ({ isChecked, userData }: any) => {
                 <div style={inputFormStyle}>
                   <Select
                     showSearch
-                    placeholder="Select a color"
                     optionFilterProp="children"
                     onChange={handleColorChange}
                     onSearch={onSearch}
                     size="large"
                     style={{ width: '100%' }}
                     filterOption={filterOption}
-                    options={color}
+                    options={colorOptions}
                   ></Select>
-                  <div style={inputPlusBtnStyle}>
+                  <div style={inputPlusBtnStyle} onClick={showColorModal}>
                     <PlusOutlined />
                   </div>
                 </div>

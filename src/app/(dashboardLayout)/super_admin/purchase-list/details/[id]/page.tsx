@@ -1,17 +1,17 @@
 'use client'
 
 import PosBreadcrumb from '@/components/breadcrumb/PosBreadcrumb'
-import ProductDetails from '@/components/product/ProductDetails'
+import PurchaseDetails from '@/components/purchase/PurchaseDetails'
 import ActionBar from '@/components/ui/ActionBar'
-import { useGetSingleProductQuery } from '@/redux/api/productApi/productApi'
+import { useGetSinglePurchaseQuery } from '@/redux/api/purchaseApi/PurchaseApi'
 import { getUserInfo } from '@/services/auth.services'
 import { Spin } from 'antd'
 import 'antd/dist/reset.css' // Import Ant Design styles by default
 
-const ProductDetailsPage = ({ params }: any) => {
+const PurchaseDetailsPage = ({ params }: any) => {
   const { role } = getUserInfo() as any
   const { id } = params
-  const { isLoading, data } = useGetSingleProductQuery(id)
+  const { isLoading, data } = useGetSinglePurchaseQuery(id)
 
   return (
     <div>
@@ -22,18 +22,18 @@ const ProductDetailsPage = ({ params }: any) => {
             link: `/${role}`,
           },
           {
-            label: `Product list`,
-            link: `/${role}/product-list`,
+            label: `Purchase list`,
+            link: `/${role}/purchase-list`,
           },
           {
             label: `Details`,
             // @ts-ignore
-            link: `/${role}/product-list/details/${params?.id}`,
+            link: `/${role}/purchase-list/details/${params?.id}`,
           },
         ]}
       />
 
-      <ActionBar title="Product details"></ActionBar>
+      <ActionBar title="Purchase details"></ActionBar>
       {isLoading ? (
         <div
           style={{ display: 'grid', placeItems: 'center', minHeight: '100vh' }}
@@ -41,10 +41,10 @@ const ProductDetailsPage = ({ params }: any) => {
           <Spin size="small" />
         </div>
       ) : (
-        <ProductDetails product={data} />
+        <PurchaseDetails purchase={data} />
       )}
     </div>
   )
 }
 
-export default ProductDetailsPage
+export default PurchaseDetailsPage

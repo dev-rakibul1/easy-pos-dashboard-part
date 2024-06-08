@@ -16,10 +16,9 @@ import { useGetAllUnitQuery } from '@/redux/api/unitApi/unitApi'
 import { createProductYupValidation } from '@/schemas/productSchema/productSchema'
 import { getUserInfo } from '@/services/auth.services'
 import { IBrandResponse, ICategoryResponse, IUnitDataResponse } from '@/types'
-import CustomButton from '@/utils/Button'
 import { PlusOutlined } from '@ant-design/icons'
 import { yupResolver } from '@hookform/resolvers/yup'
-import { Col, Row } from 'antd'
+import { Form as AntdForm, Button, Col, Row, message } from 'antd'
 import dynamic from 'next/dynamic'
 import { useState } from 'react'
 import {
@@ -64,6 +63,7 @@ const AddProduct = () => {
   const { role } = getUserInfo() as any
   const methods = useForm()
   const [addANewProduct] = useAddANewProductMutation()
+  const [form] = AntdForm.useForm()
 
   const onSubmit = async (values: any) => {
     const obj = { ...values }
@@ -74,50 +74,47 @@ const AddProduct = () => {
     formData.append('file', file as Blob)
     formData.append('data', data)
     // console.log(file)
+    message.loading({ content: 'Creating product...', key: 'creating' })
     try {
       const res = await addANewProduct(formData)
-      //  console.log(res)
-      // console.log('from login page', data)
+
+      if (res.data) {
+        message.success('Product created successfully!')
+        form.resetFields()
+      } else {
+        message.error('Product created fail!')
+      }
     } catch (error: any) {
       console.error(error.message)
     }
   }
 
-  // Unit options
-  const { data } = useGetAllUnitQuery({ limit: 100, page: 1 })
+  // Fetch options for selects
+  const { data: unitData } = useGetAllUnitQuery({ limit: 100, page: 1 })
   // @ts-ignore
-  const units: IUnitDataResponse[] = data?.units
+  const units: IUnitDataResponse[] = unitData?.units || []
 
-  const unitOptions = units?.map((unit: IUnitDataResponse) => {
-    return {
-      label: unit?.unitName,
-      value: unit?.unitName,
-    }
-  })
-
-  // Brand options
   const { data: brandData } = useGetAllBrandQuery({ limit: 100, page: 1 })
   // @ts-ignore
-  const brands: IBrandResponse[] = brandData?.brands
+  const brands: IBrandResponse[] = brandData?.brands || []
 
-  const brandOptions = brands?.map((brand: IBrandResponse) => {
-    return {
-      label: brand?.brandName,
-      value: brand?.brandName,
-    }
-  })
-
-  // Category options
   const { data: categoryData } = useGetAllCategoryQuery({ limit: 100, page: 1 })
   // @ts-ignore
-  const categories: ICategoryResponse[] = categoryData?.categories
+  const categories: ICategoryResponse[] = categoryData?.categories || []
 
-  const catagoriesOption = categories?.map((category: ICategoryResponse) => {
-    return {
-      label: category?.categoryName,
-      value: category?.categoryName,
-    }
-  })
+  // Options
+  const unitOptions = units.map(unit => ({
+    label: unit.unitName,
+    value: unit.unitName,
+  }))
+  const brandOptions = brands.map(brand => ({
+    label: brand.brandName,
+    value: brand.brandName,
+  }))
+  const categoryOptions = categories.map(category => ({
+    label: category.categoryName,
+    value: category.categoryName,
+  }))
 
   // -----------Brand modal-----------
   const [isBrandModal, setIsBrandModal] = useState(false)
@@ -299,7 +296,7 @@ const AddProduct = () => {
                 <InputSelect
                   name="category"
                   label="Category"
-                  options={catagoriesOption}
+                  options={categoryOptions}
                   size="large"
                   addonAfter={<PlusOutlined onClick={showCategoryModal} />}
                 />
@@ -341,9 +338,9 @@ const AddProduct = () => {
                 <FormSunEditor name="description" label="Description" />
               </Col>
             </Row>
-            <CustomButton type="primary" htmlType="submit">
-              Submit
-            </CustomButton>
+            <Button type="primary" htmlType="submit">
+              Created
+            </Button>
           </Form>
         </div>
       </div>

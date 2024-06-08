@@ -1,0 +1,25 @@
+.profile-card {
+  max-width: 100%; /* Ensures the card takes the full width of the container */
+  margin: 0 auto;
+  padding: 20px;
+  border-radius: 8px;
+  margin-top: 15px;
+}
+
+.profile-card .ant-avatar {
+  margin-bottom: 10px;
+}
+
+.profile-card .ant-typography-title {
+  margin-bottom: 0;
+  text-align: center;
+}
+
+.profile-card .ant-typography {
+  margin-bottom: 10px;
+  text-align: center;
+}
+
+.profile-card .ant-descriptions-item-label {
+  font-weight: bold;
+}

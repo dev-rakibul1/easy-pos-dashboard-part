@@ -14,7 +14,7 @@ const ProductDetails = ({ product, variant }: any) => {
           <Card
             cover={
               <Image
-                alt={product?.productName ? product?.productName : 'Empty'}
+                alt={product?.productName ? product?.productName : 'N/A'}
                 src={
                   product?.productImage
                     ? `http://localhost:7000${product?.productImage}`
@@ -38,52 +38,52 @@ const ProductDetails = ({ product, variant }: any) => {
         </Col>
         <Col xs={24} md={12}>
           <Title level={2}>
-            {product?.productName ? product?.productName : 'Empty'}
+            {product?.productName ? product?.productName : 'N/A'}
           </Title>
           <Paragraph>
-            {product?.description ? product?.description : 'Empty'}
+            {product?.description ? product?.description : 'N/A'}
           </Paragraph>
           <Descriptions bordered column={1} size="small">
             <Descriptions.Item label="Brand">
-              {product?.brandName ? product?.brandName : 'Empty'}
+              {product?.brandName ? product?.brandName : 'N/A'}
             </Descriptions.Item>
             <Descriptions.Item label="Model">
-              {product?.modelName ? product?.modelName : 'Empty'}
+              {product?.modelName ? product?.modelName : 'N/A'}
             </Descriptions.Item>
             <Descriptions.Item label="Processor">
-              {product?.processor ? product?.processor : 'Empty'}
+              {product?.processor ? product?.processor : 'N/A'}
             </Descriptions.Item>
             <Descriptions.Item label="Category">
-              {product?.category ? product?.category : 'Empty'}
+              {product?.category ? product?.category : 'N/A'}
             </Descriptions.Item>
             <Descriptions.Item label="Unit">
-              {product?.unit ? product?.unit : 'Empty'}
+              {product?.unit ? product?.unit : 'N/A'}
             </Descriptions.Item>
             <Descriptions.Item label="Re-order Alert">
-              {product?.reOrderAlert ? product?.reOrderAlert : 'Empty'}
+              {product?.reOrderAlert ? product?.reOrderAlert : 'N/A'}
             </Descriptions.Item>
             <Descriptions.Item label="Unique ID">
-              {product?.uniqueId ? product?.uniqueId : 'Empty'}
+              {product?.uniqueId ? product?.uniqueId : 'N/A'}
             </Descriptions.Item>
             <Descriptions.Item label="Product Stock">
               {product?.productStock !== undefined
                 ? product?.productStock
-                : 'Empty'}
+                : 'N/A'}
             </Descriptions.Item>
             <Descriptions.Item label="Other Stock">
               {product?.othersStock !== undefined
                 ? product?.othersStock
-                : 'Empty'}
+                : 'N/A'}
             </Descriptions.Item>
             <Descriptions.Item label="Created At">
               {product?.createdAt
                 ? new Date(product?.createdAt).toLocaleString()
-                : 'Empty'}
+                : 'N/A'}
             </Descriptions.Item>
             <Descriptions.Item label="Updated At">
               {product?.updatedAt
                 ? new Date(product?.updatedAt).toLocaleString()
-                : 'Empty'}
+                : 'N/A'}
             </Descriptions.Item>
           </Descriptions>
         </Col>

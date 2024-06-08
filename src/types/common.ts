@@ -293,3 +293,29 @@ export type IPurchaseFormData = {
   ram: string
   room: string
 }
+
+export interface IVats {
+  id: string
+  name: string
+  vatType: string
+  vatValue: number
+  uniqueId: string
+  createdAt: string
+  updatedAt: string
+}
+export interface IDiscounts {
+  id: string
+  name: string
+  discountType: string
+  discountValue: number
+  uniqueId: string
+  createdAt: string
+  updatedAt: string
+}
+export interface IColor {
+  id: string
+  name: string
+  colorCode: string
+  createdAt: string
+  updatedAt: string
+}

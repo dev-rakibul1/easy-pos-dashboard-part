@@ -72,7 +72,6 @@ const UserInfo = ({
       } else {
         message.error('Purchase fail!')
       }
-      console.log(res)
     } catch (error: any) {
       message.error('Purchase fail!')
     } finally {
@@ -80,7 +79,7 @@ const UserInfo = ({
     }
   }
 
-  console.log(payloads)
+  // console.log(payloads)
 
   const onSearch = (value: string) => {
     // console.log('Search:', value)

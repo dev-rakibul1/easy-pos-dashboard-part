@@ -51,7 +51,8 @@ const PurchaseTable = ({
         discounts: totalDiscounts,
         vats: totalVats,
         purchaseRate: purchasePrice,
-        totalPrice: totalPrices - formValues?.amount,
+        // @ts-ignore
+        totalPrice: parseFloat(totalPrices - formValues?.amount).toFixed(2),
         sellingPrice: sellingPrice,
       },
     ]
@@ -72,8 +73,8 @@ const PurchaseTable = ({
     },
     {
       title: 'O. Count',
-      dataIndex: 'otherStock',
-      key: 'otherStock',
+      dataIndex: 'othersStock',
+      key: 'othersStock',
       render: (text: string | undefined) => text || '-',
     },
     {

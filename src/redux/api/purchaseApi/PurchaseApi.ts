@@ -1,5 +1,5 @@
 import { tagTypes } from '@/redux/tags/tagTypes'
-import { IMeta } from '@/types'
+import { IMeta, IPurchase } from '@/types'
 import { baseApi } from '../baseApi'
 
 const PURCHASE_URL = '/purchase'
@@ -21,7 +21,7 @@ export const purchaseApi = baseApi.injectEndpoints({
         method: 'GET',
         params: arg,
       }),
-      transformResponse: (response: any, meta: IMeta) => {
+      transformResponse: (response: IPurchase, meta: IMeta) => {
         return {
           purchases: response,
           meta: meta,
@@ -38,10 +38,31 @@ export const purchaseApi = baseApi.injectEndpoints({
 
       providesTags: [tagTypes.purchase],
     }),
+
+    // get single purchase api
+    getSinglePurchase: build.query({
+      query: (id: string) => ({
+        url: `${PURCHASE_URL}/${id}`,
+        method: 'GET',
+      }),
+      providesTags: [tagTypes.purchase],
+    }),
+
+    updatePurchase: build.mutation({
+      query: data => ({
+        url: `${PURCHASE_URL}/${data?.id}/`,
+        method: 'PATCH',
+        data: data.body,
+      }),
+      invalidatesTags: [tagTypes.purchase],
+    }),
   }),
 })
 
 export const {
   useGetPurchaseBySupplierAndUserQuery,
   useAddANewPurchaseMutation,
+  useGetAllPurchaseQuery,
+  useGetSinglePurchaseQuery,
+  useUpdatePurchaseMutation,
 } = purchaseApi
