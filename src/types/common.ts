@@ -319,3 +319,16 @@ export interface IColor {
   createdAt: string
   updatedAt: string
 }
+
+export interface ISupplierSells {
+  id: string
+  quantity: number
+  totalSellAmounts: number
+  totalDue: number
+  totalPay: number
+  supplierId: string
+  userId: string
+  productId: string
+  createdAt: string // You can use Date if you prefer handling dates as Date objects
+  updatedAt: string // You can use Date if you prefer handling dates as Date objects
+}

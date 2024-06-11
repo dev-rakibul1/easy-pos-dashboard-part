@@ -1,0 +1,79 @@
+[
+  {
+    "variants": [
+      {
+        "imeiNumber": "345",
+        "ram": "34",
+        "rom": "44",
+        "color": "red",
+        "productId": "c589e0e9-67aa-4696-af3e-3275221a40f2"
+      },
+      {
+        "imeiNumber": "345",
+        "ram": "34",
+        "rom": "4",
+        "color": "red",
+        "productId": "029bdc7e-4754-4bd6-9c20-15b22fb857db"
+      },
+      {
+        "imeiNumber": "345",
+        "ram": "3",
+        "rom": "4",
+        "color": "pink",
+        "productId": "029bdc7e-4754-4bd6-9c20-15b22fb857db"
+      }
+    ],
+    "purchase": [
+      {
+        "purchaseRate": 456,
+        "sellingPrice": 456,
+        "productStock": 1,
+        "userId": "6099199c-df9f-4a52-adaa-2279e5f6e3b3",
+        "supplierId": "91e0c1bb-cf2c-4f2b-bb0f-83a562809689",
+        "productId": "c589e0e9-67aa-4696-af3e-3275221a40f2",
+        "totalPrice": 396.72,
+        "color": "",
+        "othersStock": 0,
+        "vats": 2,
+        "discounts": 15,
+        "productName": "Iphone",
+        "brandName": "Iphone"
+      }
+    ]
+  },
+  {
+    "variants": [
+      {
+        "imeiNumber": "345",
+        "ram": "34",
+        "rom": "44",
+        "color": "red",
+        "productId": "c589e0e9-67aa-4696-af3e-3275221a40f2"
+      },
+      {
+        "imeiNumber": "345",
+        "ram": "34",
+        "rom": "4",
+        "color": "red",
+        "productId": "029bdc7e-4754-4bd6-9c20-15b22fb857db"
+      }
+    ],
+    "purchase": [
+      {
+        "purchaseRate": 345,
+        "sellingPrice": 345,
+        "productStock": 2,
+        "userId": "6099199c-df9f-4a52-adaa-2279e5f6e3b3",
+        "supplierId": "073f7cfd-a3c1-4861-adc4-87e0fe3232b8",
+        "productId": "029bdc7e-4754-4bd6-9c20-15b22fb857db",
+        "totalPrice": 600.3,
+        "color": "",
+        "othersStock": 0,
+        "vats": 2,
+        "discounts": 15,
+        "productName": "Walton M20",
+        "brandName": "Walton"
+      }
+    ]
+  }
+]

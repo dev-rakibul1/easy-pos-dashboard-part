@@ -1,101 +1,141 @@
-import { Button, Form, Input, Select } from 'antd'
-import { useState } from 'react'
+import type { TableColumnsType } from 'antd'
+import { Table } from 'antd'
+import React from 'react'
 
-const { Item } = Form
-
-const payments = [
-  { value: 'credit_card', label: 'Credit Card' },
-  { value: 'paypal', label: 'PayPal' },
-  { value: 'bank_transfer', label: 'Bank Transfer' },
-]
-
-interface FormValues {
-  name: string
-  email: string
-  paymentMethod: string
+interface DataType {
+  key: React.Key
+  productName: string
+  productStock: number
+  discounts: number
+  vats: number
+  purchaseRate: number
+  totalPrice: number
+  productId: string
 }
 
-const NameEmailForm = () => {
-  const [formValues, setFormValues] = useState<FormValues>({
-    name: '',
-    email: '',
-    paymentMethod: '',
-  })
+interface ExpandedDataType {
+  key: React.Key
+  imeiNumber: string
+  ram: string
+  rom: string
+  color: string
+  productId: string
+}
 
-  const [form] = Form.useForm()
+interface PayloadsType {
+  purchase: DataType[]
+  variants: ExpandedDataType[]
+}
 
-  const handleChange = (
-    changedValues: Partial<FormValues>,
-    allValues: FormValues
-  ) => {
-    setFormValues(allValues)
-    console.log('Form values:', allValues)
+interface TestTableProps {
+  payloads: PayloadsType
+}
+
+const TestTable: React.FC<TestTableProps> = ({ payloads }) => {
+  const expandedRowRender = (record: DataType) => {
+    const columns: TableColumnsType<ExpandedDataType> = [
+      { title: 'IMEI Number', dataIndex: 'imeiNumber', key: 'imeiNumber' },
+      { title: 'RAM', dataIndex: 'ram', key: 'ram' },
+      { title: 'ROM', dataIndex: 'rom', key: 'rom' },
+      { title: 'Color', dataIndex: 'color', key: 'color' },
+    ]
+
+    const variantsData = payloads.variants
+      .filter(variant => variant.productId === record.productId)
+      .map((item, index) => ({ ...item, key: index.toString() }))
+
+    return (
+      <Table
+        columns={columns}
+        dataSource={variantsData}
+        pagination={false}
+        bordered
+      />
+    )
   }
 
-  const handleFinish = (values: FormValues) => {
-    console.log('Form submitted:', values)
-  }
+  const columns: TableColumnsType<DataType> = [
+    {
+      title: 'Product Name',
+      dataIndex: 'productName',
+      key: 'productName',
+      render: (text: string | undefined) => text || '-',
+    },
+    {
+      title: 'Product Count',
+      dataIndex: 'productStock',
+      key: 'productStock',
+      render: (text: number | undefined) => text || '-',
+    },
+    {
+      title: 'Discounts',
+      dataIndex: 'discounts',
+      key: 'discounts',
+      render: (text: number | undefined) => text || '-',
+    },
+    {
+      title: 'VATs',
+      dataIndex: 'vats',
+      key: 'vats',
+      render: (text: number | undefined) => text || '-',
+    },
+    {
+      title: 'Purchase Rate',
+      dataIndex: 'purchaseRate',
+      key: 'purchaseRate',
+      render: (text: number | undefined) => text || '-',
+    },
+    {
+      title: 'Total Price',
+      dataIndex: 'totalPrice',
+      key: 'totalPrice',
+      render: (text: number | undefined) => text || '-',
+    },
+  ]
 
-  const onSearch = (value: string) => {
-    console.log('Search:', value)
-  }
+  const data = payloads?.purchase?.map((item, index) => ({
+    ...item,
+    key: index.toString(),
+  }))
 
-  const filterOption = (
-    input: string,
-    option?: { label: string; value: string }
-  ) => (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
+  const totalProductCount = payloads.purchase.reduce(
+    (acc, item) => acc + item.productStock,
+    0
+  )
+  const totalDiscounts = payloads.purchase.reduce(
+    (acc, item) => acc + item.discounts,
+    0
+  )
+  const totalVATs = payloads.purchase.reduce((acc, item) => acc + item.vats, 0)
+  const totalPurchaseRate = payloads.purchase.reduce(
+    (acc, item) => acc + item.purchaseRate,
+    0
+  )
+  const totalPrice = payloads.purchase.reduce(
+    (acc, item) => acc + item.totalPrice,
+    0
+  )
 
   return (
-    <Form
-      form={form}
-      name="name_email_form"
-      initialValues={formValues}
-      onValuesChange={handleChange}
-      onFinish={handleFinish}
-      layout="vertical"
-    >
-      <Item
-        name="name"
-        label="Name"
-        rules={[
-          { required: true, message: 'Please enter your name' },
-          { max: 50, message: 'Name cannot exceed 50 characters' },
-        ]}
-      >
-        <Input placeholder="Enter your name" />
-      </Item>
-      <Item
-        name="email"
-        label="Email"
-        rules={[
-          { required: true, message: 'Please enter your email' },
-          { type: 'email', message: 'Please enter a valid email' },
-        ]}
-      >
-        <Input placeholder="Enter your email" />
-      </Item>
-      <Item
-        name="paymentMethod"
-        label="Payment Method"
-        rules={[{ required: true, message: 'Please select a payment method' }]}
-      >
-        <Select
-          showSearch
-          placeholder="Select a payment"
-          optionFilterProp="children"
-          onSearch={onSearch}
-          options={payments}
-          filterOption={filterOption}
-          style={{ width: '100%' }}
-        />
-      </Item>
-      <Item>
-        <Button type="primary" htmlType="submit">
-          Submit
-        </Button>
-      </Item>
-    </Form>
+    <Table
+      columns={columns}
+      expandable={{ expandedRowRender }}
+      dataSource={data}
+      size="small"
+      bordered
+      summary={() => (
+        <Table.Summary.Row>
+          <Table.Summary.Cell index={0}>Total</Table.Summary.Cell>
+          <Table.Summary.Cell index={1}></Table.Summary.Cell>
+          <Table.Summary.Cell index={2}>{totalProductCount}</Table.Summary.Cell>
+          <Table.Summary.Cell index={3}>{totalDiscounts}</Table.Summary.Cell>
+          <Table.Summary.Cell index={4}>{totalVATs}</Table.Summary.Cell>
+          <Table.Summary.Cell index={5}>{totalPurchaseRate}</Table.Summary.Cell>
+          <Table.Summary.Cell index={6}>{totalPrice}</Table.Summary.Cell>
+        </Table.Summary.Row>
+      )}
+    />
   )
 }
 
-export default NameEmailForm
+export default TestTable

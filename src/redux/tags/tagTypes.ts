@@ -16,6 +16,7 @@ export enum tagTypes {
   variants = 'variants',
   customerPayments = 'customerPayments',
   currencyType = 'currencyType',
+  supplierSells = 'supplierSells',
 }
 
 export const tagTypeLists = [
@@ -37,4 +38,5 @@ export const tagTypeLists = [
   tagTypes.variants,
   tagTypes.customerPayments,
   tagTypes.currencyType,
+  tagTypes.supplierSells,
 ]

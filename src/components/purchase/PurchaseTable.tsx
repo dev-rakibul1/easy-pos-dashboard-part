@@ -111,13 +111,13 @@ const PurchaseTable = ({
       title: 'Ram',
       dataIndex: 'ram',
       key: 'ram',
-      render: (text: string | undefined) => `${text} GB` || '-',
+      render: (text: string | undefined) => text || '-',
     },
     {
       title: 'Room',
       dataIndex: 'room',
       key: 'room',
-      render: (text: string | undefined) => `${text} GB` || '-',
+      render: (text: string | undefined) => text || '-',
     },
     {
       title: 'Color',

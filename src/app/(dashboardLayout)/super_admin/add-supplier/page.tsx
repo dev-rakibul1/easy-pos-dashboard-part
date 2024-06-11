@@ -18,7 +18,7 @@ const SupplierPage = () => {
   const [addANewSupplier] = useAddANewSupplierMutation()
 
   const onSubmit = async (values: any) => {
-    console.log(values)
+    // console.log(values)
     const obj = { ...values }
     const file = obj['file']
     delete obj['file']

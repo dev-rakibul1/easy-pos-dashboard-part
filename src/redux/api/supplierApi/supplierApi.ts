@@ -71,4 +71,6 @@ export const {
   useAddANewSupplierMutation,
   useGetAllSupplierQuery,
   useGetSingleSupplierQuery,
+  useDeleteSupplierMutation,
+  useUpdateSupplierMutation,
 } = supplierApi

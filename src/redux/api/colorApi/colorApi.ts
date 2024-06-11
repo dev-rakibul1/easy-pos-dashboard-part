@@ -58,4 +58,10 @@ export const colorApi = baseApi.injectEndpoints({
   }),
 })
 
-export const { useAddANewColorMutation, useGetAllColorQuery } = colorApi
+export const {
+  useAddANewColorMutation,
+  useGetAllColorQuery,
+  useDeleteColorMutation,
+  useGetSingleColorQuery,
+  useUpdateColorMutation,
+} = colorApi

@@ -200,8 +200,8 @@ const sidebarItems = (role: string) => {
           icon: <FaArrowRightLong />,
         },
         {
-          label: <Link href={`/${role}/supplier-list`}>Supplier list</Link>,
-          key: `/${role}/supplier-list`,
+          label: <Link href={`/${role}/supplier-lists`}>Supplier list</Link>,
+          key: `/${role}/supplier-lists`,
           icon: <FaArrowRightLong />,
         },
       ],
@@ -297,13 +297,13 @@ const sidebarItems = (role: string) => {
       icon: <QuestionCircleOutlined />,
       children: [
         {
-          label: <Link href={`/${role}/discounts`}>Discounts</Link>,
-          key: `/${role}/discounts`,
+          label: <Link href={`/${role}/discount-lists`}>Discounts</Link>,
+          key: `/${role}/discount-lists`,
           icon: <FaArrowRightLong />,
         },
         {
-          label: <Link href={`/${role}/vats`}>Vats</Link>,
-          key: `/${role}/vats`,
+          label: <Link href={`/${role}/vat-lists`}>Vats</Link>,
+          key: `/${role}/vat-lists`,
           icon: <FaArrowRightLong />,
         },
         {
@@ -312,13 +312,18 @@ const sidebarItems = (role: string) => {
           icon: <FaArrowRightLong />,
         },
         {
-          label: <Link href={`/${role}/brand-lists`}>Brand</Link>,
+          label: <Link href={`/${role}/brand-lists`}>Brands</Link>,
           key: 'brand',
           icon: <FaArrowRightLong />,
         },
         {
-          label: <Link href={`/${role}/category-lists`}>Category</Link>,
+          label: <Link href={`/${role}/category-lists`}>Categories</Link>,
           key: 'category',
+          icon: <FaArrowRightLong />,
+        },
+        {
+          label: <Link href={`/${role}/color-lists`}>Colors</Link>,
+          key: 'color',
           icon: <FaArrowRightLong />,
         },
       ],

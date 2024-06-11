@@ -159,7 +159,7 @@ const ProductVariants = ({ variant }: any) => {
     },
   ]
 
-  return <Table columns={columns} dataSource={variant} />
+  return <Table columns={columns} dataSource={variant} bordered />
 }
 
 export default ProductVariants

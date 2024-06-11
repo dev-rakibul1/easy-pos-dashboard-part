@@ -5,7 +5,7 @@ import './PurchaseStyle.css'
 const { Title, Text } = Typography
 
 const SupplierUI = ({ purchase }: any) => {
-  console.log(purchase)
+  // console.log(purchase)
   return (
     <Card className="profile-card" style={{ width: '100%', marginTop: '15px' }}>
       <Row justify="center" align="middle">

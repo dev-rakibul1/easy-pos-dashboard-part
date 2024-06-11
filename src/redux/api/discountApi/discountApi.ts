@@ -58,5 +58,10 @@ export const discountApi = baseApi.injectEndpoints({
   }),
 })
 
-export const { useAddANewDiscountMutation, useGetAllDiscountQuery } =
-  discountApi
+export const {
+  useAddANewDiscountMutation,
+  useGetAllDiscountQuery,
+  useDeleteDiscountMutation,
+  useGetSingleDiscountQuery,
+  useUpdateDiscountMutation,
+} = discountApi

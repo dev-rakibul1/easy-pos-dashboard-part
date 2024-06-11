@@ -58,4 +58,10 @@ export const vatApi = baseApi.injectEndpoints({
   }),
 })
 
-export const { useAddANewVatsMutation, useGetAllVatsQuery } = vatApi
+export const {
+  useAddANewVatsMutation,
+  useGetAllVatsQuery,
+  useGetSingleVatsQuery,
+  useUpdateVatsMutation,
+  useDeleteVatsMutation,
+} = vatApi

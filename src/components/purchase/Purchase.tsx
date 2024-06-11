@@ -35,6 +35,7 @@ import { useEffect, useState } from 'react'
 import { inputFormStyle, inputPlusBtnStyle } from '../styles/style'
 import ActionBar from '../ui/ActionBar'
 import PurchaseTable from './PurchaseTable'
+import TestTable from './Test'
 import UserInfo from './UserInfo'
 import VariantModal from './variants/VariantModal'
 const { Item } = Form
@@ -108,7 +109,7 @@ const PurchaseForm = ({ isChecked, userData }: any) => {
     return {
       label: `${supplier?.firstName} ${
         supplier?.middleName === null ? '' : supplier?.middleName
-      } ${supplier?.lastName}`,
+      } ${supplier?.lastName} | ${supplier?.uniqueId}`,
       value: supplier?.id,
     }
   })
@@ -120,7 +121,7 @@ const PurchaseForm = ({ isChecked, userData }: any) => {
 
   const productOptions = getProductsOption?.map((product: any) => {
     return {
-      label: `${product?.productName}`,
+      label: `${product?.productName} | ${product?.uniqueId}`,
       value: product?.id,
     }
   })
@@ -282,6 +283,7 @@ const PurchaseForm = ({ isChecked, userData }: any) => {
         totalPay: formValues.amount,
         supplierId: supplierId,
         userId: userData?.id,
+        productId: productId,
       },
       variants: storeVariants,
       purchase: newPurchaseData, // Use the updated purchaseData
@@ -586,58 +588,88 @@ const PurchaseForm = ({ isChecked, userData }: any) => {
                 </Form.Item>
               </Col>
             ) : (
-              <Col xs={24} sm={12} md={8} lg={6}>
-                <Form.Item
-                  name="othersStock"
-                  label="Stock"
-                  rules={[
-                    {
-                      required: true,
-                      message: 'Please input the others stock!',
-                    },
-                  ]}
-                >
-                  <Input
-                    size="large"
-                    min={0}
-                    step={0.01}
-                    style={{ width: '100%' }}
-                    type="number"
-                  />
-                </Form.Item>
-              </Col>
+              <>
+                <Col xs={24} sm={12} md={8} lg={6}>
+                  <Form.Item
+                    name="othersStock"
+                    label="Stock"
+                    rules={[
+                      {
+                        required: true,
+                        message: 'Please input the others stock!',
+                      },
+                    ]}
+                  >
+                    <Input
+                      size="large"
+                      min={0}
+                      step={0.01}
+                      style={{ width: '100%' }}
+                      type="number"
+                    />
+                  </Form.Item>
+                </Col>
+                <Col xs={24} sm={12} md={8} lg={6}>
+                  <Form.Item
+                    name="ram"
+                    label="Ram"
+                    rules={[
+                      { required: true, message: 'Please input the ram!' },
+                    ]}
+                  >
+                    <Input
+                      size="large"
+                      min={0}
+                      step={0.01}
+                      style={{ width: '100%' }}
+                      type="text"
+                    />
+                  </Form.Item>
+                </Col>
+                <Col xs={24} sm={12} md={8} lg={6}>
+                  <Form.Item
+                    name="room"
+                    label="Room"
+                    rules={[
+                      { required: true, message: 'Please input the room!' },
+                    ]}
+                  >
+                    <Input
+                      size="large"
+                      min={0}
+                      step={0.01}
+                      style={{ width: '100%' }}
+                      type="text"
+                    />
+                  </Form.Item>
+                </Col>
+                <Col xs={24} sm={12} md={8} lg={6}>
+                  <Form.Item
+                    label="Color"
+                    labelAlign="left"
+                    wrapperCol={{ span: 24 }}
+                    style={{ marginBottom: 0 }}
+                  >
+                    <div style={inputFormStyle}>
+                      <Select
+                        showSearch
+                        optionFilterProp="children"
+                        onChange={handleColorChange}
+                        onSearch={onSearch}
+                        size="large"
+                        style={{ width: '100%' }}
+                        filterOption={filterOption}
+                        options={colorOptions}
+                      ></Select>
+                      <div style={inputPlusBtnStyle} onClick={showColorModal}>
+                        <PlusOutlined />
+                      </div>
+                    </div>
+                  </Form.Item>
+                </Col>
+              </>
             )}
 
-            <Col xs={24} sm={12} md={8} lg={6}>
-              <Form.Item
-                name="ram"
-                label="Ram"
-                rules={[{ required: true, message: 'Please input the ram!' }]}
-              >
-                <Input
-                  size="large"
-                  min={0}
-                  step={0.01}
-                  style={{ width: '100%' }}
-                  type="text"
-                />
-              </Form.Item>
-            </Col>
-            <Col xs={24} sm={12} md={8} lg={6}>
-              <Form.Item
-                name="room"
-                label="Room"
-                rules={[{ required: true, message: 'Please input the room!' }]}
-              >
-                <Input
-                  size="large"
-                  min={0}
-                  step={0.01}
-                  style={{ width: '100%' }}
-                  type="text"
-                />
-              </Form.Item>
-            </Col>
             <Col xs={24} sm={12} md={8} lg={6}>
               <Form.Item
                 label="Discounts"
@@ -689,31 +721,6 @@ const PurchaseForm = ({ isChecked, userData }: any) => {
             </Col>
 
             <Col xs={24} sm={12} md={8} lg={6}>
-              <Form.Item
-                label="Color"
-                labelAlign="left"
-                wrapperCol={{ span: 24 }}
-                style={{ marginBottom: 0 }}
-              >
-                <div style={inputFormStyle}>
-                  <Select
-                    showSearch
-                    optionFilterProp="children"
-                    onChange={handleColorChange}
-                    onSearch={onSearch}
-                    size="large"
-                    style={{ width: '100%' }}
-                    filterOption={filterOption}
-                    options={colorOptions}
-                  ></Select>
-                  <div style={inputPlusBtnStyle} onClick={showColorModal}>
-                    <PlusOutlined />
-                  </div>
-                </div>
-              </Form.Item>
-            </Col>
-
-            <Col xs={24} sm={12} md={8} lg={6}>
               <Form.Item label="Total Price">
                 <Input
                   size="large"
@@ -737,10 +744,15 @@ const PurchaseForm = ({ isChecked, userData }: any) => {
           </Button>
         </Form>
       </div>
+
       {purchaseData.length && (
         <div style={{ marginTop: '15px' }}>
           {/* @ts-ignore */}
-          <PurchaseTable payloads={payloads} formValues={formValues} />
+          {payloads.variants ? (
+            <TestTable payloads={payloads} isChecked={isChecked} />
+          ) : (
+            <PurchaseTable payloads={payloads} formValues={formValues} />
+          )}
         </div>
       )}
 

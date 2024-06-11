@@ -7,6 +7,7 @@ import ProductVariants from './ProductVariants'
 const { Title, Paragraph } = Typography
 
 const ProductDetails = ({ product, variant }: any) => {
+  console.log(product)
   return (
     <div style={{ padding: '20px' }}>
       <Row gutter={16}>
@@ -67,7 +68,7 @@ const ProductDetails = ({ product, variant }: any) => {
             </Descriptions.Item>
             <Descriptions.Item label="Product Stock">
               {product?.productStock !== undefined
-                ? product?.productStock
+                ? product?.variants.length
                 : 'N/A'}
             </Descriptions.Item>
             <Descriptions.Item label="Other Stock">
