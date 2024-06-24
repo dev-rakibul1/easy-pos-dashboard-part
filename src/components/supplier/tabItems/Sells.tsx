@@ -12,9 +12,11 @@ import { TbReport } from 'react-icons/tb'
 
 interface SupplierActionsProps {
   supplier: ISupplier
+  params: any
 }
 
-const Sells: React.FC<SupplierActionsProps> = ({ supplier }) => {
+const Sells: React.FC<SupplierActionsProps> = ({ supplier, params }) => {
+  console.log(params)
   const { role, uniqueId: id } = getUserInfo() as any
   const { data } = useGetSingleUserQuery(id)
 

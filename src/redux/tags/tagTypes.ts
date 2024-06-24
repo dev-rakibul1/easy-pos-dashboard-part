@@ -17,6 +17,9 @@ export enum tagTypes {
   customerPayments = 'customerPayments',
   currencyType = 'currencyType',
   supplierSells = 'supplierSells',
+  supplierSellVariants = 'supplierSellVariants',
+  supplierSellProducts = 'supplierSellProducts',
+  purchaseGroup = 'purchaseGroup',
 }
 
 export const tagTypeLists = [

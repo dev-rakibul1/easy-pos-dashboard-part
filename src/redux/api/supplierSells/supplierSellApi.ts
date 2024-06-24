@@ -13,7 +13,18 @@ export const supplierSellsApi = baseApi.injectEndpoints({
 
       providesTags: [tagTypes.supplierSells],
     }),
+    getSingleSupplierSell: build.query({
+      query: (id: string) => ({
+        url: `${SUPPLIER_SELLS_URL}/${id}`,
+        method: 'GET',
+      }),
+
+      providesTags: [tagTypes.supplierSells],
+    }),
   }),
 })
 
-export const { useGetSupplierSellsBySupplierAndUserQuery } = supplierSellsApi
+export const {
+  useGetSupplierSellsBySupplierAndUserQuery,
+  useGetSingleSupplierSellQuery,
+} = supplierSellsApi
