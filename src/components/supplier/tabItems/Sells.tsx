@@ -16,7 +16,6 @@ interface SupplierActionsProps {
 }
 
 const Sells: React.FC<SupplierActionsProps> = ({ supplier, params }) => {
-  console.log(params)
   const { role, uniqueId: id } = getUserInfo() as any
   const { data } = useGetSingleUserQuery(id)
 
@@ -27,8 +26,6 @@ const Sells: React.FC<SupplierActionsProps> = ({ supplier, params }) => {
     supplierId,
     userId
   )
-
-  console.log('Supplier and user get by supplier and user', supplierAndUser)
 
   const columns = [
     {
@@ -66,7 +63,7 @@ const Sells: React.FC<SupplierActionsProps> = ({ supplier, params }) => {
         return (
           <>
             <Tooltip title="Payment">
-              <Link href="/">
+              <Link href={`/${role}/supplier-lists/supplier-pay/${data.id}`}>
                 <Button style={{ margin: '0 3px' }} size="small" type="text">
                   <SiFampay />
                 </Button>

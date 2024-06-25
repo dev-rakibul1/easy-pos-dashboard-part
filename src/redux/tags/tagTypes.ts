@@ -20,6 +20,7 @@ export enum tagTypes {
   supplierSellVariants = 'supplierSellVariants',
   supplierSellProducts = 'supplierSellProducts',
   purchaseGroup = 'purchaseGroup',
+  payInSupplier = 'payInSupplier',
 }
 
 export const tagTypeLists = [
