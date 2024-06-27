@@ -23,8 +23,16 @@ const { Title } = Typography
 const SupplierPay = ({ params }: any) => {
   const { role } = getUserInfo() as any
   const paramsId = params.id
-  const { data, isLoading } = useGetSingleSupplierSellQuery(paramsId)
-  const { data: purchaseGroup } = useGetSinglePurchaseGroupQuery(paramsId)
+  const { data, isLoading } = useGetSingleSupplierSellQuery(paramsId, {
+    pollingInterval: 15000,
+    skipPollingIfUnfocused: true,
+    refetchOnMountOrArgChange: true,
+  })
+  const { data: purchaseGroup } = useGetSinglePurchaseGroupQuery(paramsId, {
+    pollingInterval: 15000,
+    skipPollingIfUnfocused: true,
+    refetchOnMountOrArgChange: true,
+  })
   const [createPayInSupplier, { isLoading: PayCreateLoading }] =
     useCreatePayInSupplierMutation()
 

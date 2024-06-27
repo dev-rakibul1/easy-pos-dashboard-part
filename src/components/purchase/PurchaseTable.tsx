@@ -127,11 +127,6 @@ const PurchaseTable = ({
     },
   ]
 
-  const handlePurchaseProduct = () => {
-    console.log(formValues)
-    console.log(payloads)
-  }
-
   return (
     <div>
       <Table

@@ -1,10 +1,13 @@
 'use client'
 
 import PosBreadcrumb from '@/components/breadcrumb/PosBreadcrumb'
+import { flexBetween } from '@/components/styles/style'
 import SupplierReport from '@/components/supplier/SupplierReport'
 import ActionBar from '@/components/ui/ActionBar'
 import { useGetSingleSupplierSellQuery } from '@/redux/api/supplierSells/supplierSellApi'
 import { getUserInfo } from '@/services/auth.services'
+import { PrinterOutlined } from '@ant-design/icons'
+import { Button } from 'antd'
 
 const SupplierSellReport = ({ params }: any) => {
   const { role } = getUserInfo() as any
@@ -33,8 +36,16 @@ const SupplierSellReport = ({ params }: any) => {
         ]}
       />
 
-      <ActionBar title="Report details"></ActionBar>
-      <SupplierReport id={paramsId} supplier={supplier} />
+      <div style={flexBetween}>
+        <ActionBar title="Report details"></ActionBar>
+        <Button>
+          {' '}
+          Print <PrinterOutlined />
+        </Button>
+      </div>
+      <div style={{ marginTop: '15px' }}>
+        <SupplierReport id={paramsId} supplier={supplier} />
+      </div>
     </div>
   )
 }

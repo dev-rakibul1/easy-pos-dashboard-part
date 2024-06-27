@@ -5,20 +5,59 @@ import Form from '@/components/form/Form'
 import FormInput from '@/components/form/FormInput'
 import ActionBar from '@/components/ui/ActionBar'
 import UploadImage from '@/components/ui/UploadImage'
+import { useAddANewCustomerMutation } from '@/redux/api/customerApi/customerApi'
 import { CreateCustomerYupSchema } from '@/schemas/customerSchemes/customerScheme'
 import { getUserInfo } from '@/services/auth.services'
-import CustomButton from '@/utils/Button'
 import { yupResolver } from '@hookform/resolvers/yup'
-import { Col, Row } from 'antd'
+import { Button, Col, Row, message } from 'antd'
 import { FormProvider, useForm } from 'react-hook-form'
+
+export type ICreateCustomerFormData = {
+  firstName: string
+  middleName?: string | null
+  lastName: string
+  email: string
+  phoneNo: number | string
+  nid?: number | null | string
+  presentAddress?: string | null
+  permanentAddress?: string | null
+  file?: File | null
+}
 
 const AddCustomers = () => {
   const { role } = getUserInfo() as any
   const methods = useForm()
 
-  const onSubmit = async (data: any) => {
+  const [addANewCustomer] = useAddANewCustomerMutation()
+
+  const onSubmit = async (values: ICreateCustomerFormData) => {
+    values.phoneNo = String(values.phoneNo)
+    values.nid = String(values.nid)
+    const obj = { ...values }
+    const file = obj['file']
+    delete obj['file']
+    const data = JSON.stringify(obj)
+    const formData = new FormData()
+    formData.append('file', file as Blob)
+    formData.append('data', data)
     try {
-      console.log('from customer page', data)
+      message.loading({ content: 'Add customer...', key: 'adding' })
+      const res = await addANewCustomer(formData)
+      if (res.data) {
+        message.success({
+          content: 'Customer added successfully!',
+          key: 'adding',
+          duration: 2,
+        })
+      } else {
+        message.error({
+          content: 'Added failed!',
+          key: 'adding',
+          duration: 2,
+        })
+      }
+      //  console.log(res)
+      // console.log('from login page', data)
     } catch (error: any) {
       console.error(error.message)
     }
@@ -179,9 +218,13 @@ const AddCustomers = () => {
                 <UploadImage name="file" />
               </Col>
             </Row>
-            <CustomButton type="primary" htmlType="submit">
-              Submit
-            </CustomButton>
+            <Button
+              type="primary"
+              htmlType="submit"
+              style={{ marginTop: '15px' }}
+            >
+              Add customer
+            </Button>
           </Form>
         </div>
       </div>

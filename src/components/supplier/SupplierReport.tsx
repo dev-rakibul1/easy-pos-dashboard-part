@@ -1,8 +1,9 @@
 import { useGetSinglePurchaseGroupQuery } from '@/redux/api/purchaseGroup/purchaseGroupApi'
-import { ISupplier } from '@/types'
-import { Button, Col, Row, Spin, Table, Typography } from 'antd'
+import { ISupplier, IVariant } from '@/types'
+import { Col, Row, Spin, Table, Typography } from 'antd'
 import dayjs from 'dayjs'
 import React from 'react'
+import { flexCenter } from '../styles/style'
 
 const { Title, Text } = Typography
 
@@ -21,7 +22,7 @@ const SupplierInvoice: React.FC<SupplierInvoiceProps> = ({ id, supplier }) => {
 
   const columns = [
     {
-      title: 'Product Name',
+      title: 'Product',
       dataIndex: 'productName',
       key: 'productName',
     },
@@ -36,7 +37,7 @@ const SupplierInvoice: React.FC<SupplierInvoiceProps> = ({ id, supplier }) => {
       key: 'quantity',
     },
     {
-      title: 'PUR. Price',
+      title: 'P. Price',
       dataIndex: 'purchaseRate',
       key: 'purchaseRate',
     },
@@ -51,7 +52,7 @@ const SupplierInvoice: React.FC<SupplierInvoiceProps> = ({ id, supplier }) => {
       key: 'discounts',
     },
     {
-      title: 'Discount Amount',
+      title: 'Discount A.',
       dataIndex: 'discountAmount',
       key: 'discountAmount',
     },
@@ -61,7 +62,7 @@ const SupplierInvoice: React.FC<SupplierInvoiceProps> = ({ id, supplier }) => {
       key: 'vats',
     },
     {
-      title: 'VAT Amount',
+      title: 'V. Amount',
       dataIndex: 'vatAmount',
       key: 'vatAmount',
     },
@@ -77,7 +78,7 @@ const SupplierInvoice: React.FC<SupplierInvoiceProps> = ({ id, supplier }) => {
       title: 'Payment date',
       dataIndex: 'createdAt',
       render: (data: any) => {
-        return data && dayjs(data).format('D MMM, YYYY hh:mm A')
+        return data && dayjs(data).format('D MMM, YYYY, hh:mm A')
       },
     },
     {
@@ -90,8 +91,8 @@ const SupplierInvoice: React.FC<SupplierInvoiceProps> = ({ id, supplier }) => {
   const payInSupplierDataSource = data?.payInSupplier
 
   const groupedProducts = data?.supplierSellProducts?.reduce(
-    (acc: Record<string, any>, product) => {
-      product.variants.forEach(variant => {
+    (acc: Record<string, any>, product: any) => {
+      product.variants.forEach((variant: IVariant) => {
         const key = `${product.productName}`
         if (!acc[key]) {
           acc[key] = {
@@ -109,15 +110,26 @@ const SupplierInvoice: React.FC<SupplierInvoiceProps> = ({ id, supplier }) => {
           }
         }
         const quantity = product.purchase.productStock ?? 0
-        const totalAmount = product.purchase.purchaseRate * quantity
-        const discountAmount = (product.purchase.discounts / 100) * totalAmount
-        const vatAmount =
-          (product.purchase.vats / 100) * (totalAmount - discountAmount)
+        const totalAmount = (product.purchase.purchaseRate * quantity).toFixed(
+          2
+        )
+        const discountAmount = (
+          (product.purchase.discounts / 100) *
+          parseFloat(totalAmount)
+        ).toFixed(2)
+        const vatAmount = (
+          (product.purchase.vats / 100) *
+          (parseFloat(totalAmount) - parseFloat(discountAmount))
+        ).toFixed(2)
         acc[key].quantity = quantity
-        acc[key].totalAmount = totalAmount
-        acc[key].discountAmount = discountAmount
-        acc[key].vatAmount = vatAmount
-        acc[key].totalPrice = totalAmount - discountAmount + vatAmount
+        acc[key].totalAmount = parseFloat(totalAmount)
+        acc[key].discountAmount = parseFloat(discountAmount)
+        acc[key].vatAmount = parseFloat(vatAmount)
+        acc[key].totalPrice = (
+          parseFloat(totalAmount) -
+          parseFloat(discountAmount) +
+          parseFloat(vatAmount)
+        ).toFixed(2)
         acc[key].variants.push(
           `${variant.ram}GB / ${variant.rom}GB / ${variant.color} [${variant.imeiNumber}]`
         )
@@ -128,7 +140,9 @@ const SupplierInvoice: React.FC<SupplierInvoiceProps> = ({ id, supplier }) => {
   )
 
   const dataSource = Object?.values(groupedProducts)?.map(product => ({
+    // @ts-ignore
     ...product,
+    // @ts-ignore
     variants: product.variants.join(', '),
   }))
 
@@ -165,13 +179,14 @@ const SupplierInvoice: React.FC<SupplierInvoiceProps> = ({ id, supplier }) => {
           <Col span={12} style={{ borderLeft: '1px solid #ddd' }}>
             <Text strong>Invoice Info</Text>
             <br />
-            <Text>Invoice No: 11</Text>
+            <Text>Invoice No: {data?.uniqueId}</Text>
             <br />
             <Text>
-              Invoice Date: {new Date(data?.createdAt).toLocaleDateString()}
+              Invoice Date:{' '}
+              {dayjs(data.createdAt).format('D MMM, YYYY, hh:mm A')}
             </Text>
             <br />
-            <Text>Due Pay Date: </Text>
+            {/* <Text>Due Pay Date: </Text> */}
           </Col>
         </Row>
       </div>
@@ -200,31 +215,31 @@ const SupplierInvoice: React.FC<SupplierInvoiceProps> = ({ id, supplier }) => {
               totalQuantity += quantity
               totalDiscountAmount += discountAmount
               totalVatAmount += vatAmount
-              totalPrice += price
+              totalPrice += parseFloat(price)
             }
           )
 
           return (
             <>
               <Table.Summary.Row>
-                <Table.Summary.Cell>Total</Table.Summary.Cell>
-                <Table.Summary.Cell />
-                <Table.Summary.Cell>
+                <Table.Summary.Cell index={0}>Total</Table.Summary.Cell>
+                <Table.Summary.Cell index={1} />
+                <Table.Summary.Cell index={2}>
                   <Text>{totalQuantity} items</Text>
                 </Table.Summary.Cell>
-                <Table.Summary.Cell />
-                <Table.Summary.Cell>
+                <Table.Summary.Cell index={3} />
+                <Table.Summary.Cell index={4}>
                   <Text>{totalAmount.toFixed(2)}</Text>
                 </Table.Summary.Cell>
-                <Table.Summary.Cell />
-                <Table.Summary.Cell>
+                <Table.Summary.Cell index={5} />
+                <Table.Summary.Cell index={6}>
                   <Text>{totalDiscountAmount.toFixed(2)}</Text>
                 </Table.Summary.Cell>
-                <Table.Summary.Cell />
-                <Table.Summary.Cell>
+                <Table.Summary.Cell index={7} />
+                <Table.Summary.Cell index={8}>
                   <Text>{totalVatAmount.toFixed(2)}</Text>
                 </Table.Summary.Cell>
-                <Table.Summary.Cell>
+                <Table.Summary.Cell index={9}>
                   <Text>{totalPrice.toFixed(2)}</Text>
                 </Table.Summary.Cell>
               </Table.Summary.Row>
@@ -232,16 +247,6 @@ const SupplierInvoice: React.FC<SupplierInvoiceProps> = ({ id, supplier }) => {
           )
         }}
       />
-
-      <div style={{ marginTop: '15px' }}>
-        <Text strong>Additional payments</Text>
-        <Table
-          columns={payInSupplier}
-          dataSource={payInSupplierDataSource}
-          pagination={false}
-          bordered
-        />
-      </div>
 
       <Row
         gutter={[16, 16]}
@@ -251,7 +256,25 @@ const SupplierInvoice: React.FC<SupplierInvoiceProps> = ({ id, supplier }) => {
           justifyContent: 'flex-end', // Align items to the end of the row
         }}
       >
-        <Col span={6}>
+        {!data?.payInSupplier.length ? (
+          <Col span={16} style={flexCenter}>
+            <Text strong>Additional payments not available</Text>
+          </Col>
+        ) : (
+          <Col span={16}>
+            <Text strong>Additional payments</Text>
+            <Table
+              columns={payInSupplier}
+              dataSource={payInSupplierDataSource}
+              pagination={false}
+              bordered
+            />
+          </Col>
+        )}
+        <Col
+          span={8}
+          style={{ marginTop: '25px', background: '#fff', padding: '10px' }}
+        >
           <div style={{ display: 'flex', flexDirection: 'column' }}>
             <div
               style={{
@@ -273,7 +296,10 @@ const SupplierInvoice: React.FC<SupplierInvoiceProps> = ({ id, supplier }) => {
               <Text>Total Discount:</Text>
               <Text>
                 {dataSource
-                  .reduce((acc, item) => acc + item.discountAmount, 0)
+                  .reduce(
+                    (acc, item) => acc + parseFloat(item.discountAmount),
+                    0
+                  )
                   .toFixed(2)}
               </Text>
             </div>
@@ -289,10 +315,13 @@ const SupplierInvoice: React.FC<SupplierInvoiceProps> = ({ id, supplier }) => {
                 {(
                   data?.supplierSells?.totalSellAmounts -
                   dataSource.reduce(
-                    (acc, item) => acc + item.discountAmount,
+                    (acc, item) => acc + parseFloat(item.discountAmount),
                     0
                   ) +
-                  dataSource.reduce((acc, item) => acc + item.vatAmount, 0)
+                  dataSource.reduce(
+                    (acc, item) => acc + parseFloat(item.vatAmount),
+                    0
+                  )
                 ).toFixed(2)}
               </Text>
             </div>
@@ -316,9 +345,6 @@ const SupplierInvoice: React.FC<SupplierInvoiceProps> = ({ id, supplier }) => {
               <Text>Due:</Text>
               <Text>{data?.supplierSells?.totalDue?.toFixed(2)}</Text>
             </div>
-            <Button type="primary" onClick={() => window.print()}>
-              Print
-            </Button>
           </div>
         </Col>
       </Row>

@@ -35,6 +35,22 @@ export const productApi = baseApi.injectEndpoints({
       },
       providesTags: [tagTypes.product],
     }),
+    // Get all stock in product
+    getAllStockInProduct: build.query({
+      query: (arg: Record<string, any>) => ({
+        url: `${PRODUCT_URL}/stock-in`,
+        method: 'GET',
+        params: arg,
+      }),
+
+      transformResponse: (response: IProduct, meta: IMeta) => {
+        return {
+          products: response,
+          meta: meta,
+        }
+      },
+      providesTags: [tagTypes.product],
+    }),
 
     // Delete product
     deleteProduct: build.mutation({
@@ -73,4 +89,5 @@ export const {
   useDeleteProductMutation,
   useGetSingleProductQuery,
   useUpdateProductMutation,
+  useGetAllStockInProductQuery,
 } = productApi

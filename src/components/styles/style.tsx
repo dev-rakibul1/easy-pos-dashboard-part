@@ -5,6 +5,16 @@ export const inputFormStyle: CSSProperties = {
   alignItems: 'center',
   border: '1px solid #ddd',
 }
+export const flexBetween: CSSProperties = {
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+}
+export const flexCenter: CSSProperties = {
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+}
 export const inputPlusBtnStyle: CSSProperties = {
   display: 'flex',
   alignItems: 'center',

@@ -7,7 +7,6 @@ import ProductVariants from './ProductVariants'
 const { Title, Paragraph } = Typography
 
 const ProductDetails = ({ product, variant }: any) => {
-  console.log(product)
   return (
     <div style={{ padding: '20px' }}>
       <Row gutter={16}>

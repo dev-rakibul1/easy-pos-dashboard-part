@@ -12,4 +12,76 @@
       "supplierSellId": 1 // Object
     }
   ]
+},
+
+
+{
+  "sellInfo" :[
+  {
+    "productId":1 ,
+    "customerId":1,
+    "variantId":1,
+    "customerName": "string",
+    "discounts":"number",
+    "vats":"number",
+    "productName":"string",
+    "modelName":"string",
+    "quantity":"number",
+    "sellingPrice":"number",
+    "totalPrice":"number",
+    "variantIds"[],
+    "variants":[ // Array of object
+      {
+        "imeiNumber":"string",
+        "ram":"string",
+        "rom":"string",
+        "color":"string",
+      }
+    ]
+
+
+  }
+]
 }
+
+
+
+ // --------------------------
+    // Check if the variant already exists in any product
+    // const isExistVariant = sellInfo.some(product =>
+    //   product.variantIds.includes(newFormData.selectVariant)
+    // )
+
+    // if (isExistVariant) {
+    //   message.warning('The variant already selected!.')
+    //   return
+    // }
+
+    // const existingProducts = sellInfo.find(
+    //   product => product.selectProduct === newFormData.selectProduct
+    // )
+
+    // if (existingProducts) {
+    //   // If product exists, update its quantity and variants
+    //   const updatedSellInfo = sellInfo.map(product =>
+    //     product.selectProduct === newFormData.selectProduct
+    //       ? {
+    //           ...product,
+    //           quantity: product.quantity + 1,
+    //           variantIds: [...product.variantIds, ...newFormData.variantIds],
+    //         }
+    //       : product
+    //   )
+
+    //   setSellInfo(updatedSellInfo)
+    // } else {
+    //   // If product does not exist, add a new entry
+    //   setSellInfo([
+    //     {
+    //       ...newFormData,
+    //       quantity: 1,
+    //       variantIds: [...newFormData.variantIds],
+    //     },
+    //     ...sellInfo,
+    //   ])
+    // }

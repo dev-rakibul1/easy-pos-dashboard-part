@@ -115,7 +115,7 @@ const sidebarItems = (role: string) => {
       icon: <LiaSellcast />,
       children: [
         {
-          label: <Link href={`/${role}/add-sells`}>Add sells</Link>,
+          label: <Link href={`/${role}/add-sells`}>POS</Link>,
           key: `/${role}/add-sell`,
           icon: <FaArrowRightLong />,
         },
@@ -136,7 +136,7 @@ const sidebarItems = (role: string) => {
       children: [
         {
           label: <Link href={`/${role}/add-customers`}>Add customers</Link>,
-          key: `/${role}/add-sell`,
+          key: `/${role}/manage-customer`,
           icon: <FaArrowRightLong />,
         },
         {

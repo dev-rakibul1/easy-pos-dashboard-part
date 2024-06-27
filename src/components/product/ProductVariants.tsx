@@ -136,20 +136,7 @@ const ProductVariants = ({ variant }: any) => {
       width: '16.67%',
       ...getColumnSearchProps('rom'),
     },
-    {
-      title: 'Purchase Rate',
-      dataIndex: 'purchaseRate',
-      key: 'purchaseRate',
-      width: '16.67%',
-      ...getColumnSearchProps('purchaseRate'),
-    },
-    {
-      title: 'Selling Price',
-      dataIndex: 'sellingPrice',
-      key: 'sellingPrice',
-      width: '16.67%',
-      ...getColumnSearchProps('sellingPrice'),
-    },
+
     {
       title: 'Color',
       dataIndex: 'color',
