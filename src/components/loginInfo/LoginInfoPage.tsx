@@ -26,7 +26,6 @@ const LoginInfoPage = () => {
   const onSubmit: SubmitHandler<IFormValues> = async (data: any) => {
     try {
       const res = await userLogin({ ...data }).unwrap()
-      // console.log('from login page', res)
       storeUserInfo(res)
 
       if (res?.accessToken) {
@@ -36,7 +35,7 @@ const LoginInfoPage = () => {
         message.error('Login fail!')
       }
     } catch (error: any) {
-      console.error(error.message)
+      // console.error(error.message)
       message.error('Invalid unique id and password.')
     }
   }

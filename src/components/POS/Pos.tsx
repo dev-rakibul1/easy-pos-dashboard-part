@@ -58,7 +58,7 @@ interface ISellVariant {
   color: string
 }
 
-interface IProductData {
+export interface IProductData {
   productId: string
   customerId: string
   variantId: string
@@ -84,7 +84,7 @@ const PosPage = () => {
   const [selectVats, setSelectVats] = useState<number>(0)
   const [sellingPrice, setSellingPrice] = useState<number>(0)
   const [subTotal, setSubtotal] = useState<number>(0)
-  const [sellInfo, setSellInfo] = useState<IFormType[]>([])
+  // const [sellInfo, setSellInfo] = useState<IFormType[]>([])
   const [sellPayloads, setSellPayloads] = useState<IProductData[]>([])
   const router = useRouter()
 
@@ -110,6 +110,8 @@ const PosPage = () => {
   // --------------PRODUCTS--------------
   const { data: products } = useGetAllStockInProductQuery({
     pollingInterval: 15000,
+    skipPollingIfUnfocused: true,
+    refetchOnMountOrArgChange: true,
   })
   // @ts-ignore
   const getProductOption: IProduct[] = products?.products
@@ -273,58 +275,65 @@ const PosPage = () => {
     )
 
     if (isExistVariant) {
-      message.warning('The variant already selected!.')
+      message.warning('The variant is already selected!')
       return
     }
 
     const existingProduct = sellPayloads.find(item => item.productId === pId)
 
     if (existingProduct) {
-      const updatedSellPayloads = sellPayloads.map(item => {
-        return {
-          ...item,
-          quantity: item.quantity + 1,
-          variants: [...item.variants, variantObj],
-          variantIds: [...item.variantIds, ...newFormData.variantIds],
-        }
-      })
+      const isMatchVariant = existingProduct.variants.some(
+        variant =>
+          variant.ram === variantObj.ram && variant.rom === variantObj.rom
+      )
 
-      setSellPayloads(updatedSellPayloads)
+      if (isMatchVariant) {
+        const updatedSellPayloads = sellPayloads.map(item => {
+          if (item.productId === pId) {
+            return {
+              ...item,
+              quantity: item.quantity + 1,
+              variants: [...item.variants, variantObj],
+              variantIds: [...item.variantIds, vId],
+            }
+          }
+          return item
+        })
+        setSellPayloads(updatedSellPayloads)
+      } else {
+        setSellPayloads([sellObject, ...sellPayloads])
+      }
     } else {
       setSellPayloads([sellObject, ...sellPayloads])
     }
 
-    console.log(sellPayloads)
-
     // Reset form fields except selectCustomer
-    // setFormData({
-    //   ...formData, // retain selectCustomer
-    //   selectProduct: '',
-    //   selectVariant: '',
-    //   discounts: 0,
-    //   sellingPrice: 0,
-    //   vats: 0,
-    //   totalPrice: 0,
-    //   modelName: '',
-    //   productName: '',
-    //   customerName: '',
-    //   ram: '',
-    //   rom: '',
-    //   color: '',
-    //   imeiNumber: '',
-    //   variantIds: '',
-    //   quantity: 0,
-    // })
+    setFormData({
+      ...formData,
+      selectProduct: '',
+      selectVariant: '',
+      discounts: 0,
+      sellingPrice: 0,
+      vats: 0,
+      totalPrice: 0,
+      modelName: '',
+      productName: '',
+      customerName: '',
+      ram: '',
+      rom: '',
+      color: '',
+      imeiNumber: '',
+      variantIds: '',
+      quantity: 0,
+    })
 
-    // // Reset other states
-    // setSelectVariant('')
-    // setSelectCustomer('')
-    // setSelectProduct('')
-    // setSubtotal(0)
-    // form.resetFields()
+    // Reset other states
+    setSelectVariant('')
+    setSelectCustomer('')
+    setSelectProduct('')
+    setSubtotal(0)
+    form.resetFields()
   }
-
-  console.log('Sell payloads___:', sellPayloads)
 
   const handleProductChange = (value: string) => {
     setSelectProduct(value)
@@ -479,30 +488,58 @@ const PosPage = () => {
                     </Form.Item>
                   </Col>
                   <Text>
-                    <Text strong>Name:</Text> {singleProductById?.productName}
+                    <Text strong>Name:</Text>{' '}
+                    {singleProductById?.productName
+                      ? singleProductById?.productName
+                      : 'N/A'}
                   </Text>
                   <br />
                   <Text>
-                    <Text strong>Brand:</Text> {singleProductById?.brandName}
+                    <Text strong>Brand:</Text>{' '}
+                    {singleProductById?.brandName
+                      ? singleProductById?.brandName
+                      : 'N/A'}
+                  </Text>
+                  <br />
+                  <Text>
+                    <Text strong>Stock:</Text>{' '}
+                    {`${
+                      singleProductById?.variants?.length
+                        ? singleProductById?.variants?.length
+                        : 0
+                    } pics`}
                   </Text>
                   <br />
                   {selectVariant !== '' ? (
                     <>
                       <Text>
                         <Text strong>Imei number:</Text>{' '}
-                        {singleVariantsById?.imeiNumber}
+                        {singleVariantsById?.imeiNumber
+                          ? singleVariantsById?.imeiNumber
+                          : 'N/A'}
                       </Text>
                       <br />
                       <Text>
-                        <Text strong>Ram:</Text> {singleVariantsById?.ram} GB
+                        <Text strong>Ram:</Text>{' '}
+                        {singleVariantsById?.ram
+                          ? singleVariantsById?.ram
+                          : 'N/A'}{' '}
+                        GB
                       </Text>
                       <br />
                       <Text>
-                        <Text strong>Rom:</Text> {singleVariantsById?.rom} GB
+                        <Text strong>Rom:</Text>{' '}
+                        {singleVariantsById?.rom
+                          ? singleVariantsById?.rom
+                          : 'N/A'}{' '}
+                        GB
                       </Text>
                       <br />
                       <Text>
-                        <Text strong>Color:</Text> {singleVariantsById?.color}
+                        <Text strong>Color:</Text>{' '}
+                        {singleVariantsById?.color
+                          ? singleVariantsById?.color
+                          : 'N/A'}
                       </Text>
                     </>
                   ) : null}
@@ -540,19 +577,38 @@ const PosPage = () => {
                   <>
                     <Text>
                       <Text strong>Name:</Text>{' '}
-                      {`${singleCustomerById?.firstName} ${
+                      {`${
+                        singleCustomerById?.firstName
+                          ? singleCustomerById?.firstName
+                          : ''
+                      } ${
                         singleCustomerById?.middleName
                           ? singleCustomerById?.middleName
                           : ''
-                      } ${singleCustomerById?.lastName}`}
+                      } ${
+                        singleCustomerById?.lastName
+                          ? singleCustomerById?.lastName
+                          : ''
+                      } ${
+                        !singleCustomerById?.firstName &&
+                        !singleCustomerById?.firstName
+                          ? 'N/A'
+                          : ''
+                      }`}
                     </Text>
                     <br />
                     <Text>
-                      <Text strong>Phone:</Text> {singleCustomerById?.phoneNo}
+                      <Text strong>Phone:</Text>{' '}
+                      {singleCustomerById?.phoneNo
+                        ? singleCustomerById?.phoneNo
+                        : 'N/A'}
                     </Text>
                     <br />
                     <Text>
-                      <Text strong>Email:</Text> {singleCustomerById?.email}
+                      <Text strong>Email:</Text>{' '}
+                      {singleCustomerById?.email
+                        ? singleCustomerById?.email
+                        : 'N/A'}
                     </Text>
                     <br />
                     <Text>
@@ -670,7 +726,9 @@ const PosPage = () => {
         </Button>
       </Form>
 
-      <SellTable payloads={sellPayloads} />
+      <div style={{ marginTop: '15px' }}>
+        <SellTable payloads={sellPayloads} />
+      </div>
     </div>
   )
 }

@@ -22,37 +22,38 @@ const SupplierInvoice: React.FC<SupplierInvoiceProps> = ({ id, supplier }) => {
 
   const columns = [
     {
-      title: 'Product',
+      title: 'PRODUCT',
       dataIndex: 'productName',
       key: 'productName',
     },
     {
-      title: 'Variants',
+      title: 'VARIANTS',
       dataIndex: 'variants',
       key: 'variants',
+      width: '25%',
     },
     {
-      title: 'Quantity',
+      title: 'QUANTITY',
       dataIndex: 'quantity',
       key: 'quantity',
     },
     {
-      title: 'P. Price',
+      title: 'P. PRICE',
       dataIndex: 'purchaseRate',
       key: 'purchaseRate',
     },
     {
-      title: 'Amount',
+      title: 'AMOUNT',
       dataIndex: 'totalAmount',
       key: 'totalAmount',
     },
     {
-      title: 'Discount (%)',
+      title: 'DISCOUNT (%)',
       dataIndex: 'discounts',
       key: 'discounts',
     },
     {
-      title: 'Discount A.',
+      title: 'DISCOUNT A.',
       dataIndex: 'discountAmount',
       key: 'discountAmount',
     },
@@ -62,12 +63,12 @@ const SupplierInvoice: React.FC<SupplierInvoiceProps> = ({ id, supplier }) => {
       key: 'vats',
     },
     {
-      title: 'V. Amount',
+      title: 'V. AMOUNT',
       dataIndex: 'vatAmount',
       key: 'vatAmount',
     },
     {
-      title: 'Total',
+      title: 'TOTAL',
       dataIndex: 'totalPrice',
       key: 'totalPrice',
     },
