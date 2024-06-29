@@ -17,7 +17,7 @@ interface DataType {
   total: number
 }
 
-const SellTable = ({ payloads }: any) => {
+const SellTable = ({ payloads, setSellPayloads }: any) => {
   const [payAmountInfo, setPayAmountInfo] = useState<ISellPay>({
     amount: 0,
     paymentMethod: '',
@@ -130,7 +130,6 @@ const SellTable = ({ payloads }: any) => {
   // Calculate paid and due
   const paid = Number(payAmountInfo.amount) || 0
   const due = totalNet - paid
-  console.log(due)
 
   return (
     <>
@@ -215,6 +214,7 @@ const SellTable = ({ payloads }: any) => {
             setPayAmountInfo={setPayAmountInfo}
             dueBalance={totalNet}
             sellPayloads={payloads}
+            setSellPayloads={setSellPayloads}
           />
         </div>
       )}

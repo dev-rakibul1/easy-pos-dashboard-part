@@ -51,11 +51,13 @@ type IFormType = {
   quantity: number
 }
 
-interface ISellVariant {
+export interface ISellVariant {
   imeiNumber: string
   ram: string
   rom: string
   color: string
+  variantId: string
+  productId: string
 }
 
 export interface IProductData {
@@ -108,11 +110,12 @@ const PosPage = () => {
   })
 
   // --------------PRODUCTS--------------
-  const { data: products } = useGetAllStockInProductQuery({
-    pollingInterval: 15000,
-    skipPollingIfUnfocused: true,
-    refetchOnMountOrArgChange: true,
-  })
+  const { data: products, isLoading: isProductLoading } =
+    useGetAllStockInProductQuery({
+      pollingInterval: 15000,
+      skipPollingIfUnfocused: true,
+      refetchOnMountOrArgChange: true,
+    })
   // @ts-ignore
   const getProductOption: IProduct[] = products?.products
 
@@ -124,7 +127,8 @@ const PosPage = () => {
   })
 
   // Single product get by id
-  const { data: singleProductById } = useGetSingleProductQuery(selectProduct)
+  const { data: singleProductById, isLoading: isSingleProductLoading } =
+    useGetSingleProductQuery(selectProduct)
 
   // get product variants
   const { data: singleVariantsById, isLoading: getSingleVariantLoading } =
@@ -141,11 +145,12 @@ const PosPage = () => {
   })
 
   // Customer
-  const { data: customers } = useGetAllCustomerQuery({
-    pollingInterval: 15000,
-    skipPollingIfUnfocused: true,
-    refetchOnMountOrArgChange: true,
-  })
+  const { data: customers, isLoading: isCustomerLoading } =
+    useGetAllCustomerQuery({
+      pollingInterval: 15000,
+      skipPollingIfUnfocused: true,
+      refetchOnMountOrArgChange: true,
+    })
   // @ts-ignore
   const getCustomerOption: ICustomer[] = customers?.customers
 
@@ -252,11 +257,15 @@ const PosPage = () => {
       ...restData
     } = newFormData
 
+    console.log(newFormData)
+
     const variantObj: ISellVariant = {
       imeiNumber,
       ram,
       rom,
       color,
+      variantId: vId,
+      productId: pId,
     }
 
     // @ts-ignore
@@ -487,61 +496,71 @@ const PosPage = () => {
                       />
                     </Form.Item>
                   </Col>
-                  <Text>
-                    <Text strong>Name:</Text>{' '}
-                    {singleProductById?.productName
-                      ? singleProductById?.productName
-                      : 'N/A'}
-                  </Text>
-                  <br />
-                  <Text>
-                    <Text strong>Brand:</Text>{' '}
-                    {singleProductById?.brandName
-                      ? singleProductById?.brandName
-                      : 'N/A'}
-                  </Text>
-                  <br />
-                  <Text>
-                    <Text strong>Stock:</Text>{' '}
-                    {`${
-                      singleProductById?.variants?.length
-                        ? singleProductById?.variants?.length
-                        : 0
-                    } pics`}
-                  </Text>
-                  <br />
-                  {selectVariant !== '' ? (
+                  {isSingleProductLoading ? (
+                    <Spin size="small" />
+                  ) : (
                     <>
                       <Text>
-                        <Text strong>Imei number:</Text>{' '}
-                        {singleVariantsById?.imeiNumber
-                          ? singleVariantsById?.imeiNumber
+                        <Text strong>Name:</Text>{' '}
+                        {singleProductById?.productName
+                          ? singleProductById?.productName
                           : 'N/A'}
                       </Text>
                       <br />
                       <Text>
-                        <Text strong>Ram:</Text>{' '}
-                        {singleVariantsById?.ram
-                          ? singleVariantsById?.ram
-                          : 'N/A'}{' '}
-                        GB
-                      </Text>
-                      <br />
-                      <Text>
-                        <Text strong>Rom:</Text>{' '}
-                        {singleVariantsById?.rom
-                          ? singleVariantsById?.rom
-                          : 'N/A'}{' '}
-                        GB
-                      </Text>
-                      <br />
-                      <Text>
-                        <Text strong>Color:</Text>{' '}
-                        {singleVariantsById?.color
-                          ? singleVariantsById?.color
+                        <Text strong>Brand:</Text>{' '}
+                        {singleProductById?.brandName
+                          ? singleProductById?.brandName
                           : 'N/A'}
                       </Text>
+                      <br />
+                      <Text>
+                        <Text strong>Stock:</Text>{' '}
+                        {`${
+                          singleProductById?.variants?.length
+                            ? singleProductById?.variants?.length
+                            : 0
+                        } pics`}
+                      </Text>
+                      <br />
                     </>
+                  )}
+                  {selectVariant !== '' ? (
+                    getSingleVariantLoading ? (
+                      <Spin size="small" />
+                    ) : (
+                      <>
+                        <Text>
+                          <Text strong>Imei number:</Text>{' '}
+                          {singleVariantsById?.imeiNumber
+                            ? singleVariantsById?.imeiNumber
+                            : 'N/A'}
+                        </Text>
+                        <br />
+                        <Text>
+                          <Text strong>Ram:</Text>{' '}
+                          {singleVariantsById?.ram
+                            ? singleVariantsById?.ram
+                            : 'N/A'}{' '}
+                          GB
+                        </Text>
+                        <br />
+                        <Text>
+                          <Text strong>Rom:</Text>{' '}
+                          {singleVariantsById?.rom
+                            ? singleVariantsById?.rom
+                            : 'N/A'}{' '}
+                          GB
+                        </Text>
+                        <br />
+                        <Text>
+                          <Text strong>Color:</Text>{' '}
+                          {singleVariantsById?.color
+                            ? singleVariantsById?.color
+                            : 'N/A'}
+                        </Text>
+                      </>
+                    )
                   ) : null}
                 </div>
               ) : null}
@@ -571,7 +590,7 @@ const PosPage = () => {
               </Form.Item>
 
               {selectCustomer !== '' ? (
-                getSingleVariantLoading ? (
+                isCustomerLoading ? (
                   <Spin size="small" />
                 ) : (
                   <>
@@ -727,7 +746,7 @@ const PosPage = () => {
       </Form>
 
       <div style={{ marginTop: '15px' }}>
-        <SellTable payloads={sellPayloads} />
+        <SellTable payloads={sellPayloads} setSellPayloads={setSellPayloads} />
       </div>
     </div>
   )

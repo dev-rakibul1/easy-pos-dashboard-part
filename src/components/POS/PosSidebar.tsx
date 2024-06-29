@@ -6,9 +6,17 @@ const { Text, Title } = Typography
 
 const PosSidebar = () => {
   const { data: variantData, isLoading: variantLoading } =
-    useGetAllVariantsQuery({ pollingInterval: 15000 })
+    useGetAllVariantsQuery({
+      pollingInterval: 5000,
+      skipPollingIfUnfocused: true,
+      refetchOnMountOrArgChange: true,
+    })
   const { data: productData, isLoading: productLoading } =
-    useGetAllStockInProductQuery({ pollingInterval: 15000 })
+    useGetAllStockInProductQuery({
+      pollingInterval: 5000,
+      skipPollingIfUnfocused: true,
+      refetchOnMountOrArgChange: true,
+    })
 
   // @ts-ignore
   const products: IProduct[] = productData?.products || []
