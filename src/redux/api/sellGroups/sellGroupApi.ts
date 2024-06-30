@@ -32,4 +32,5 @@ export const sellGroupApi = baseApi.injectEndpoints({
   }),
 })
 
-export const { useGetAllSellGroupQuery } = sellGroupApi
+export const { useGetAllSellGroupQuery, useGetSingleSellGroupQuery } =
+  sellGroupApi

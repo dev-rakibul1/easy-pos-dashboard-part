@@ -1,10 +1,9 @@
 import { UserOutlined } from '@ant-design/icons'
 import { Avatar, Card, Col, Descriptions, Divider, Row, Typography } from 'antd'
-import './SupplierUI'
 
 const { Title, Text } = Typography
 
-const SupplierUI = ({ supplier }: any) => {
+const CustomerUi = ({ customer }: any) => {
   //   console.log('Supplier form Supplier UI pages', supplier)
 
   return (
@@ -19,8 +18,8 @@ const SupplierUI = ({ supplier }: any) => {
               size={120}
               icon={<UserOutlined />}
               src={
-                supplier?.profileImage
-                  ? `http://localhost:7000${supplier?.profileImage}`
+                customer?.profileImage
+                  ? `http://localhost:7000${customer?.profileImage}`
                   : 'https://via.placeholder.com/300'
               }
               style={{ marginBottom: 16 }}
@@ -30,11 +29,11 @@ const SupplierUI = ({ supplier }: any) => {
         <Row justify="center" align="middle">
           <Col>
             <Title level={4}>
-              {supplier?.firstName}{' '}
-              {supplier?.middleName === null ? '' : supplier?.middleName}{' '}
-              {supplier?.lastName}
+              {customer?.firstName}{' '}
+              {customer?.middleName === null ? '' : customer?.middleName}{' '}
+              {customer?.lastName}
             </Title>
-            <Text type="secondary">Supplier Information</Text>
+            <Text type="secondary">customer Information</Text>
             {/* <Text type="secondary">Los Angeles, California, USA</Text> */}
           </Col>
         </Row>
@@ -50,34 +49,34 @@ const SupplierUI = ({ supplier }: any) => {
             >
               <Descriptions.Item label="First Name">
                 {' '}
-                {supplier?.firstName}
+                {customer?.firstName}
               </Descriptions.Item>
               <Descriptions.Item label="Middle Name">
                 {' '}
-                {supplier?.middleName ? supplier?.middleName : 'N/A'}
+                {customer?.middleName ? customer?.middleName : 'N/A'}
               </Descriptions.Item>
               <Descriptions.Item label="Last Name">
                 {' '}
-                {supplier?.lastName}
+                {customer?.lastName}
               </Descriptions.Item>
               <Descriptions.Item label="Email address">
-                {supplier?.email ? supplier?.email : 'N/A'}
+                {customer?.email ? customer?.email : 'N/A'}
               </Descriptions.Item>
               <Descriptions.Item label="Phone">
                 {' '}
-                {supplier?.phoneNo ? supplier?.phoneNo : 'N/A'}
+                {customer?.phoneNo ? customer?.phoneNo : 'N/A'}
               </Descriptions.Item>
               <Descriptions.Item label="Unique ID">
                 {' '}
-                {supplier?.uniqueId ? supplier?.uniqueId : 'N/A'}
+                {customer?.uniqueId ? customer?.uniqueId : 'N/A'}
               </Descriptions.Item>
               <Descriptions.Item label="NID">
                 {' '}
-                {supplier?.nid ? supplier?.nid : 'N/A'}
+                {customer?.nid ? customer?.nid : 'N/A'}
               </Descriptions.Item>
               <Descriptions.Item label="Gender">
                 {' '}
-                {supplier?.gender ? supplier?.gender : 'N/A'}
+                {customer?.gender ? customer?.gender : 'N/A'}
               </Descriptions.Item>
             </Descriptions>
           </Col>
@@ -95,12 +94,12 @@ const SupplierUI = ({ supplier }: any) => {
               <Descriptions.Item label="TAX ID">N/A</Descriptions.Item>
               <Descriptions.Item label="Present address">
                 {' '}
-                {supplier?.presentAddress ? supplier?.presentAddress : 'N/A'}
+                {customer?.presentAddress ? customer?.presentAddress : 'N/A'}
               </Descriptions.Item>
               <Descriptions.Item label="Permanent address">
                 {' '}
-                {supplier?.permanentAddress
-                  ? supplier?.permanentAddress
+                {customer?.permanentAddress
+                  ? customer?.permanentAddress
                   : 'N/A'}
               </Descriptions.Item>
             </Descriptions>
@@ -112,4 +111,4 @@ const SupplierUI = ({ supplier }: any) => {
   )
 }
 
-export default SupplierUI
+export default CustomerUi

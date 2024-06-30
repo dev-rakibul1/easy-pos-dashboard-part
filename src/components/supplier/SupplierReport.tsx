@@ -14,7 +14,6 @@ interface SupplierInvoiceProps {
 
 const SupplierInvoice: React.FC<SupplierInvoiceProps> = ({ id, supplier }) => {
   const { data, isLoading } = useGetSinglePurchaseGroupQuery(id)
-  console.log(data)
 
   if (isLoading) {
     return <Spin size="small" />
@@ -301,6 +300,20 @@ const SupplierInvoice: React.FC<SupplierInvoiceProps> = ({ id, supplier }) => {
                     (acc, item) => acc + parseFloat(item.discountAmount),
                     0
                   )
+                  .toFixed(2)}
+              </Text>
+            </div>
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                marginBottom: '8px',
+              }}
+            >
+              <Text>Total VAT:</Text> {/* Added VAT amount */}
+              <Text>
+                {dataSource
+                  .reduce((acc, item) => acc + parseFloat(item.vatAmount), 0)
                   .toFixed(2)}
               </Text>
             </div>

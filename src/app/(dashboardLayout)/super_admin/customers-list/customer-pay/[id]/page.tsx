@@ -5,10 +5,8 @@ import {
   supplierAndCustomerCoverStyle,
   supplierAndCustomerStyle,
 } from '@/components/styles/style'
-
-import { useCreatePayInSupplierMutation } from '@/redux/api/payInSupplier/payInSupplierApi'
-import { useGetSinglePurchaseGroupQuery } from '@/redux/api/purchaseGroup/purchaseGroupApi'
-import { useGetSingleSupplierSellQuery } from '@/redux/api/supplierSells/supplierSellApi'
+import { useGetSingleCustomerPurchaseQuery } from '@/redux/api/customerPurchase/customerPurchaseApi'
+import { useGetSingleSellGroupQuery } from '@/redux/api/sellGroups/sellGroupApi'
 import { getUserInfo } from '@/services/auth.services'
 import {
   DollarCircleOutlined,
@@ -30,6 +28,7 @@ import {
   message,
 } from 'antd'
 import React, { useEffect, useState } from 'react'
+import { useCreateCustomerPayInUserMutation } from '../../../../../../redux/api/customerPayInUserApi/customerPayInUserApi'
 
 const { Title, Text } = Typography
 
@@ -41,21 +40,22 @@ interface Props {
   params: Params
 }
 
-const SupplierPayPage: React.FC<Props> = ({ params }) => {
+const CustomerPayPage: React.FC<Props> = ({ params }) => {
   const { role } = getUserInfo() as any
   const paramsId = params.id
-  const { data, isLoading } = useGetSingleSupplierSellQuery(paramsId, {
+  const { data, isLoading } = useGetSingleCustomerPurchaseQuery(paramsId, {
     pollingInterval: 15000,
     skipPollingIfUnfocused: true,
     refetchOnMountOrArgChange: true,
   })
-  const { data: purchaseGroup } = useGetSinglePurchaseGroupQuery(paramsId, {
+
+  const { data: sellGroup } = useGetSingleSellGroupQuery(paramsId, {
     pollingInterval: 15000,
     skipPollingIfUnfocused: true,
     refetchOnMountOrArgChange: true,
   })
-  const [createPayInSupplier, { isLoading: PayCreateLoading }] =
-    useCreatePayInSupplierMutation()
+  const [createCustomerPayInUser, { isLoading: PayCreateLoading }] =
+    useCreateCustomerPayInUserMutation()
 
   const [form] = Form.useForm()
   const [activeTabKey, setActiveTabKey] = useState<string>('details')
@@ -65,26 +65,28 @@ const SupplierPayPage: React.FC<Props> = ({ params }) => {
       form.setFieldsValue({
         previousDue: data.totalDue,
         totalPay: data.totalPay,
-        totalSellAmounts: data.totalSellAmounts,
+        totalPurchaseAmounts: data.totalPurchaseAmounts,
         SupplierSellId: data?.id,
-        purchaseGroupId: purchaseGroup?.id,
+        purchaseGroupId: sellGroup?.id,
       })
     }
-  }, [data, form, purchaseGroup?.id])
+  }, [data, form, sellGroup?.id])
 
   const onFinish = async (values: any) => {
     const convertNumberValue = Number(values?.pay)
     if (convertNumberValue > data?.totalDue) {
-      message.warning('Your amount is too long for supplier amount.')
+      message.warning('Your amount is too long for purchase amount.')
       return
     } else {
       const payloads = {
-        supplierSellId: data?.id,
-        purchaseGroupId: purchaseGroup?.id,
+        customerPurchaseId: data?.id,
+        sellGroupId: sellGroup?.id,
         payAmount: convertNumberValue,
       }
 
-      const res = await createPayInSupplier(payloads)
+      console.log(payloads)
+
+      const res = await createCustomerPayInUser(payloads)
 
       if (PayCreateLoading) {
         return (
@@ -112,7 +114,7 @@ const SupplierPayPage: React.FC<Props> = ({ params }) => {
   const tabList = [
     {
       key: 'details',
-      tab: 'Supplier Details',
+      tab: 'Customer Details',
     },
     {
       key: 'Payment',
@@ -122,59 +124,64 @@ const SupplierPayPage: React.FC<Props> = ({ params }) => {
 
   const contentList: Record<string, React.ReactNode> = {
     details: (
-      <Card style={{ marginTop: '50px' }}>
-        <Title level={2}>
-          <Text type="success" style={{ fontSize: '20px' }}>
-            {data?.supplier?.firstName && data?.supplier?.firstName}{' '}
-            {data?.supplier?.middleName && data?.supplier?.middleName}{' '}
-            {data?.supplier?.lastName && data?.supplier?.lastName}
-            {!data?.supplier?.firstName && !data?.supplier?.lastName && 'N/A'}
-          </Text>
-        </Title>
-        <Descriptions bordered column={1} style={{ marginTop: '15px' }}>
-          <Descriptions.Item label="Total Purchase">
-            <Text type="warning">
-              <DollarCircleOutlined />{' '}
-              {data?.totalSellAmounts ? data?.totalSellAmounts : 'N/A'}
+      <>
+        <Card style={{ marginTop: '50px' }}>
+          <Title level={2}>
+            <Text type="success" style={{ fontSize: '20px' }}>
+              {data?.customer?.firstName && data?.customer?.firstName}{' '}
+              {data?.customer?.middleName && data?.customer?.middleName}{' '}
+              {data?.customer?.lastName && data?.customer?.lastName}
+              {!data?.customer?.firstName && !data?.customer?.lastName && 'N/A'}
             </Text>
-          </Descriptions.Item>
-          <Descriptions.Item label="Previous Due">
-            <Text type="danger">
-              <ExclamationCircleOutlined />{' '}
-              {data?.totalSellAmounts
-                ? data?.totalSellAmounts <= data?.totalPay
-                  ? 'Paid'
-                  : data?.totalDue
-                : 'N/A'}
-            </Text>
-          </Descriptions.Item>
-          <Descriptions.Item label="Total Pay">
-            <Text type="success">
-              <DollarCircleOutlined /> {data?.totalPay ? data?.totalPay : 'N/A'}
-            </Text>
-          </Descriptions.Item>
-          <Descriptions.Item label="Email">
-            <Text type="secondary">
-              <MailOutlined />{' '}
-              {data?.supplier?.email ? data?.supplier?.email : 'N/A'}
-            </Text>
-          </Descriptions.Item>
-          <Descriptions.Item label="Phone">
-            <Text type="secondary">
-              <PhoneOutlined />{' '}
-              {data?.supplier?.phoneNo ? data?.supplier?.phoneNo : 'N/A'}
-            </Text>
-          </Descriptions.Item>
-          <Descriptions.Item label="Address">
-            <Text type="secondary">
-              <HomeOutlined />{' '}
-              {data?.supplier?.presentAddress
-                ? data?.supplier?.presentAddress
-                : 'N/A'}
-            </Text>
-          </Descriptions.Item>
-        </Descriptions>
-      </Card>
+          </Title>
+          <Descriptions bordered column={1} style={{ marginTop: '15px' }}>
+            <Descriptions.Item label="Total Purchase">
+              <Text type="warning">
+                <DollarCircleOutlined />{' '}
+                {data?.totalPurchaseAmounts
+                  ? data?.totalPurchaseAmounts
+                  : 'N/A'}
+              </Text>
+            </Descriptions.Item>
+            <Descriptions.Item label="Previous Due">
+              <Text type="danger">
+                <ExclamationCircleOutlined />{' '}
+                {data?.totalPurchaseAmounts
+                  ? data?.totalPurchaseAmounts <= data?.totalPay
+                    ? 'Paid'
+                    : data?.totalDue
+                  : 'N/A'}
+              </Text>
+            </Descriptions.Item>
+            <Descriptions.Item label="Total Pay">
+              <Text type="success">
+                <DollarCircleOutlined />{' '}
+                {data?.totalPay ? data?.totalPay : 'N/A'}
+              </Text>
+            </Descriptions.Item>
+            <Descriptions.Item label="Email">
+              <Text type="secondary">
+                <MailOutlined />{' '}
+                {data?.customer?.email ? data?.customer?.email : 'N/A'}
+              </Text>
+            </Descriptions.Item>
+            <Descriptions.Item label="Phone">
+              <Text type="secondary">
+                <PhoneOutlined />{' '}
+                {data?.customer?.phoneNo ? data?.customer?.phoneNo : 'N/A'}
+              </Text>
+            </Descriptions.Item>
+            <Descriptions.Item label="Address">
+              <Text type="secondary">
+                <HomeOutlined />{' '}
+                {data?.customer?.presentAddress
+                  ? data?.customer?.presentAddress
+                  : 'N/A'}
+              </Text>
+            </Descriptions.Item>
+          </Descriptions>
+        </Card>
+      </>
     ),
     Payment: (
       <Form
@@ -222,13 +229,13 @@ const SupplierPayPage: React.FC<Props> = ({ params }) => {
             link: `/${role}`,
           },
           {
-            label: `Supplier List`,
-            link: `/${role}/supplier-lists/`,
+            label: `Customer list`,
+            link: `/${role}/customers-list/`,
           },
           {
             label: `Payment`,
             // @ts-ignore
-            link: `/${role}/supplier-lists/supplier-pay/${params?.id}`,
+            link: `/${role}/customers-list/customer-pay/${params?.id}`,
           },
         ]}
       />
@@ -237,17 +244,18 @@ const SupplierPayPage: React.FC<Props> = ({ params }) => {
           <Card
             style={{ padding: '15px', position: 'relative' }}
             cover={
+              // eslint-disable-next-line @next/next/no-img-element
               <img
-                alt="supplier"
+                alt="customer"
                 src={
-                  data?.supplier?.profileImage
-                    ? `http://localhost:7000${data?.supplier?.profileImage}`
+                  data?.customer?.profileImage
+                    ? `http://localhost:7000${data?.customer?.profileImage}`
                     : 'https://via.placeholder.com/300'
                 }
                 style={supplierAndCustomerCoverStyle}
               />
             }
-            title="Supplier Information"
+            title="Customer Information"
             tabList={tabList}
             activeTabKey={activeTabKey}
             onTabChange={onTabChange}
@@ -255,8 +263,8 @@ const SupplierPayPage: React.FC<Props> = ({ params }) => {
             <div style={{ position: 'relative', zIndex: '10' }}>
               <img
                 src={
-                  data?.supplier?.profileImage
-                    ? `http://localhost:7000${data?.supplier?.profileImage}`
+                  data?.customer?.profileImage
+                    ? `http://localhost:7000${data?.customer?.profileImage}`
                     : 'https://via.placeholder.com/300'
                 }
                 alt=""
@@ -272,4 +280,4 @@ const SupplierPayPage: React.FC<Props> = ({ params }) => {
   )
 }
 
-export default SupplierPayPage
+export default CustomerPayPage

@@ -204,7 +204,7 @@ const SupplierLists = () => {
         ]}
       />
 
-      <ActionBar title="Product list">
+      <ActionBar title="Supplier list">
         <Input
           type="text"
           size="large"

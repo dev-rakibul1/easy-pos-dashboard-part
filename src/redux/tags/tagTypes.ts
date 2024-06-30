@@ -22,6 +22,8 @@ export enum tagTypes {
   purchaseGroup = 'purchaseGroup',
   sellGroup = 'sellGroup',
   payInSupplier = 'payInSupplier',
+  customerPurchase = 'customerPurchase',
+  customerPayInUser = 'customerPayInUser',
 }
 
 export const tagTypeLists = [
@@ -44,4 +46,11 @@ export const tagTypeLists = [
   tagTypes.customerPayments,
   tagTypes.currencyType,
   tagTypes.supplierSells,
+  tagTypes.customerPurchase,
+  tagTypes.payInSupplier,
+  tagTypes.sellGroup,
+  tagTypes.supplierSellProducts,
+  tagTypes.supplierSellVariants,
+  tagTypes.purchaseGroup,
+  tagTypes.customerPayInUser,
 ]

@@ -46,3 +46,23 @@ export const colorPickerStyle: CSSProperties = {
   justifyContent: 'start',
   alignItems: 'start',
 }
+export const supplierAndCustomerStyle: CSSProperties = {
+  marginLeft: 'auto',
+  objectFit: 'cover',
+  borderRadius: '100%',
+  position: 'absolute',
+  top: '-100px',
+  left: '11px',
+  border: '2px solid #fff',
+  width: '130px',
+  height: '130px',
+  maxWidth: '100%',
+  // maxHeight: '100%',
+}
+
+export const supplierAndCustomerCoverStyle: CSSProperties = {
+  maxWidth: '100%',
+  height: '150px',
+  marginLeft: 'auto',
+  objectFit: 'cover',
+}

@@ -332,3 +332,15 @@ export interface ISupplierSells {
   createdAt: string // You can use Date if you prefer handling dates as Date objects
   updatedAt: string // You can use Date if you prefer handling dates as Date objects
 }
+export interface ICustomerPurchase {
+  id: string
+  quantity: number
+  totalPurchaseAmounts: number
+  totalDue: number
+  totalPay: number
+  customerId: string
+  userId: string
+  productId: string
+  createdAt: string // You can use Date if you prefer handling dates as Date objects
+  updatedAt: string // You can use Date if you prefer handling dates as Date objects
+}

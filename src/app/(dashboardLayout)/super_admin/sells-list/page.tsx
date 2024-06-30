@@ -9,7 +9,7 @@ import { useGetAllSellGroupQuery } from '@/redux/api/sellGroups/sellGroupApi'
 import { useDeleteUnitMutation } from '@/redux/api/unitApi/unitApi'
 import { useDebounced } from '@/redux/hooks'
 import { getUserInfo } from '@/services/auth.services'
-import { IUnitDataResponse } from '@/types'
+import { ICustomer, IUnitDataResponse } from '@/types'
 import { DeleteOutlined, EditOutlined, ReloadOutlined } from '@ant-design/icons'
 import { Button, Input, message } from 'antd'
 import dayjs from 'dayjs'
@@ -25,6 +25,20 @@ const SellsListPage = () => {
   const [searchTerm, setSearchTerm] = useState<string>('')
   const [deleteId, setDeleteId] = useState<string | null>(null)
 
+  interface CustomerPurchase {
+    quantity?: number
+    totalPurchaseAmounts?: number
+    totalDue?: number
+    totalPay?: number
+    customer?: ICustomer
+  }
+
+  interface SellGroup {
+    id: string
+    uniqueId: string
+    createdAt: string
+    customerPurchase?: CustomerPurchase
+  }
   // Create Search debouncedTerms
   const debouncedSearchTerm = useDebounced({
     searchQuery: searchTerm,
@@ -45,34 +59,63 @@ const SellsListPage = () => {
 
   const columns = [
     {
-      title: 'INVOICE NO',
+      title: 'INV. NO',
       dataIndex: 'uniqueId',
     },
     {
-      title: 'QUANTITY',
-      dataIndex: ['customerPurchase', 'quantity'],
+      title: 'CUSTOMER N.',
+      dataIndex: ['customerPurchase', 'customer', 'firstName'],
+      render: (text: string, record: any) => {
+        return `${
+          !record?.customerPurchase?.customer?.firstName &&
+          !record?.customerPurchase?.customer?.lastName
+            ? 'N/A'
+            : `${record?.customerPurchase?.customer?.firstName || ''} ${
+                record?.customerPurchase?.customer?.lastName || ''
+              }`.trim()
+        }`
+      },
+    },
+    {
+      title: 'PHONE N.',
+      render: (record: SellGroup) =>
+        record?.customerPurchase?.customer?.phoneNo || 'N/A',
+    },
+    {
+      title: 'EMAIL A.',
+      render: (record: SellGroup) =>
+        record?.customerPurchase?.customer?.email || 'N/A',
+    },
+    {
+      title: 'QTY',
+      render: (record: SellGroup) =>
+        record?.customerPurchase?.quantity || 'N/A',
     },
     {
       title: 'TOTAL P.',
-      dataIndex: ['customerPurchase', 'totalPurchaseAmounts'],
+
+      render: (record: SellGroup) =>
+        record?.customerPurchase?.totalPurchaseAmounts || 'N/A',
     },
     {
       title: 'TOTAL D.',
-      dataIndex: ['customerPurchase', 'totalDue'],
+
+      render: (record: SellGroup) =>
+        record?.customerPurchase?.totalDue || 'N/A',
     },
     {
       title: 'TOTAL P.',
-      dataIndex: ['customerPurchase', 'totalPay'],
+      render: (record: SellGroup) =>
+        record?.customerPurchase?.totalPay || 'N/A',
     },
     {
-      title: 'PURCHASE DATE',
+      title: 'P. DATE',
       dataIndex: 'createdAt',
       sorter: true,
       render: (data: any) => {
         return data && dayjs(data).format('D MMM, YYYY hh:mm A')
       },
     },
-
     {
       title: 'ACTION',
       render: (data: any) => {

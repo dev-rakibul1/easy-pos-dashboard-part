@@ -195,7 +195,7 @@ const sidebarItems = (role: string) => {
       icon: <LiaSellcast />,
       children: [
         {
-          label: <Link href={`/${role}/add-supplier`}>Supplier</Link>,
+          label: <Link href={`/${role}/add-supplier`}>Add Supplier</Link>,
           key: `/${role}/supplier`,
           icon: <FaArrowRightLong />,
         },
