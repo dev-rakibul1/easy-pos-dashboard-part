@@ -343,6 +343,28 @@ const CustomerReport: React.FC<SupplierInvoiceProps> = ({ id, customer }) => {
           </Col>
         </Row>
       </div>
+
+      {data?.customerPurchase?.totalPurchaseAmounts <=
+        data?.customerPurchase?.totalPay && (
+        <h1
+          style={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            position: 'fixed',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%) rotate(-45deg)',
+            fontSize: '10vw',
+            zIndex: '5',
+            margin: '0',
+            color: '#000',
+            opacity: 0.1,
+          }}
+        >
+          Paid
+        </h1>
+      )}
     </div>
   )
 }

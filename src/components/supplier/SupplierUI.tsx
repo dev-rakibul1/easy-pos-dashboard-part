@@ -1,5 +1,6 @@
 import { UserOutlined } from '@ant-design/icons'
 import { Avatar, Card, Col, Descriptions, Divider, Row, Typography } from 'antd'
+import { textCapitalize } from '../styles/style'
 import './SupplierUI'
 
 const { Title, Text } = Typography
@@ -29,7 +30,7 @@ const SupplierUI = ({ supplier }: any) => {
         </Row>
         <Row justify="center" align="middle">
           <Col>
-            <Title level={4}>
+            <Title level={4} style={{ textTransform: 'capitalize' }}>
               {supplier?.firstName}{' '}
               {supplier?.middleName === null ? '' : supplier?.middleName}{' '}
               {supplier?.lastName}
@@ -48,15 +49,15 @@ const SupplierUI = ({ supplier }: any) => {
               bordered
               style={{ width: '100%' }}
             >
-              <Descriptions.Item label="First Name">
+              <Descriptions.Item label="First Name" style={textCapitalize}>
                 {' '}
                 {supplier?.firstName}
               </Descriptions.Item>
-              <Descriptions.Item label="Middle Name">
+              <Descriptions.Item label="Middle Name" style={textCapitalize}>
                 {' '}
                 {supplier?.middleName ? supplier?.middleName : 'N/A'}
               </Descriptions.Item>
-              <Descriptions.Item label="Last Name">
+              <Descriptions.Item label="Last Name" style={textCapitalize}>
                 {' '}
                 {supplier?.lastName}
               </Descriptions.Item>
@@ -75,7 +76,7 @@ const SupplierUI = ({ supplier }: any) => {
                 {' '}
                 {supplier?.nid ? supplier?.nid : 'N/A'}
               </Descriptions.Item>
-              <Descriptions.Item label="Gender">
+              <Descriptions.Item label="Gender" style={textCapitalize}>
                 {' '}
                 {supplier?.gender ? supplier?.gender : 'N/A'}
               </Descriptions.Item>

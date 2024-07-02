@@ -15,6 +15,8 @@ interface SupplierInvoiceProps {
 const SupplierInvoice: React.FC<SupplierInvoiceProps> = ({ id, supplier }) => {
   const { data, isLoading } = useGetSinglePurchaseGroupQuery(id)
 
+  console.log(data)
+
   if (isLoading) {
     return <Spin size="small" />
   }
@@ -362,6 +364,28 @@ const SupplierInvoice: React.FC<SupplierInvoiceProps> = ({ id, supplier }) => {
           </div>
         </Col>
       </Row>
+
+      {data?.supplierSells?.totalSellAmounts <=
+        data?.supplierSells?.totalPay && (
+        <h1
+          style={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            position: 'fixed',
+            top: '50%', // Use top instead of bottom for centering
+            left: '50%',
+            transform: 'translate(-50%, -50%) rotate(-45deg)',
+            fontSize: '10vw',
+            zIndex: '5',
+            margin: '0',
+            color: '#000',
+            opacity: 0.1,
+          }}
+        >
+          Paid
+        </h1>
+      )}
     </div>
   )
 }

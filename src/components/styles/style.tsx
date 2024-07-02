@@ -66,3 +66,5 @@ export const supplierAndCustomerCoverStyle: CSSProperties = {
   marginLeft: 'auto',
   objectFit: 'cover',
 }
+export const textCapitalize: CSSProperties = { textTransform: 'capitalize' }
+export const textUpperCase: CSSProperties = { textTransform: 'uppercase' }

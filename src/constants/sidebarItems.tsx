@@ -180,8 +180,8 @@ const sidebarItems = (role: string) => {
           icon: <FaArrowRightLong />,
         },
         {
-          label: <Link href={`/${role}/return-list`}>return list</Link>,
-          key: `/${role}/return-list`,
+          label: <Link href={`/${role}/return-lists`}>return list</Link>,
+          key: `/${role}/return-lists`,
           icon: <FaArrowRightLong />,
         },
       ],

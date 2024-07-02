@@ -174,6 +174,26 @@ const SupplierPayPage: React.FC<Props> = ({ params }) => {
             </Text>
           </Descriptions.Item>
         </Descriptions>
+
+        {data?.totalSellAmounts <= data?.totalPay && (
+          <h1
+            style={{
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              position: 'absolute',
+              top: '50%',
+              left: '50%',
+              transform: 'translate(-50%, -50%) rotate(-45deg)',
+              fontSize: '10vw',
+              zIndex: '0',
+              margin: '0',
+              color: '#ddd',
+            }}
+          >
+            Paid
+          </h1>
+        )}
       </Card>
     ),
     Payment: (
@@ -182,7 +202,7 @@ const SupplierPayPage: React.FC<Props> = ({ params }) => {
         name="customer_pay"
         onFinish={onFinish}
         layout="vertical"
-        disabled={data?.totalPurchaseAmounts <= data?.totalPay}
+        disabled={data?.totalSellAmounts <= data?.totalPay}
         style={{ marginTop: '50px' }}
       >
         <Col xs={24} sm={12} md={12} lg={12} xl={12}>
@@ -199,9 +219,9 @@ const SupplierPayPage: React.FC<Props> = ({ params }) => {
             <Button
               type="primary"
               htmlType="submit"
-              disabled={data?.totalPurchaseAmounts <= data?.totalPay}
+              disabled={data?.totalSellAmounts <= data?.totalPay}
             >
-              {data?.totalPurchaseAmounts <= data?.totalPay ? 'Paid' : 'Pay'}
+              {data?.totalSellAmounts <= data?.totalPay ? 'Paid' : 'Pay'}
             </Button>
           </Form.Item>
         </Col>
@@ -233,7 +253,7 @@ const SupplierPayPage: React.FC<Props> = ({ params }) => {
         ]}
       />
       <Row justify="center" style={{ padding: '20px' }}>
-        <Col span={16}>
+        <Col xs={24} sm={24} md={16} lg={16} xl={16}>
           <Card
             style={{ padding: '15px', position: 'relative' }}
             cover={

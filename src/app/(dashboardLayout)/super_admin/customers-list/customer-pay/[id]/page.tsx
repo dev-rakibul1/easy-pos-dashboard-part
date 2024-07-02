@@ -180,6 +180,26 @@ const CustomerPayPage: React.FC<Props> = ({ params }) => {
               </Text>
             </Descriptions.Item>
           </Descriptions>
+
+          {data?.totalPurchaseAmounts <= data?.totalPay && (
+            <h1
+              style={{
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                position: 'absolute',
+                top: '50%',
+                left: '50%',
+                transform: 'translate(-50%, -50%) rotate(-45deg)',
+                fontSize: '10vw',
+                zIndex: '0',
+                margin: '0',
+                color: '#ddd',
+              }}
+            >
+              Paid
+            </h1>
+          )}
         </Card>
       </>
     ),
