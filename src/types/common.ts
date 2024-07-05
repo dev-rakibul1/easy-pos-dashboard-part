@@ -56,6 +56,7 @@ export type IVariant = {
   productId: string
   product: IProduct
   status: string
+  price: number
   createdAt: Date
   updatedAt: Date
 }
@@ -332,6 +333,21 @@ export interface ISupplierSells {
   createdAt: string // You can use Date if you prefer handling dates as Date objects
   updatedAt: string // You can use Date if you prefer handling dates as Date objects
 }
+
+export interface ISupplierReturn {
+  totalReturnAmount: number
+  id: string
+  quantity: number
+  totalSellAmounts: number
+  totalDue: number
+  totalPay: number
+  supplierId: string
+  userId: string
+  productId: string
+  createdAt: string // You can use Date if you prefer handling dates as Date objects
+  updatedAt: string // You can use Date if you prefer handling dates as Date objects
+}
+
 export interface ICustomerPurchase {
   id: string
   quantity: number

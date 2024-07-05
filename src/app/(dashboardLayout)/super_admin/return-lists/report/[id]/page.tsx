@@ -1,21 +1,23 @@
 'use client'
 
 import PosBreadcrumb from '@/components/breadcrumb/PosBreadcrumb'
-import CustomerReport from '@/components/customer/CustomerReport'
+import ReturnInvoice from '@/components/return/ReturnReport'
 import { flexBetween } from '@/components/styles/style'
 import ActionBar from '@/components/ui/ActionBar'
-import { useGetSingleCustomerPurchaseQuery } from '@/redux/api/customerPurchase/customerPurchaseApi'
+import { useGetSingleSupplierQuery } from '@/redux/api/supplierApi/supplierApi'
+import { useGetSingleSupplierReturnPaymentQuery } from '@/redux/api/supplierReturnPayment/supplierReturnPayemntApi'
 import { getUserInfo } from '@/services/auth.services'
 import { PrinterOutlined } from '@ant-design/icons'
 import { Button } from 'antd'
 
-const CustomerPurchaseReport = ({ params }: any) => {
+const ReturnReportPage = ({ params }: any) => {
   const { role } = getUserInfo() as any
   const paramsId = params.id
+  const { data } = useGetSingleSupplierReturnPaymentQuery(paramsId)
+  const supplierId = data?.supplierId
+  const { data: supplier } = useGetSingleSupplierQuery(supplierId)
 
-  const { data } = useGetSingleCustomerPurchaseQuery(paramsId)
-  const customer = data?.customer
-  // console.log(customer)
+  console.log(data)
 
   return (
     <div>
@@ -26,30 +28,29 @@ const CustomerPurchaseReport = ({ params }: any) => {
             link: `/${role}`,
           },
           {
-            label: `Customer list`,
-            link: `/${role}/customers-list/`,
+            label: `Return list`,
+            link: `/${role}/return-lists/`,
           },
           {
             label: `Report`,
             // @ts-ignore
-            link: `/${role}/Customers-list/report/${params?.id}`,
+            link: `/${role}/return-lists/report/${params?.id}`,
           },
         ]}
       />
 
       <div style={flexBetween}>
-        <ActionBar title="Customer report details"></ActionBar>
+        <ActionBar title="Report details"></ActionBar>
         <Button>
           {' '}
           Print <PrinterOutlined />
         </Button>
       </div>
       <div style={{ marginTop: '15px' }}>
-        <CustomerReport id={paramsId} customer={customer} />
-        {/* <SupplierReport id={paramsId} supplier={customer} /> */}
+        <ReturnInvoice id={paramsId} supplier={supplier} />
       </div>
     </div>
   )
 }
 
-export default CustomerPurchaseReport
+export default ReturnReportPage

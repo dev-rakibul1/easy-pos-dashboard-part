@@ -41,7 +41,7 @@ const PurchaseEditPage = ({ params }: any) => {
       }
     })
 
-    console.log(convertedValues)
+    // console.log(convertedValues)
 
     message.loading({ content: 'Updating purchase...', key: 'updating' })
     try {
@@ -53,7 +53,7 @@ const PurchaseEditPage = ({ params }: any) => {
       } else {
         message.error('Purchase update failed!')
       }
-      console.log(res)
+      // console.log(res)
     } catch (error: any) {
       message.error(error.message)
     }

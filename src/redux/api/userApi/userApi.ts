@@ -1,5 +1,5 @@
 import { tagTypes } from '@/redux/tags/tagTypes'
-import { IMeta } from '@/types'
+import { IMeta, IUser } from '@/types'
 import { baseApi } from '../baseApi'
 
 const USER_URL = '/user'
@@ -21,7 +21,7 @@ export const userApi = baseApi.injectEndpoints({
         method: 'GET',
         params: arg,
       }),
-      transformResponse: (response: any, meta: IMeta) => {
+      transformResponse: (response: IUser, meta: IMeta) => {
         return {
           users: response,
           meta: meta,
@@ -33,6 +33,15 @@ export const userApi = baseApi.injectEndpoints({
     getSingleUser: build.query({
       query: (id: string) => ({
         url: `${USER_URL}/${id}`,
+        method: 'GET',
+      }),
+
+      providesTags: [tagTypes.user],
+    }),
+
+    getSingleUserById: build.query({
+      query: (id: string) => ({
+        url: `${USER_URL}/single-user-by-id/${id}`,
         method: 'GET',
       }),
 
@@ -58,4 +67,8 @@ export const userApi = baseApi.injectEndpoints({
   }),
 })
 
-export const { useGetSingleUserQuery } = userApi
+export const {
+  useGetSingleUserQuery,
+  useGetSingleUserByIdQuery,
+  useGetAllUserQuery,
+} = userApi

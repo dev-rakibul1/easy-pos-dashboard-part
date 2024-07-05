@@ -44,7 +44,7 @@ const PurchaseList = () => {
   const meta = data?.meta
   const purchases = data?.purchases
 
-  console.log(purchases)
+  // console.log(purchases)
 
   // Reset filter
   const resetFilters = () => {

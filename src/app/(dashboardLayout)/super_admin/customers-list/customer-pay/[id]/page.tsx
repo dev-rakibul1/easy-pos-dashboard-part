@@ -84,7 +84,7 @@ const CustomerPayPage: React.FC<Props> = ({ params }) => {
         payAmount: convertNumberValue,
       }
 
-      console.log(payloads)
+      // console.log(payloads)
 
       const res = await createCustomerPayInUser(payloads)
 

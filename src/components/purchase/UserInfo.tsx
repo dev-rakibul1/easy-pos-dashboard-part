@@ -63,7 +63,7 @@ const UserInfo = ({
 
     try {
       const res = await addANewPurchase(payloads).unwrap()
-      console.log(res)
+      // console.log(res)
 
       if (res) {
         message.success('Purchase successfully!')

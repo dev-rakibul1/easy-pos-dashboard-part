@@ -65,7 +65,7 @@ const ProductEditPage = ({ params }: any) => {
   const router = useRouter()
 
   const onSubmit = async (values: any) => {
-    console.log(values)
+    // console.log(values)
     message.loading({ content: 'Updating product...', key: 'updating' })
     try {
       const res = await updateProduct({ id, body: values })

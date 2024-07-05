@@ -38,7 +38,7 @@ const ColorEditPage = ({ params }: any) => {
 
   const onFinish = async (values: IColorValues) => {
     const updatedValues = { ...values, colorCode }
-    console.log(updatedValues)
+    // console.log(updatedValues)
     message.loading({ content: 'Updating color...', key: 'updating' })
     try {
       const res = await updateColor({ id, body: updatedValues })

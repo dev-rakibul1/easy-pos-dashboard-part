@@ -1,5 +1,5 @@
 import { payments } from '@/constants/global'
-import { useAddANewSellsMutation } from '@/redux/api/sells/sellsApi'
+import { useAddANewReturnMutation } from '@/redux/api/returnApi/returnApi'
 import { useGetSingleUserQuery } from '@/redux/api/userApi/userApi'
 import { getUserInfo } from '@/services/auth.services'
 import { Button, Col, Form, Input, Row, Select, message } from 'antd'
@@ -30,7 +30,7 @@ const ReturnAmounts: React.FC<ISellPayProps> = ({
   const [form] = Form.useForm<ISellPayISellPay>()
   const [concatVariants, setConcatVariants] = useState<ISellVariant[]>([])
   const { data: userData } = useGetSingleUserQuery(uniqueId)
-  const [addANewSells] = useAddANewSellsMutation()
+  const [addANewReturn] = useAddANewReturnMutation()
 
   const handlePayChange = (
     changedValues: Partial<ISellPayISellPay>,
@@ -48,17 +48,17 @@ const ReturnAmounts: React.FC<ISellPayProps> = ({
     const supplierId = returnPayloads?.find(id => id.supplierId)
     const productId = returnPayloads?.find(id => id.productId)
 
-    // Customer payment
+    // return payment
     // @ts-ignore
     values.amount = parseFloat(values?.amount ? values?.amount : 0) as number
     const supplierReturn = {
       totalPay: values?.amount,
-      customerId: supplierId?.supplierId,
+      supplierId: supplierId?.supplierId,
       productId: productId?.productId,
       userId: userData?.id,
     }
 
-    // sell variants
+    // Sell variants
     const variantsData: ISellVariant[] =
       returnPayloads?.flatMap(variant => variant?.variants || []) || []
     setConcatVariants(prevConcatVariants => [
@@ -70,12 +70,10 @@ const ReturnAmounts: React.FC<ISellPayProps> = ({
     const returnsInfo = returnPayloads.map(ret => {
       return {
         totalSellPrice: ret?.totalPrice,
-
         productName: ret?.productName,
         modelName: ret?.modelName,
         supplierName: ret?.supplierName,
         quantity: ret?.quantity,
-
         supplierId: ret?.supplierId,
         productId: ret?.productId,
         variantId: ret?.variantId,
@@ -83,9 +81,34 @@ const ReturnAmounts: React.FC<ISellPayProps> = ({
       }
     })
 
+    // Logging the returnsInfo array to ensure it contains the correct data
+    // console.log('returnsInfo:', returnsInfo)
+
+    // Iterate over variantsData and construct newVariant objects correctly
+    const newVariants = variantsData
+      .map(variant => {
+        const { imeiNumber, ram, rom, color, ...restData } = variant
+        const correspondingReturnInfo = returnsInfo.find(
+          info => info.variantId === variant.variantId
+        )
+
+        if (!correspondingReturnInfo) {
+          message.error('No corresponding return info found for variant:')
+          return null
+        }
+
+        return {
+          ...restData,
+          productId: correspondingReturnInfo.productId,
+          userId: correspondingReturnInfo.userId,
+          supplierId: correspondingReturnInfo.supplierId,
+        }
+      })
+      .filter(Boolean) // Remove any null values
+
     const finalSellInformation = {
       supplierReturn: supplierReturn,
-      variants: variantsData,
+      variants: newVariants,
       payloads: returnsInfo,
     }
 
@@ -93,25 +116,25 @@ const ReturnAmounts: React.FC<ISellPayProps> = ({
 
     console.log(finalSellInformation)
 
-    // try {
-    //   const res = await addANewSells(finalSellInformation)
+    try {
+      const res = await addANewReturn(finalSellInformation)
 
-    //   if (res?.data?.count) {
-    //     message.success('Sell successfully!')
+      if (res?.data) {
+        message.success('Return successfully!')
 
-    //     form.resetFields()
-    //     setSellPayloads([])
-    //   } else {
-    //     message.error('Sell fail!')
-    //   }
-    // } catch (error: any) {
-    //   message.error('Sell fail!')
-    // } finally {
-    //   message.destroy('creating')
-    // }
+        form.resetFields()
+        setReturnPayloads([])
+      } else {
+        message.error('Return fail!')
+      }
+    } catch (error: any) {
+      message.error('Return fail!')
+    } finally {
+      message.destroy('creating')
+    }
 
     // form.resetFields()
-    // setSellPayloads([])
+    // setReturnPayloads([])
   }
 
   const filterOption = (

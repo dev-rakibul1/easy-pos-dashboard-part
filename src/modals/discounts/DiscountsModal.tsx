@@ -29,7 +29,7 @@ const DiscountsModal = ({
     }
 
     values.discountValue = discountValue // Update values with parsed discountValue
-    console.log(values)
+    // console.log(values)
     message.loading({ content: 'Creating discount...', key: 'creating' })
 
     try {

@@ -49,7 +49,7 @@ const ProductListPage = () => {
   const meta = data?.meta
   const products = data?.products
 
-  console.log(products)
+  // console.log(products)
 
   // Reset filter
   const resetFilters = () => {

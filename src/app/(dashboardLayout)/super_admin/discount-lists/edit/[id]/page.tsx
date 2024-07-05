@@ -26,11 +26,11 @@ const EditDiscountPage = ({ params }: any) => {
   const router = useRouter()
 
   const onsubmit = async (values: IDiscountsValues) => {
-    console.log('first')
+    // console.log('first')
 
     // @ts-ignore
     values.discountValue = parseFloat(values.discountValue)
-    console.log(values)
+    // console.log(values)
     message.loading({ content: 'Updating discount...', key: 'updating' })
     try {
       const res = await updateDiscount({ id, body: values })

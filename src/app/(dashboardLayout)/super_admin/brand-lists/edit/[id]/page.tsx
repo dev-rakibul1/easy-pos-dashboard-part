@@ -27,7 +27,6 @@ const BrandEditPage = ({ params }: any) => {
   const router = useRouter()
 
   const onsubmit = async (values: IBrandData) => {
-    console.log(values)
     message.loading({ content: 'Updating brand...', key: 'updating' })
     try {
       const res = await updateBrand({ id, body: values })

@@ -257,7 +257,7 @@ const PosPage = () => {
       ...restData
     } = newFormData
 
-    console.log(newFormData)
+    // console.log(newFormData)
 
     const variantObj: ISellVariant = {
       imeiNumber,

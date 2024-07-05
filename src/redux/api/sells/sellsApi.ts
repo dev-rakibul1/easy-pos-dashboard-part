@@ -16,8 +16,17 @@ export const sellsApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: [tagTypes.sell],
     }),
+    // Create a new sell
+    getSellByCurrentDate: build.query({
+      query: () => ({
+        url: `${SELLS_URL}/get-sell-by-current-date/`,
+        method: 'GET',
+      }),
+      providesTags: [tagTypes.sell],
+    }),
   }),
   overrideExisting: false,
 })
 
-export const { useAddANewSellsMutation } = sellsApi
+export const { useAddANewSellsMutation, useGetSellByCurrentDateQuery } =
+  sellsApi

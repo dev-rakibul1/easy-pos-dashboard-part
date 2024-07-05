@@ -47,7 +47,7 @@ const SupplierLists = () => {
   const meta = data?.meta
   const suppliers = data?.suppliers
 
-  console.log(suppliers)
+  // console.log(suppliers)
 
   // Reset filter
   const resetFilters = () => {

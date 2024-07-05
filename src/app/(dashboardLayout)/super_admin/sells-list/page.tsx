@@ -55,7 +55,7 @@ const SellsListPage = () => {
   const { isLoading, data } = useGetAllSellGroupQuery(query)
   const meta = data?.meta
   const sellGroups = data?.sellGroups
-  console.log(sellGroups)
+  // console.log(sellGroups)
 
   const columns = [
     {

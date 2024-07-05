@@ -47,7 +47,7 @@ const CustomersList = () => {
   const meta = data?.meta
   const customers = data?.customers
 
-  console.log(customers)
+  // console.log(customers)
 
   // Reset filter
   const resetFilters = () => {

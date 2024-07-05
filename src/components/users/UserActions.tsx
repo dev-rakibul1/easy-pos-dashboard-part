@@ -1,21 +1,21 @@
-import { ICustomer } from '@/types'
+import { IUser } from '@/types'
 import type { TabsProps } from 'antd'
 import { Tabs } from 'antd'
 import React from 'react'
 import Payments from '../supplier/tabItems/Payments'
-import Returns from '../supplier/tabItems/Returns'
 import Purchase from './tabs/Purchase'
+import Returns from './tabs/Returns'
 
 const onChange = (key: string) => {
   //   console.log(key)
 }
 
-interface CustomerActionsProps {
-  customer: ICustomer
+interface SupplierActionsProps {
+  user: IUser
 }
 
-const CustomerActions: React.FC<CustomerActionsProps> = ({ customer }) => {
-  // console.log(customer)
+const UserActions: React.FC<SupplierActionsProps> = ({ user }) => {
+  // console.log(supplier)
 
   const items: TabsProps['items'] = [
     {
@@ -23,7 +23,7 @@ const CustomerActions: React.FC<CustomerActionsProps> = ({ customer }) => {
       label: 'Purchase',
       children: (
         <div style={{ padding: '15px' }}>
-          <Purchase customer={customer} />
+          <Purchase user={user} />
         </div>
       ),
     },
@@ -36,11 +36,11 @@ const CustomerActions: React.FC<CustomerActionsProps> = ({ customer }) => {
     {
       key: '4',
       label: 'Returns',
-      children: <Returns />,
+      children: <Returns user={user} />,
     },
   ]
 
   return <Tabs defaultActiveKey="1" items={items} onChange={onChange} />
 }
 
-export default CustomerActions
+export default UserActions

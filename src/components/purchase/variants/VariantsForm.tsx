@@ -55,7 +55,7 @@ const DynamicForm = ({
   }
 
   const onSearch = (value: string) => {
-    console.log('search:', value)
+    // console.log('search:', value)
   }
 
   const renderFormItems = () => {

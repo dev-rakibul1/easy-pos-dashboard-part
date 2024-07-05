@@ -15,7 +15,7 @@ interface SupplierInvoiceProps {
 const SupplierInvoice: React.FC<SupplierInvoiceProps> = ({ id, supplier }) => {
   const { data, isLoading } = useGetSinglePurchaseGroupQuery(id)
 
-  console.log(data)
+  // console.log(data)
 
   if (isLoading) {
     return <Spin size="small" />

@@ -155,10 +155,6 @@ const ReturnToSupplier = () => {
     }
   })
 
-  //   const singleSupplierGet = formData.selectProduct ? userAndProduct : ''
-
-  //   console.log(suppliers)
-
   // Single customer get
   const { data: singleSupplierById } = useGetSingleSupplierQuery(selectSupplier)
 
@@ -210,7 +206,6 @@ const ReturnToSupplier = () => {
     const newFormData = {
       ...formData,
     }
-    console.log(newFormData)
 
     const {
       imeiNumber,
@@ -222,8 +217,6 @@ const ReturnToSupplier = () => {
       selectVariant: vId,
       ...restData
     } = newFormData
-
-    console.log(newFormData)
 
     const variantObj: ISellVariant = {
       imeiNumber,
@@ -361,6 +354,7 @@ const ReturnToSupplier = () => {
   }
 
   //----------VAT, DISCOUNT AND OTHERS CALCULATION--------
+
   useEffect(() => {
     // Return calculation
     const totalPrice = singlePurchase?.totalPrice
