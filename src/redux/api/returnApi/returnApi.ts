@@ -29,7 +29,22 @@ export const returnApi = baseApi.injectEndpoints({
       },
       providesTags: [tagTypes.return],
     }),
+    getAllReturnsByCurrentDate: build.query({
+      query: (arg: Record<string, any>) => ({
+        url: `${RETURN_URL}/get-by-current-date`,
+        method: 'GET',
+        params: arg,
+      }),
+      transformResponse: (response: any, meta: IMeta) => {
+        return {
+          returns: response,
+          meta: meta,
+        }
+      },
+      providesTags: [tagTypes.return],
+    }),
   }),
 })
 
-export const { useAddANewReturnMutation } = returnApi
+export const { useAddANewReturnMutation, useGetAllReturnsByCurrentDateQuery } =
+  returnApi

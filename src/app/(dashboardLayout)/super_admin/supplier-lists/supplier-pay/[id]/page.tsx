@@ -5,18 +5,13 @@ import {
   supplierAndCustomerCoverStyle,
   supplierAndCustomerStyle,
 } from '@/components/styles/style'
+import { currencyName, payments } from '@/constants/global'
 
 import { useCreatePayInSupplierMutation } from '@/redux/api/payInSupplier/payInSupplierApi'
 import { useGetSinglePurchaseGroupQuery } from '@/redux/api/purchaseGroup/purchaseGroupApi'
 import { useGetSingleSupplierSellQuery } from '@/redux/api/supplierSells/supplierSellApi'
 import { getUserInfo } from '@/services/auth.services'
-import {
-  DollarCircleOutlined,
-  ExclamationCircleOutlined,
-  HomeOutlined,
-  MailOutlined,
-  PhoneOutlined,
-} from '@ant-design/icons'
+import { HomeOutlined, MailOutlined, PhoneOutlined } from '@ant-design/icons'
 import {
   Button,
   Card,
@@ -25,6 +20,7 @@ import {
   Form,
   Input,
   Row,
+  Select,
   Spin,
   Typography,
   message,
@@ -82,6 +78,7 @@ const SupplierPayPage: React.FC<Props> = ({ params }) => {
         supplierSellId: data?.id,
         purchaseGroupId: purchaseGroup?.id,
         payAmount: convertNumberValue,
+        paymentType: values?.paymentMethod,
       }
 
       const res = await createPayInSupplier(payloads)
@@ -120,6 +117,11 @@ const SupplierPayPage: React.FC<Props> = ({ params }) => {
     },
   ]
 
+  const filterOption = (
+    input: string,
+    option?: { label: string; value: string }
+  ) => (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
+
   const contentList: Record<string, React.ReactNode> = {
     details: (
       <Card style={{ marginTop: '50px' }}>
@@ -134,23 +136,22 @@ const SupplierPayPage: React.FC<Props> = ({ params }) => {
         <Descriptions bordered column={1} style={{ marginTop: '15px' }}>
           <Descriptions.Item label="Total Purchase">
             <Text type="warning">
-              <DollarCircleOutlined />{' '}
+              {currencyName}{' '}
               {data?.totalSellAmounts ? data?.totalSellAmounts : 'N/A'}
             </Text>
           </Descriptions.Item>
           <Descriptions.Item label="Previous Due">
             <Text type="danger">
-              <ExclamationCircleOutlined />{' '}
               {data?.totalSellAmounts
                 ? data?.totalSellAmounts <= data?.totalPay
                   ? 'Paid'
-                  : data?.totalDue
+                  : `${currencyName} ${data?.totalDue}`
                 : 'N/A'}
             </Text>
           </Descriptions.Item>
           <Descriptions.Item label="Total Pay">
             <Text type="success">
-              <DollarCircleOutlined /> {data?.totalPay ? data?.totalPay : 'N/A'}
+              {currencyName} {data?.totalPay ? data?.totalPay : 'N/A'}
             </Text>
           </Descriptions.Item>
           <Descriptions.Item label="Email">
@@ -202,29 +203,58 @@ const SupplierPayPage: React.FC<Props> = ({ params }) => {
         name="customer_pay"
         onFinish={onFinish}
         layout="vertical"
-        disabled={data?.totalSellAmounts <= data?.totalPay}
+        disabled={data?.totalPurchaseAmounts <= data?.totalPay}
         style={{ marginTop: '50px' }}
       >
-        <Col xs={24} sm={12} md={12} lg={12} xl={12}>
-          <Form.Item
-            name="pay"
-            label="Pay"
-            rules={[
-              { required: true, message: 'Please input the pay amount!' },
-            ]}
-          >
-            <Input placeholder="Enter pay amount" size="large" />
-          </Form.Item>
-          <Form.Item>
-            <Button
-              type="primary"
-              htmlType="submit"
-              disabled={data?.totalSellAmounts <= data?.totalPay}
+        <Row gutter={16}>
+          <Col xs={24} sm={12} md={12} lg={12} xl={12}>
+            <Form.Item
+              name="pay"
+              label="Pay"
+              rules={[
+                { required: true, message: 'Please input the pay amount!' },
+              ]}
             >
-              {data?.totalSellAmounts <= data?.totalPay ? 'Paid' : 'Pay'}
-            </Button>
-          </Form.Item>
-        </Col>
+              <Input placeholder="Enter pay amount" size="large" />
+            </Form.Item>
+          </Col>
+          <Col xs={24} sm={12} md={12} lg={12} xl={12}>
+            <Form.Item
+              name="paymentMethod"
+              label="Payment Method"
+              rules={[
+                {
+                  required: true,
+                  message: 'Please select a payment method',
+                },
+              ]}
+            >
+              <Select
+                showSearch
+                placeholder="Select a payment"
+                optionFilterProp="children"
+                options={payments}
+                filterOption={filterOption}
+                style={{ width: '100%' }}
+                size="large"
+              />
+            </Form.Item>
+          </Col>
+        </Row>
+        <Row gutter={16}>
+          <Col xs={24} sm={24} md={24} lg={24} xl={24}>
+            <Form.Item>
+              <Button
+                type="primary"
+                htmlType="submit"
+                disabled={data?.totalPurchaseAmounts <= data?.totalPay}
+                block
+              >
+                {data?.totalPurchaseAmounts <= data?.totalPay ? 'Paid' : 'Pay'}
+              </Button>
+            </Form.Item>
+          </Col>
+        </Row>
       </Form>
     ),
   }

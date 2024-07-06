@@ -1,5 +1,6 @@
 'use client'
 
+import { currencyName } from '@/constants/global'
 import { useGetSingleSellGroupQuery } from '@/redux/api/sellGroups/sellGroupApi'
 import { ICustomer } from '@/types'
 import { Col, Row, Spin, Table, Typography } from 'antd'
@@ -77,11 +78,25 @@ const CustomerReport: React.FC<SupplierInvoiceProps> = ({ id, customer }) => {
       title: 'PRODUCT P.',
       dataIndex: ['sell', 'sellingPrice'],
       key: 'sellingPrice',
+      render: (amount: number) => {
+        return (
+          <span>
+            {currencyName} {amount}
+          </span>
+        )
+      },
     },
     {
       title: 'AMOUNT',
       dataIndex: ['sell', 'totalSellPrice'],
       key: 'totalSellPrice',
+      render: (amount: number) => {
+        return (
+          <span>
+            {currencyName} {amount}
+          </span>
+        )
+      },
     },
     {
       title: 'DISCOUNT (%)',
@@ -94,7 +109,7 @@ const CustomerReport: React.FC<SupplierInvoiceProps> = ({ id, customer }) => {
       render: (_, record) => {
         const discountAmount =
           record.sell.totalSellPrice * (record.sell.discounts / 100)
-        return discountAmount.toFixed(2)
+        return `${currencyName} ${discountAmount.toFixed(2)}`
       },
     },
     {
@@ -107,7 +122,7 @@ const CustomerReport: React.FC<SupplierInvoiceProps> = ({ id, customer }) => {
       key: 'vatAmount',
       render: (_, record) => {
         const vatAmount = record.sell.totalSellPrice * (record.sell.vats / 100)
-        return vatAmount.toFixed(2)
+        return `${currencyName} ${vatAmount.toFixed(2)}`
       },
     },
     {
@@ -118,7 +133,7 @@ const CustomerReport: React.FC<SupplierInvoiceProps> = ({ id, customer }) => {
           record.sell.totalSellPrice * (record.sell.discounts / 100)
         const vatAmount = record.sell.totalSellPrice * (record.sell.vats / 100)
         const total = record.sell.totalSellPrice - discountAmount + vatAmount
-        return total.toFixed(2)
+        return `${currencyName} ${total.toFixed(2)}`
       },
     },
   ]
@@ -132,9 +147,21 @@ const CustomerReport: React.FC<SupplierInvoiceProps> = ({ id, customer }) => {
       },
     },
     {
+      title: 'Payment method',
+      dataIndex: 'paymentType',
+      key: 'paymentType',
+    },
+    {
       title: 'Total pay',
       dataIndex: 'payAmount',
       key: 'payAmount',
+      render: (amount: number) => {
+        return (
+          <span>
+            {currencyName} {amount}
+          </span>
+        )
+      },
     },
   ]
 
@@ -234,12 +261,20 @@ const CustomerReport: React.FC<SupplierInvoiceProps> = ({ id, customer }) => {
               <Table.Summary.Cell index={1} colSpan={1}></Table.Summary.Cell>
               <Table.Summary.Cell index={2}>{totalQuantity}</Table.Summary.Cell>
               <Table.Summary.Cell index={3}></Table.Summary.Cell>
-              <Table.Summary.Cell index={4}>{totalAmount}</Table.Summary.Cell>
+              <Table.Summary.Cell index={4}>
+                {currencyName} {totalAmount}
+              </Table.Summary.Cell>
               <Table.Summary.Cell index={5}></Table.Summary.Cell>
-              <Table.Summary.Cell index={6}>{totalDiscount}</Table.Summary.Cell>
+              <Table.Summary.Cell index={6}>
+                {currencyName} {totalDiscount}
+              </Table.Summary.Cell>
               <Table.Summary.Cell index={7}></Table.Summary.Cell>
-              <Table.Summary.Cell index={8}>{totalVat}</Table.Summary.Cell>
-              <Table.Summary.Cell index={9}>{totalSum}</Table.Summary.Cell>
+              <Table.Summary.Cell index={8}>
+                {currencyName} {totalVat}
+              </Table.Summary.Cell>
+              <Table.Summary.Cell index={9}>
+                {currencyName} {totalSum}
+              </Table.Summary.Cell>
             </Table.Summary.Row>
           )}
         />
@@ -280,6 +315,7 @@ const CustomerReport: React.FC<SupplierInvoiceProps> = ({ id, customer }) => {
               >
                 <Text>Total Net:</Text>
                 <Text>
+                  {currencyName}{' '}
                   {data?.customerPurchase?.totalPurchaseAmounts?.toFixed(2)}
                 </Text>
               </div>
@@ -291,7 +327,9 @@ const CustomerReport: React.FC<SupplierInvoiceProps> = ({ id, customer }) => {
                 }}
               >
                 <Text>Total Discount:</Text>
-                <Text>{totalDiscount}</Text>
+                <Text>
+                  {currencyName} {totalDiscount}
+                </Text>
               </div>
               <div
                 style={{
@@ -301,7 +339,9 @@ const CustomerReport: React.FC<SupplierInvoiceProps> = ({ id, customer }) => {
                 }}
               >
                 <Text>VAT Amount:</Text>
-                <Text>{totalVat}</Text>
+                <Text>
+                  {currencyName} {totalVat}
+                </Text>
               </div>
               <div
                 style={{
@@ -312,6 +352,7 @@ const CustomerReport: React.FC<SupplierInvoiceProps> = ({ id, customer }) => {
               >
                 <Text>Net Total:</Text>
                 <Text>
+                  {currencyName}{' '}
                   {(
                     data?.customerPurchase?.totalPurchaseAmounts -
                     parseFloat(totalDiscount) +
@@ -327,7 +368,9 @@ const CustomerReport: React.FC<SupplierInvoiceProps> = ({ id, customer }) => {
                 }}
               >
                 <Text>Pay:</Text>
-                <Text>{data?.customerPurchase?.totalPay?.toFixed(2)}</Text>
+                <Text>
+                  {currencyName} {data?.customerPurchase?.totalPay?.toFixed(2)}
+                </Text>
               </div>
               <div
                 style={{
@@ -337,7 +380,9 @@ const CustomerReport: React.FC<SupplierInvoiceProps> = ({ id, customer }) => {
                 }}
               >
                 <Text>Due:</Text>
-                <Text>{data?.customerPurchase?.totalDue?.toFixed(2)}</Text>
+                <Text>
+                  {currencyName} {data?.customerPurchase?.totalDue?.toFixed(2)}
+                </Text>
               </div>
             </div>
           </Col>

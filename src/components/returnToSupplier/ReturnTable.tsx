@@ -1,6 +1,7 @@
 import { Table, TableColumnsType } from 'antd'
 import { useState } from 'react'
 // @ts-ignore
+import { currencyName } from '@/constants/global'
 import ReturnAmounts from './ReturnAmount'
 
 interface DataType {
@@ -52,7 +53,7 @@ const ReturnTable = ({ payloads, setSellPayloads }: any) => {
       title: 'TOTAL',
       dataIndex: 'total',
       key: 'total',
-      render: (text: number | undefined) => text || '-',
+      render: (text: number | undefined) => `${currencyName} ${text}` || '-',
     },
   ]
 
@@ -103,7 +104,7 @@ const ReturnTable = ({ payloads, setSellPayloads }: any) => {
                     {quantities} Items
                   </Table.Summary.Cell>
                   <Table.Summary.Cell index={4}>
-                    {totalNet.toFixed(2)}
+                    {currencyName} {totalNet.toFixed(2)}
                   </Table.Summary.Cell>
                 </Table.Summary.Row>
 
@@ -113,7 +114,7 @@ const ReturnTable = ({ payloads, setSellPayloads }: any) => {
                     Net Total
                   </Table.Summary.Cell>
                   <Table.Summary.Cell index={2}>
-                    {totalNet.toFixed(2)}
+                    {currencyName} {totalNet.toFixed(2)}
                   </Table.Summary.Cell>
                 </Table.Summary.Row>
 
@@ -123,7 +124,7 @@ const ReturnTable = ({ payloads, setSellPayloads }: any) => {
                     Pay
                   </Table.Summary.Cell>
                   <Table.Summary.Cell index={2}>
-                    {paid.toFixed(2)}
+                    {currencyName} {paid.toFixed(2)}
                   </Table.Summary.Cell>
                 </Table.Summary.Row>
 
@@ -133,7 +134,7 @@ const ReturnTable = ({ payloads, setSellPayloads }: any) => {
                     Due
                   </Table.Summary.Cell>
                   <Table.Summary.Cell index={2}>
-                    {due.toFixed(2)}
+                    {currencyName} {due.toFixed(2)}
                   </Table.Summary.Cell>
                 </Table.Summary.Row>
               </>

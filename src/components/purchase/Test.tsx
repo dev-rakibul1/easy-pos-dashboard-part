@@ -1,3 +1,4 @@
+import { currencyName } from '@/constants/global'
 import type { TableColumnsType } from 'antd'
 import { Table } from 'antd'
 import React from 'react'
@@ -71,25 +72,25 @@ const TestTable: React.FC<TestTableProps> = ({ payloads }) => {
       title: 'Discounts',
       dataIndex: 'discounts',
       key: 'discounts',
-      render: (text: number | undefined) => text || '-',
+      render: (text: number | undefined) => `${text}` || '-',
     },
     {
       title: 'VATs',
       dataIndex: 'vats',
       key: 'vats',
-      render: (text: number | undefined) => text || '-',
+      render: (text: number | undefined) => `${text}` || '-',
     },
     {
       title: 'Purchase Rate',
       dataIndex: 'purchaseRate',
       key: 'purchaseRate',
-      render: (text: number | undefined) => text || '-',
+      render: (text: number | undefined) => `${currencyName} ${text}` || '-',
     },
     {
       title: 'Total Price',
       dataIndex: 'totalPrice',
       key: 'totalPrice',
-      render: (text: number | undefined) => text || '-',
+      render: (text: number | undefined) => `${currencyName} ${text}` || '-',
     },
   ]
 
@@ -130,8 +131,12 @@ const TestTable: React.FC<TestTableProps> = ({ payloads }) => {
           <Table.Summary.Cell index={2}>{totalProductCount}</Table.Summary.Cell>
           <Table.Summary.Cell index={3}>{totalDiscounts}</Table.Summary.Cell>
           <Table.Summary.Cell index={4}>{totalVATs}</Table.Summary.Cell>
-          <Table.Summary.Cell index={5}>{totalPurchaseRate}</Table.Summary.Cell>
-          <Table.Summary.Cell index={6}>{totalPrice}</Table.Summary.Cell>
+          <Table.Summary.Cell index={5}>
+            {currencyName} {totalPurchaseRate}
+          </Table.Summary.Cell>
+          <Table.Summary.Cell index={6}>
+            {currencyName} {totalPrice}
+          </Table.Summary.Cell>
         </Table.Summary.Row>
       )}
     />

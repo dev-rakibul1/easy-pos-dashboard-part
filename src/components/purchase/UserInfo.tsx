@@ -5,7 +5,6 @@ import {
 } from '@/redux/api/purchaseApi/PurchaseApi'
 import { useGetSingleSupplierQuery } from '@/redux/api/supplierApi/supplierApi'
 import { useSupplierPaymentBySupplierUserQuery } from '@/redux/api/supplierPayments/supplierPayments'
-import { IUser } from '@/types'
 import { UserOutlined } from '@ant-design/icons'
 import {
   Avatar,
@@ -25,13 +24,6 @@ import { IFormValues } from './Purchase'
 
 const { Item } = Form
 const { Text, Title } = Typography
-
-interface UserInfoProps {
-  supplierId: string
-  userData: IUser
-  amount: number
-  setAmount: any
-}
 
 const UserInfo = ({
   supplierId,
@@ -59,7 +51,10 @@ const UserInfo = ({
   const handleFinish = async (values: IFormValues) => {
     // @ts-ignore
     payloads.supplierPayment.totalPay = parseFloat(values.amount) || 0
+    payloads.supplierPayment.paymentType = values?.paymentMethod
     message.loading({ content: 'Creating purchase...', key: 'creating' })
+
+    // console.log(payloads)
 
     try {
       const res = await addANewPurchase(payloads).unwrap()

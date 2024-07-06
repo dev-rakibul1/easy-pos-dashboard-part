@@ -1,3 +1,4 @@
+import { currencyName } from '@/constants/global'
 import { useGetSingleReturnGroupQuery } from '@/redux/api/returnGroupApi/returnGroupApi'
 import { ISupplier, IVariant } from '@/types'
 import { Col, Row, Spin, Table, Typography } from 'antd'
@@ -34,9 +35,21 @@ const ReturnInvoice: React.FC<ReturnInvoiceProps> = ({ id, supplier }) => {
       },
     },
     {
+      title: 'Payment method',
+      dataIndex: 'paymentType',
+      key: 'paymentType',
+    },
+    {
       title: 'Total pay',
       dataIndex: 'payAmount',
       key: 'payAmount',
+      render: (payAmount: number) => {
+        return (
+          <span>
+            {currencyName} {payAmount}
+          </span>
+        )
+      },
     },
   ]
 
@@ -69,6 +82,13 @@ const ReturnInvoice: React.FC<ReturnInvoiceProps> = ({ id, supplier }) => {
       title: 'TOTAL',
       dataIndex: 'totalPrice',
       key: 'totalPrice',
+      render: (totalPrice: number) => {
+        return (
+          <span>
+            {currencyName} {totalPrice}
+          </span>
+        )
+      },
     },
   ]
 
@@ -177,7 +197,9 @@ const ReturnInvoice: React.FC<ReturnInvoiceProps> = ({ id, supplier }) => {
                   <Text>{totalQuantity} items</Text>
                 </Table.Summary.Cell>
                 <Table.Summary.Cell index={4}>
-                  <Text>{totalPrice.toFixed(2)}</Text>
+                  <Text>
+                    {currencyName} {totalPrice.toFixed(2)}
+                  </Text>
                 </Table.Summary.Cell>
               </Table.Summary.Row>
             </>
@@ -223,6 +245,7 @@ const ReturnInvoice: React.FC<ReturnInvoiceProps> = ({ id, supplier }) => {
             >
               <Text>Total Net:</Text>
               <Text>
+                {currencyName}{' '}
                 {data.supplierReturnPayments.totalReturnAmount.toFixed(2)}
               </Text>
             </div>
@@ -235,7 +258,9 @@ const ReturnInvoice: React.FC<ReturnInvoiceProps> = ({ id, supplier }) => {
               }}
             >
               <Text>Total Paid:</Text>
-              <Text>{data.supplierReturnPayments.totalPay.toFixed(2)}</Text>
+              <Text>
+                {currencyName} {data.supplierReturnPayments.totalPay.toFixed(2)}
+              </Text>
             </div>
             <div
               style={{
@@ -245,7 +270,9 @@ const ReturnInvoice: React.FC<ReturnInvoiceProps> = ({ id, supplier }) => {
               }}
             >
               <Text>Total Due:</Text>
-              <Text>{data.supplierReturnPayments.totalDue.toFixed(2)}</Text>
+              <Text>
+                {currencyName} {data.supplierReturnPayments.totalDue.toFixed(2)}
+              </Text>
             </div>
           </div>
         </Col>

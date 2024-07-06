@@ -53,6 +53,7 @@ const PaySell: React.FC<ISellPayProps> = ({
     values.amount = parseFloat(values?.amount ? values?.amount : 0) as number
     const customerPayInUser = {
       totalPay: values?.amount,
+      paymentType: values?.paymentMethod,
       customerId: customerId?.customerId,
       productId: productId?.productId,
       userId: userData?.id,

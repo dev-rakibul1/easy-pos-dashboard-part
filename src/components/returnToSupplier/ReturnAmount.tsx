@@ -53,6 +53,7 @@ const ReturnAmounts: React.FC<ISellPayProps> = ({
     values.amount = parseFloat(values?.amount ? values?.amount : 0) as number
     const supplierReturn = {
       totalPay: values?.amount,
+      paymentType: values?.paymentMethod,
       supplierId: supplierId?.supplierId,
       productId: productId?.productId,
       userId: userData?.id,
@@ -166,7 +167,12 @@ const ReturnAmounts: React.FC<ISellPayProps> = ({
               },
             ]}
           >
-            <Input placeholder="Enter your amount" type="number" />
+            <Input
+              placeholder="Enter your amount"
+              type="number"
+              maxLength={10}
+              max={9999999}
+            />
           </Item>
         </Col>
         <Col xs={24} sm={20} md={8} lg={8}>

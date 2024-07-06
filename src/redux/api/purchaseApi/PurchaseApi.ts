@@ -30,6 +30,22 @@ export const purchaseApi = baseApi.injectEndpoints({
       providesTags: [tagTypes.purchase],
     }),
 
+    // Get by current date
+    getAllPurchaseByCurrentDate: build.query({
+      query: (arg: Record<string, any>) => ({
+        url: `${PURCHASE_URL}/get-by-current-date`,
+        method: 'GET',
+        params: arg,
+      }),
+      transformResponse: (response: IPurchase, meta: IMeta) => {
+        return {
+          purchases: response,
+          meta: meta,
+        }
+      },
+      providesTags: [tagTypes.purchase],
+    }),
+
     getPurchaseBySupplierAndUser: build.query({
       query: (id: string) => ({
         url: `${PURCHASE_URL}/get-by-supplier-and-user/${id}`,
@@ -56,6 +72,22 @@ export const purchaseApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: [tagTypes.purchase],
     }),
+
+    // Get purchase group by current date
+    getPurchaseGroupByCurrentDate: build.query({
+      query: (arg: Record<string, any>) => ({
+        url: `${PURCHASE_URL}/get-by-current-date`,
+        method: 'GET',
+        params: arg,
+      }),
+      transformResponse: (response: any, meta: IMeta) => {
+        return {
+          purchaseGroups: response,
+          meta: meta,
+        }
+      },
+      providesTags: [tagTypes.purchaseGroup],
+    }),
   }),
 })
 
@@ -65,4 +97,6 @@ export const {
   useGetAllPurchaseQuery,
   useGetSinglePurchaseQuery,
   useUpdatePurchaseMutation,
+  useGetAllPurchaseByCurrentDateQuery,
+  useGetPurchaseGroupByCurrentDateQuery,
 } = purchaseApi

@@ -1,3 +1,4 @@
+import { currencyName } from '@/constants/global'
 import { Table } from 'antd'
 import { useMemo } from 'react'
 import { IFormValues } from './Purchase'
@@ -81,19 +82,19 @@ const PurchaseTable = ({
       title: 'Discounts',
       dataIndex: 'discounts',
       key: 'discounts',
-      render: (text: string | undefined) => text || '-',
+      render: (text: string | undefined) => `${currencyName} ${text}` || '-',
     },
     {
       title: 'Vats',
       dataIndex: 'vats',
       key: 'vats',
-      render: (text: string | undefined) => text || '-',
+      render: (text: string | undefined) => `${currencyName} ${text}` || '-',
     },
     {
       title: 'Pur. Rate',
       dataIndex: 'purchaseRate',
       key: 'purchaseRate',
-      render: (text: string | undefined) => text || '-',
+      render: (text: string | undefined) => `${currencyName} ${text}` || '-',
     },
     // {
     //   title: 'S. Price',
@@ -105,7 +106,7 @@ const PurchaseTable = ({
       title: 'Total Price',
       dataIndex: 'totalPrice',
       key: 'totalPrice',
-      render: (text: string | undefined) => text || '-',
+      render: (text: string | undefined) => `${currencyName} ${text}` || '-',
     },
     {
       title: 'Ram',
