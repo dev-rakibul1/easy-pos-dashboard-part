@@ -1,32 +1,55 @@
 import { currencyName } from '@/constants/global'
-import { calculatePriceWithVAT } from '@/utils/VATDiscountCal'
-import { Card, Col, Descriptions, Divider, Row, Typography } from 'antd'
+import { IPurchase, ISell } from '@/types'
+import {
+  additionalPaymentCalculate,
+  additionalPaymentCalculateForPurchase,
+  additionalPaymentCalculateForReturn,
+  bankPaymentCalculate,
+  bankPurchasePaymentCalculate,
+  bankReturnPaymentCalculate,
+  cashPurchasePaymentCalculate,
+  cashReturnPaymentCalculate,
+  handPaymentCalculate,
+} from '@/utils/paymentMethodCalculate'
+import {
+  calculatePriceWithVAT,
+  purchaseCalculatePriceWithVAT,
+} from '@/utils/VATDiscountCal'
+import { Card, Col, Descriptions, Divider, Row } from 'antd'
 import React from 'react'
 
-const { Title, Text } = Typography
-
-// Define interfaces/types for props and data structures
 interface SellGroupInfo {
-  customerPurchase?: {
-    totalPurchaseAmounts?: number
-    totalDue?: number
-    totalPay?: number
+  customerPurchase: {
+    totalPurchaseAmounts: number
+    totalDue: number
+    totalPay: number
+    paymentType: string
   }
-}
-
-interface SalesItem {
-  vats?: number
-  discounts?: number
-  sellingPrice?: number
+  customerPayInUser: {
+    payAmount: number
+    paymentType: string
+  }[]
 }
 
 interface DailyReportProps {
   sellGroups?: {
     sellGroups: SellGroupInfo[]
   }
-  sales?: SalesItem[]
-  purchases: any
-  purchaseGroups: any
+  returnsGroups: any
+  sales: ISell[]
+  purchases: {
+    purchases: IPurchase[]
+  }
+  purchaseGroups?: {
+    purchaseGroups: {
+      supplierSells: {
+        totalSellAmounts: number
+        totalDue: number
+        totalPay: number
+      }
+    }[]
+  }
+  returns: any
 }
 
 const DailyReport: React.FC<DailyReportProps> = ({
@@ -34,27 +57,21 @@ const DailyReport: React.FC<DailyReportProps> = ({
   sales,
   purchases,
   purchaseGroups,
+  returnsGroups,
+  returns,
 }) => {
   // ----------------------Purchase information----------------------
   const purchaseInfo = purchases?.purchases
   const purchaseGroupsInfo = purchaseGroups?.purchaseGroups
 
   // Accumulate VAT, Discount, and Selling Price
-  const totalPurchasePrice =
-    purchaseInfo?.reduce((acc, item) => acc + (item?.purchaseRate || 0), 0) || 0
-  const totalPurchaseVatRate =
-    purchaseInfo?.reduce((acc, item) => acc + (item?.vats || 0), 0) || 0
-  const purchaseDiscountRate =
-    purchaseInfo?.reduce((acc, item) => acc + (item?.discounts || 0), 0) || 0
   const totalPurchasePriceWithVatsDiscounts =
     purchaseInfo?.reduce((acc, item) => acc + (item?.totalPrice || 0), 0) || 0
 
   // Calculate VAT and Discount
-  const calculatePurchaseVatDiscount = calculatePriceWithVAT(
-    totalPurchasePrice,
-    totalPurchaseVatRate,
-    purchaseDiscountRate
-  )
+  const calculatePurchaseVatDiscount =
+    purchaseCalculatePriceWithVAT(purchaseInfo)
+
   const purchaseTotals = purchaseGroupsInfo?.reduce(
     (acc, sellGroup) => {
       acc.totalSellAmounts += sellGroup?.supplierSells?.totalSellAmounts || 0
@@ -64,6 +81,9 @@ const DailyReport: React.FC<DailyReportProps> = ({
     },
     { totalSellAmounts: 0, totalDue: 0, totalPay: 0 }
   )
+
+  const totalPurchase =
+    purchaseInfo?.reduce((acc, item) => acc + (item?.purchaseRate || 0), 0) || 0
 
   // ----------------------Sales information----------------------
   const sellGroupInfo = sellGroups?.sellGroups
@@ -80,19 +100,42 @@ const DailyReport: React.FC<DailyReportProps> = ({
   )
 
   // Accumulate VAT, Discount, and Selling Price
-  const totalSellingPrice =
+  const calculateVatDiscount = calculatePriceWithVAT(sales)
+  const totalSells =
     sales?.reduce((acc, item) => acc + (item?.sellingPrice || 0), 0) || 0
-  const totalVatRate =
-    sales?.reduce((acc, item) => acc + (item?.vats || 0), 0) || 0
-  const discountRate =
-    sales?.reduce((acc, item) => acc + (item?.discounts || 0), 0) || 0
 
-  // Calculate VAT and Discount
-  const calculateVatDiscount = calculatePriceWithVAT(
-    totalSellingPrice,
-    totalVatRate,
-    discountRate
+  // ---------------------PAYMENT TYPE FOR SALES---------------------
+  const bankPayment = bankPaymentCalculate(sellGroupInfo)
+  const handCash = handPaymentCalculate(sellGroupInfo)
+  const additionalPayment = additionalPaymentCalculate(sellGroupInfo)
+
+  // ---------------------PAYMENT TYPE FOR PURCHASE---------------------
+  const purchaseBankPayment = bankPurchasePaymentCalculate(purchaseGroupsInfo)
+  const purchaseCashPayment = cashPurchasePaymentCalculate(purchaseGroupsInfo)
+  const additionalPurchasePayment =
+    additionalPaymentCalculateForPurchase(purchaseGroupsInfo)
+
+  // ---------------------RETURN GROUPS---------------------
+  // const returnInfo = returns?.returns
+  const returnGroupInfo = returnsGroups?.returnGroups
+
+  console.log(returnGroupInfo)
+
+  const returnBankPayment = bankReturnPaymentCalculate(returnGroupInfo)
+  const returnCashPayment = cashReturnPaymentCalculate(returnGroupInfo)
+
+  const returnTotals = returnGroupInfo?.reduce(
+    (acc: any, returnGroup: any) => {
+      acc.totalReturnAmount +=
+        returnGroup?.supplierReturnPayments?.totalReturnAmount || 0
+      acc.totalDue += returnGroup?.supplierReturnPayments?.totalDue || 0
+      acc.totalPay += returnGroup?.supplierReturnPayments?.totalPay || 0
+      return acc
+    },
+    { totalReturnAmount: 0, totalDue: 0, totalPay: 0 }
   )
+  const returnAdditionalPayment =
+    additionalPaymentCalculateForReturn(returnGroupInfo)
 
   return (
     <div>
@@ -111,36 +154,53 @@ const DailyReport: React.FC<DailyReportProps> = ({
             >
               <Descriptions.Item label="Total Revenue (VAT & D.)">
                 {sellsTotals?.totalPurchaseAmounts
-                  ? `${sellsTotals?.totalPurchaseAmounts} ${currencyName}`
+                  ? ` ${currencyName} ${sellsTotals?.totalPurchaseAmounts.toFixed(
+                      2
+                    )}`
                   : 'N/A'}
               </Descriptions.Item>
               <Descriptions.Item label="Due sales">
                 {sellsTotals?.totalDue
-                  ? `${sellsTotals?.totalDue} ${currencyName}`
+                  ? ` ${currencyName} ${sellsTotals?.totalDue.toFixed(2)}`
                   : 'N/A'}
               </Descriptions.Item>
               <Descriptions.Item label="Cash sales">
                 {sellsTotals?.totalPay
-                  ? `${sellsTotals?.totalPay} ${currencyName}`
+                  ? ` ${currencyName} ${(
+                      sellsTotals?.totalPay + additionalPayment
+                    ).toFixed(2)}`
                   : 'N/A'}
               </Descriptions.Item>
               <Descriptions.Item label="Total vats">
                 {calculateVatDiscount?.vatAmount
-                  ? `${calculateVatDiscount?.vatAmount} ${currencyName}`
+                  ? `${currencyName} ${parseFloat(
+                      calculateVatDiscount?.vatAmount
+                    ).toFixed(2)}`
                   : 'N/A'}
               </Descriptions.Item>
               <Descriptions.Item label="Total discounts">
                 {calculateVatDiscount?.discountAmount
-                  ? `${calculateVatDiscount?.discountAmount} ${currencyName}`
+                  ? `${currencyName} ${parseFloat(
+                      calculateVatDiscount?.discountAmount
+                    ).toFixed(2)}`
                   : 'N/A'}
               </Descriptions.Item>
+              <Descriptions.Item label="Bank transaction">
+                {bankPayment
+                  ? `${currencyName} ${bankPayment.toFixed(2)} `
+                  : 'N/A'}
+              </Descriptions.Item>
+              <Descriptions.Item label="Hand cash transaction">
+                {handCash ? `${currencyName} ${handCash.toFixed(2)} ` : 'N/A'}
+              </Descriptions.Item>
               <Descriptions.Item label="Total exp. selling price">
-                {calculateVatDiscount?.totalPrice
-                  ? `${calculateVatDiscount?.totalPrice} ${currencyName}`
+                {totalSells
+                  ? `${currencyName} ${totalSells.toFixed(2)} `
                   : 'N/A'}
               </Descriptions.Item>
             </Descriptions>
           </Col>
+          {/* Purchase information */}
           <Col xs={24} sm={24} md={12} lg={12} xl={12} xxl={12}>
             <Descriptions
               title="Purchase information"
@@ -151,39 +211,107 @@ const DailyReport: React.FC<DailyReportProps> = ({
             >
               <Descriptions.Item label="Total purchase (+VAT & D.)">
                 {totalPurchasePriceWithVatsDiscounts
-                  ? `${totalPurchasePriceWithVatsDiscounts} ${currencyName}`
+                  ? `${currencyName} ${totalPurchasePriceWithVatsDiscounts.toFixed(
+                      2
+                    )} `
                   : 'N/A'}
               </Descriptions.Item>
               <Descriptions.Item label="Due purchase">
                 {purchaseTotals?.totalDue
-                  ? `${purchaseTotals?.totalDue} ${currencyName}`
+                  ? ` ${currencyName} ${purchaseTotals?.totalDue.toFixed(2)}`
                   : 'N/A'}
               </Descriptions.Item>
               <Descriptions.Item label="Cash purchase">
                 {purchaseTotals?.totalPay
-                  ? `${purchaseTotals?.totalPay} ${currencyName}`
+                  ? ` ${currencyName} ${(
+                      purchaseTotals?.totalPay + additionalPurchasePayment
+                    ).toFixed(2)}`
                   : 'N/A'}
               </Descriptions.Item>
-              <Descriptions.Item label="Total purchase">
-                {calculatePurchaseVatDiscount?.totalPrice
-                  ? `${calculatePurchaseVatDiscount?.totalPrice} ${currencyName}`
-                  : 'N/A'}
-              </Descriptions.Item>
+
               <Descriptions.Item label="Total vats">
                 {calculatePurchaseVatDiscount?.vatAmount
-                  ? `${calculatePurchaseVatDiscount?.vatAmount} ${currencyName}`
+                  ? ` ${currencyName} ${parseFloat(
+                      calculatePurchaseVatDiscount?.vatAmount
+                    ).toFixed(2)}`
                   : 'N/A'}
               </Descriptions.Item>
               <Descriptions.Item label="Total discounts">
                 {calculatePurchaseVatDiscount?.discountAmount
-                  ? `${calculatePurchaseVatDiscount?.discountAmount} ${currencyName}`
+                  ? ` ${currencyName} ${parseFloat(
+                      calculatePurchaseVatDiscount?.discountAmount
+                    ).toFixed(2)}`
                   : 'N/A'}
               </Descriptions.Item>
-              <Descriptions.Item label="Permanent address">
-                {/* {purchase?.suppliers?.permanentAddress
-                  ? purchase?.suppliers?.permanentAddress
-                  : 'N/A'} */}
-                permanentAddress
+              {/* <Descriptions.Item label="Total purchase">
+                {calculatePurchaseVatDiscount?.totalPrice
+                  ? `${currencyName} ${calculatePurchaseVatDiscount?.totalPrice} `
+                  : 'N/A'}
+              </Descriptions.Item> */}
+              <Descriptions.Item label="Bank transaction">
+                {purchaseBankPayment
+                  ? `${currencyName} ${purchaseBankPayment.toFixed(2)} `
+                  : 'N/A'}
+              </Descriptions.Item>
+              <Descriptions.Item label="Hand cash transaction">
+                {purchaseCashPayment
+                  ? `${currencyName} ${purchaseCashPayment.toFixed(2)} `
+                  : 'N/A'}
+              </Descriptions.Item>
+              <Descriptions.Item label="Total exp. purchase price">
+                {totalPurchase
+                  ? `${currencyName} ${totalPurchase.toFixed(2)} `
+                  : 'N/A'}
+              </Descriptions.Item>
+            </Descriptions>
+          </Col>
+
+          {/* Return information */}
+          <Col
+            xs={24}
+            sm={24}
+            md={12}
+            lg={12}
+            xl={12}
+            xxl={12}
+            style={{ marginTop: '15px' }}
+          >
+            <Descriptions
+              title="Return information"
+              column={1}
+              layout="horizontal"
+              bordered
+              style={{ width: '100%' }}
+            >
+              <Descriptions.Item label="Total return (+VAT & D.)">
+                {returnTotals?.totalReturnAmount
+                  ? `${currencyName} ${returnTotals?.totalReturnAmount.toFixed(
+                      2
+                    )} `
+                  : 'N/A'}
+              </Descriptions.Item>
+              <Descriptions.Item label="Return due">
+                {returnTotals?.totalDue
+                  ? ` ${currencyName} ${returnTotals?.totalDue.toFixed(2)}`
+                  : 'N/A'}
+              </Descriptions.Item>
+              <Descriptions.Item label="Cash return">
+                {returnTotals?.totalPay
+                  ? ` ${currencyName} ${(
+                      returnTotals?.totalPay + returnAdditionalPayment
+                    ).toFixed(2)}`
+                  : 'N/A'}
+              </Descriptions.Item>
+
+              <Descriptions.Item label="Bank transaction">
+                {returnBankPayment
+                  ? `${currencyName} ${returnBankPayment.toFixed(2)} `
+                  : 'N/A'}
+              </Descriptions.Item>
+              <Descriptions.Item label="Hand cash transaction">
+                {returnCashPayment
+                  ? `${currencyName} ${returnCashPayment.toFixed(2)} `
+                  : 'N/A'}
               </Descriptions.Item>
             </Descriptions>
           </Col>

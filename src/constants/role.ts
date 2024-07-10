@@ -8,3 +8,8 @@ export enum ENUM_USER_ROLE {
   USER = 'user',
   MODERATOR = 'moderator',
 }
+
+export enum PAYMENT_TYPE {
+  BANK_PAYMENT = 'bankPayment',
+  HAND_CASH = 'handCash',
+}

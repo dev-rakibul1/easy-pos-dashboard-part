@@ -4,14 +4,15 @@ import DailyReport from '@/components/transaction/tabs/DailyReport'
 import DailyTransactionChart from '@/components/transaction/tabs/DailyTransactionChart'
 import ActionBar from '@/components/ui/ActionBar'
 import { currencyName } from '@/constants/global'
-import {
-  useGetAllPurchaseByCurrentDateQuery,
-  useGetPurchaseGroupByCurrentDateQuery,
-} from '@/redux/api/purchaseApi/PurchaseApi'
+import { useGetAllPurchaseByCurrentDateQuery } from '@/redux/api/purchaseApi/PurchaseApi'
+import { useGetPurchaseGroupByCurrentDateQuery } from '@/redux/api/purchaseGroup/purchaseGroupApi'
 import { useGetAllReturnsByCurrentDateQuery } from '@/redux/api/returnApi/returnApi'
+import { useGetAllReturnGroupByCurrentDateQuery } from '@/redux/api/returnGroupApi/returnGroupApi'
 import { useGetSellGroupByCurrentDateQuery } from '@/redux/api/sellGroups/sellGroupApi'
 import { useGetSellByCurrentDateQuery } from '@/redux/api/sells/sellsApi'
 import { getUserInfo } from '@/services/auth.services'
+import { calculateProfit } from '@/utils/calculateProfit'
+
 import { Card, Col, Row, Statistic, Tabs } from 'antd'
 import React from 'react'
 
@@ -30,15 +31,10 @@ const DailyTransaction: React.FC = () => {
   const { role } = getUserInfo() as any
   // Fetch data using the API query
   const { data } = useGetSellByCurrentDateQuery({
-    pollingInterval: 15000,
-    skipPollingIfUnfocused: true,
-    refetchOnMountOrArgChange: true,
+    limit: 100,
   })
-
   const { data: purchases } = useGetAllPurchaseByCurrentDateQuery({
-    pollingInterval: 15000,
-    skipPollingIfUnfocused: true,
-    refetchOnMountOrArgChange: true,
+    limit: 100,
   })
   const { data: sellGroups } = useGetSellGroupByCurrentDateQuery({
     limit: 100,
@@ -49,9 +45,9 @@ const DailyTransaction: React.FC = () => {
   const { data: returns } = useGetAllReturnsByCurrentDateQuery({
     limit: 100,
   })
-
-  console.log('sales', data)
-  console.log('purchase', purchases)
+  const { data: returnsGroups } = useGetAllReturnGroupByCurrentDateQuery({
+    limit: 100,
+  })
 
   // Calculate total revenue, total customers, and total profit from sells data for the current day
   const today = new Date().toLocaleDateString('en-US', {
@@ -79,13 +75,20 @@ const DailyTransaction: React.FC = () => {
     sellsToday.map((sell: SellData) => sell.customerId)
   ).size
 
-  const totalProfit: number = sellsToday.reduce(
-    (acc: number, sell: SellData) => acc + (sell.totalSellPrice - 96000),
-    0
-  )
-
+  // ----------DAILY REPORT INFORMATION----------
+  const purchaseInfo = purchases?.purchases
   const returnsInfo = returns?.returns
-  console.log(returnsInfo)
+  const sales = data
+
+  // -----------PROFIT CALCULATION------------
+  const profitAndCost = calculateProfit(sales)
+  const dailyReportData = {
+    purchase: purchaseInfo,
+    sales,
+    returns: returnsInfo,
+    profit: profitAndCost,
+  }
+  console.log(dailyReportData)
 
   // Return the JSX for rendering
   return (
@@ -106,7 +109,7 @@ const DailyTransaction: React.FC = () => {
       <ActionBar title="Daily transaction chart and report"></ActionBar>
 
       <Row gutter={[16, 16]} style={{ marginTop: '15px' }}>
-        <Col xs={24} sm={24} md={8} lg={8} xl={8}>
+        <Col xs={24} sm={24} md={6} lg={6} xl={6}>
           <Card>
             <Statistic
               title="Total Revenue"
@@ -116,16 +119,26 @@ const DailyTransaction: React.FC = () => {
             />
           </Card>
         </Col>
-        <Col xs={24} sm={24} md={8} lg={8} xl={8}>
+        <Col xs={24} sm={24} md={6} lg={6} xl={6}>
           <Card>
             <Statistic title="Total Customers" value={totalCustomers} />
           </Card>
         </Col>
-        <Col xs={24} sm={24} md={8} lg={8} xl={8}>
+        <Col xs={24} sm={24} md={6} lg={6} xl={6}>
+          <Card>
+            <Statistic
+              title="Total Cost"
+              value={profitAndCost?.totalCost}
+              precision={2}
+              prefix={currencyName}
+            />
+          </Card>
+        </Col>
+        <Col xs={24} sm={24} md={6} lg={6} xl={6}>
           <Card>
             <Statistic
               title="Total Profit"
-              value={totalProfit}
+              value={profitAndCost?.totalProfit}
               precision={2}
               prefix={currencyName}
             />
@@ -147,7 +160,10 @@ const DailyTransaction: React.FC = () => {
             sellGroups={sellGroups}
             purchaseGroups={purchaseGroups}
             sales={data}
+            // @ts-ignore
             purchases={purchases}
+            returnsGroups={returnsGroups}
+            returns={returns}
           />
         </Tabs.TabPane>
       </Tabs>

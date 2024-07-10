@@ -116,7 +116,7 @@ export const payments = [
     value: 'bankPayment',
   },
   {
-    label: 'hand cash',
+    label: 'Hand cash',
     value: 'handCash',
   },
 ]

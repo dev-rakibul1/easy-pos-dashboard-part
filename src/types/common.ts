@@ -238,6 +238,7 @@ export type ISell = {
   customer: ICustomer
   createdAt: Date
   updatedAt: Date
+  purchaseRate: number
 }
 
 export type ISellVariant = {

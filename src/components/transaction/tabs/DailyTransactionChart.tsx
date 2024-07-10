@@ -78,13 +78,6 @@ const DailyTransactionChart: FC<Props> = ({ sales, purchases, returns }) => {
         }) === today
     ) || []
 
-  // Prepare data for the LineChart and Table
-  const chartData = sellsToday.map((sell: SellData, index: number) => ({
-    name: index + 1,
-    price: sell.totalSellPrice,
-    uv: sell.costPrice,
-  }))
-
   // Table columns and dataSource
   const columns = [
     { title: 'NO', dataIndex: 'no', key: 'no' },
@@ -115,28 +108,31 @@ const DailyTransactionChart: FC<Props> = ({ sales, purchases, returns }) => {
   const purchaseInformation = purchaseInfo || []
   const returnsInfo = returns?.returns || []
 
+  console.log('sales', sales)
+
   const data = sales?.map((sale: any, index: number) => {
     const purchase = purchaseInformation[index] || {}
-    const returnData = returnsInfo[index] || {}
+    const returnData = returnsInfo[index] ?? {}
 
     // Calculate discount amount and format to 2 decimal places
     const discountAmount = (
-      sale?.totalSellPrice *
-      (sale?.discounts / 100)
+      sale?.sellingPrice * (sale?.discounts / 100) ?? 0
     ).toFixed(2)
 
-    // Calculate VAT amount (assuming you also want to format this to 2 decimal places)
-    const vatAmount = (sale?.totalSellPrice * (sale?.vats / 100)).toFixed(2)
+    // Calculate VAT amount and format to 2 decimal places
+    const vatAmount = (sale?.sellingPrice * (sale?.vats / 100) ?? 0).toFixed(2)
 
     return {
       name: `Sale ${String.fromCharCode(65 + index)}`,
-      sales: sale.sellingPrice,
+      sales: sale?.sellingPrice ?? 0,
       discount: discountAmount,
       vat: vatAmount,
-      purchase: purchase.purchaseRate || 0,
-      return: returnData.price || 0,
+      purchase: purchase?.purchaseRate ?? 0,
+      return: returnData?.price ?? 0,
     }
   })
+
+  console.log('data', data)
 
   const dataSource = sellsToday.map((sell: SellData, index: number) => ({
     key: index.toString(),
@@ -181,7 +177,7 @@ const DailyTransactionChart: FC<Props> = ({ sales, purchases, returns }) => {
             </ResponsiveContainer>
           </Card>
 
-          <Card title="Latest Orders" style={{ marginTop: '15px' }}>
+          <Card title="Latest sales" style={{ marginTop: '15px' }}>
             <Table
               dataSource={dataSource || []}
               columns={columns}

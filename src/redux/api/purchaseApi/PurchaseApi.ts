@@ -72,22 +72,6 @@ export const purchaseApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: [tagTypes.purchase],
     }),
-
-    // Get purchase group by current date
-    getPurchaseGroupByCurrentDate: build.query({
-      query: (arg: Record<string, any>) => ({
-        url: `${PURCHASE_URL}/get-by-current-date`,
-        method: 'GET',
-        params: arg,
-      }),
-      transformResponse: (response: any, meta: IMeta) => {
-        return {
-          purchaseGroups: response,
-          meta: meta,
-        }
-      },
-      providesTags: [tagTypes.purchaseGroup],
-    }),
   }),
 })
 
@@ -98,5 +82,4 @@ export const {
   useGetSinglePurchaseQuery,
   useUpdatePurchaseMutation,
   useGetAllPurchaseByCurrentDateQuery,
-  useGetPurchaseGroupByCurrentDateQuery,
 } = purchaseApi

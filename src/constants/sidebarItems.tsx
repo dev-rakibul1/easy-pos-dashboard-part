@@ -110,7 +110,7 @@ const sidebarItems = (role: string) => {
   // Add sell
   const manageSellItems: MenuProps['items'] = [
     {
-      label: 'Sells',
+      label: 'Point of Sale',
       key: 'sell',
       icon: <LiaSellcast />,
       children: [
@@ -373,11 +373,11 @@ const sidebarItems = (role: string) => {
   // Role bass routing
   const manageSuperAdmin = [
     ...defaultHomePage,
+    ...manageSellItems,
     ...manageTransactionItems,
     ...manageProductItems,
     ...managePurchaseItems,
     ...manageSupplierItems,
-    ...manageSellItems,
     ...manageCustomersItems,
     ...manageUsersItems,
     ...manageReturnItems,
@@ -390,11 +390,11 @@ const sidebarItems = (role: string) => {
 
   const manageAdmin = [
     ...defaultHomePage,
+    ...manageSellItems,
     ...manageTransactionItems,
     ...manageProductItems,
     ...managePurchaseItems,
     ...manageSupplierItems,
-    ...manageSellItems,
     ...manageCustomersItems,
     ...manageReturnItems,
     ...manageWarrantyItems,

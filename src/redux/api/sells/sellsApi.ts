@@ -24,9 +24,21 @@ export const sellsApi = baseApi.injectEndpoints({
       }),
       providesTags: [tagTypes.sell],
     }),
+
+    // Create a new sell
+    getSellByCustomerPurchaseId: build.query({
+      query: (id: string) => ({
+        url: `${SELLS_URL}/sell-get-by-customer-purchase-product-id/${id}`,
+        method: 'GET',
+      }),
+      providesTags: [tagTypes.sell],
+    }),
   }),
   overrideExisting: false,
 })
 
-export const { useAddANewSellsMutation, useGetSellByCurrentDateQuery } =
-  sellsApi
+export const {
+  useAddANewSellsMutation,
+  useGetSellByCurrentDateQuery,
+  useGetSellByCustomerPurchaseIdQuery,
+} = sellsApi

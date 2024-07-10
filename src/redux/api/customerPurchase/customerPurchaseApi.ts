@@ -21,10 +21,20 @@ export const customerPurchasesApi = baseApi.injectEndpoints({
 
       providesTags: [tagTypes.customerPurchase],
     }),
+    // Get customer purchase by current date
+    getCustomerPurchaseByCurrentDate: build.query({
+      query: () => ({
+        url: `${CUSTOMER_PURCHASE_URL}/get-by-current-date`,
+        method: 'GET',
+      }),
+
+      providesTags: [tagTypes.customerPurchase],
+    }),
   }),
 })
 
 export const {
   useGetCustomerPurchasesByCustomerAndUserQuery,
   useGetSingleCustomerPurchaseQuery,
+  useGetCustomerPurchaseByCurrentDateQuery,
 } = customerPurchasesApi

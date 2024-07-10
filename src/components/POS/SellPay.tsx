@@ -74,6 +74,7 @@ const PaySell: React.FC<ISellPayProps> = ({
         discounts: sell?.discounts,
 
         sellingPrice: sell?.sellingPrice,
+        purchaseRate: sell?.purchaseRate,
         totalSellPrice: sell?.totalPrice,
 
         productName: sell?.productName,
@@ -95,8 +96,6 @@ const PaySell: React.FC<ISellPayProps> = ({
     }
 
     message.loading({ content: 'Selling...', key: 'creating' })
-
-    // console.log(finalSellInformation)
 
     try {
       const res = await addANewSells(finalSellInformation)

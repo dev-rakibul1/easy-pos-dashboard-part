@@ -13,6 +13,7 @@ import { PlusOutlined } from '@ant-design/icons'
 import {
   Button,
   Col,
+  Descriptions,
   Form,
   Input,
   Row,
@@ -21,11 +22,13 @@ import {
   Typography,
   message,
 } from 'antd'
-const { Text } = Typography
+const { Text, Title } = Typography
 
+import { currencyName } from '@/constants/global'
 import DiscountsModal from '@/modals/discounts/DiscountsModal'
 import VatsModal from '@/modals/vats/VatsModal'
 import { useGetAllDiscountQuery } from '@/redux/api/discountApi/discountApi'
+import { useGetSinglePurchaseQuery } from '@/redux/api/purchaseApi/PurchaseApi'
 import { useGetAllVatsQuery } from '@/redux/api/vatApi/vatApi'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
@@ -49,6 +52,7 @@ type IFormType = {
   rom?: any
   variantIds: any
   quantity: number
+  purchaseRate: number
 }
 
 export interface ISellVariant {
@@ -72,6 +76,7 @@ export interface IProductData {
   quantity: number
   sellingPrice: number
   totalPrice: number
+  purchaseRate: number
   variantIds: unknown | any
   variants: ISellVariant[]
 }
@@ -86,7 +91,7 @@ const PosPage = () => {
   const [selectVats, setSelectVats] = useState<number>(0)
   const [sellingPrice, setSellingPrice] = useState<number>(0)
   const [subTotal, setSubtotal] = useState<number>(0)
-  // const [sellInfo, setSellInfo] = useState<IFormType[]>([])
+  const [oneProductPrice, setOneProductPrice] = useState<number>(0)
   const [sellPayloads, setSellPayloads] = useState<IProductData[]>([])
   const router = useRouter()
 
@@ -107,6 +112,7 @@ const PosPage = () => {
     rom: '',
     variantIds: '',
     quantity: 0,
+    purchaseRate: 0,
   })
 
   // --------------PRODUCTS--------------
@@ -143,6 +149,11 @@ const PosPage = () => {
       value: variant?.id,
     }
   })
+
+  // Get single purchase
+  const { data: singlePurchase } = useGetSinglePurchaseQuery(
+    singleVariantsById?.purchaseId
+  )
 
   // Customer
   const { data: customers, isLoading: isCustomerLoading } =
@@ -220,8 +231,10 @@ const PosPage = () => {
     formData.color = singleVariantsById?.color
     formData.imeiNumber = singleVariantsById?.imeiNumber
     formData.variantIds = variantIds
+    formData.purchaseRate = oneProductPrice
   }, [
     formData,
+    oneProductPrice,
     selectCustomer,
     selectDiscounts,
     selectProduct,
@@ -257,8 +270,6 @@ const PosPage = () => {
       ...restData
     } = newFormData
 
-    // console.log(newFormData)
-
     const variantObj: ISellVariant = {
       imeiNumber,
       ram,
@@ -276,6 +287,7 @@ const PosPage = () => {
       variantId: vId,
       variants: [variantObj],
       quantity: 1,
+      purchaseRate: formData.purchaseRate,
     }
 
     // Check if the variant already exists in any product
@@ -375,6 +387,8 @@ const PosPage = () => {
     router.push(`/${role}/add-customers`)
   }
 
+  console.log(formData)
+
   // -----------Discounts modal-----------
   const [isDiscountsModal, setIsDiscountsModal] = useState(false)
   const showDiscountsModal = () => {
@@ -428,6 +442,19 @@ const PosPage = () => {
     setSubtotal,
     subTotal,
   ])
+
+  useEffect(() => {
+    // Return calculation
+    const totalPrice = singlePurchase?.totalPrice
+    const totalQuantity = singlePurchase?.productStock
+    const onePiceProductPrice = totalPrice / totalQuantity || 0
+
+    // @ts-ignore
+    const productPrice = parseFloat(onePiceProductPrice).toFixed(2)
+
+    // @ts-ignore
+    setOneProductPrice(productPrice)
+  }, [singlePurchase?.productStock, singlePurchase?.totalPrice])
 
   return (
     <div>
@@ -500,29 +527,47 @@ const PosPage = () => {
                     <Spin size="small" />
                   ) : (
                     <>
-                      <Text>
-                        <Text strong>Name:</Text>{' '}
-                        {singleProductById?.productName
-                          ? singleProductById?.productName
-                          : 'N/A'}
-                      </Text>
-                      <br />
-                      <Text>
-                        <Text strong>Brand:</Text>{' '}
-                        {singleProductById?.brandName
-                          ? singleProductById?.brandName
-                          : 'N/A'}
-                      </Text>
-                      <br />
-                      <Text>
-                        <Text strong>Stock:</Text>{' '}
-                        {`${
-                          singleProductById?.variants?.length
-                            ? singleProductById?.variants?.length
-                            : 0
-                        } pics`}
-                      </Text>
-                      <br />
+                      <Descriptions
+                        bordered
+                        column={1}
+                        size="small"
+                        style={{
+                          width: '100%',
+                          maxWidth: '100%',
+                          margin: '20px auto',
+                        }}
+                        contentStyle={{ padding: '8px 16px' }}
+                        labelStyle={{ padding: '8px 16px', fontWeight: 'bold' }}
+                      >
+                        <Descriptions.Item label="Name">
+                          {singleProductById?.productName || 'N/A'}
+                        </Descriptions.Item>
+                        <Descriptions.Item label="Brand">
+                          {singleProductById?.brandName || 'N/A'}
+                        </Descriptions.Item>
+                        <Descriptions.Item label="Selling price">
+                          <Text type="success">
+                            {' '}
+                            {singlePurchase?.sellingPrice
+                              ? `${singlePurchase.sellingPrice.toFixed(
+                                  2
+                                )} ${currencyName}`
+                              : 'N/A'}
+                          </Text>
+                        </Descriptions.Item>
+                        <Descriptions.Item label="Purchase rate">
+                          <Text type="danger">
+                            {' '}
+                            {oneProductPrice
+                              ? `${oneProductPrice} ${currencyName}`
+                              : 'N/A'}
+                          </Text>
+                        </Descriptions.Item>
+
+                        <Descriptions.Item label="Stock">
+                          {`${singleProductById?.variants?.length || 0} pics`}
+                        </Descriptions.Item>
+                      </Descriptions>
                     </>
                   )}
                   {selectVariant !== '' ? (
@@ -530,35 +575,48 @@ const PosPage = () => {
                       <Spin size="small" />
                     ) : (
                       <>
-                        <Text>
-                          <Text strong>Imei number:</Text>{' '}
-                          {singleVariantsById?.imeiNumber
-                            ? singleVariantsById?.imeiNumber
-                            : 'N/A'}
-                        </Text>
-                        <br />
-                        <Text>
-                          <Text strong>Ram:</Text>{' '}
-                          {singleVariantsById?.ram
-                            ? singleVariantsById?.ram
-                            : 'N/A'}{' '}
-                          GB
-                        </Text>
-                        <br />
-                        <Text>
-                          <Text strong>Rom:</Text>{' '}
-                          {singleVariantsById?.rom
-                            ? singleVariantsById?.rom
-                            : 'N/A'}{' '}
-                          GB
-                        </Text>
-                        <br />
-                        <Text>
-                          <Text strong>Color:</Text>{' '}
-                          {singleVariantsById?.color
-                            ? singleVariantsById?.color
-                            : 'N/A'}
-                        </Text>
+                        <Descriptions
+                          bordered
+                          column={1}
+                          size="small"
+                          style={{
+                            width: '100%',
+                            maxWidth: '100%',
+                            margin: '20px auto',
+                          }}
+                          contentStyle={{ padding: '8px 16px' }}
+                          labelStyle={{
+                            padding: '8px 16px',
+                            fontWeight: 'bold',
+                          }}
+                        >
+                          <Descriptions.Item label="IMEI Number">
+                            {singleVariantsById?.imeiNumber
+                              ? singleVariantsById?.imeiNumber
+                              : 'N/A'}
+                          </Descriptions.Item>
+                          <Descriptions.Item label="Ram">
+                            {singleVariantsById?.ram
+                              ? singleVariantsById?.ram
+                              : 'N/A'}{' '}
+                            GB
+                          </Descriptions.Item>
+                          <Descriptions.Item label="Rom">
+                            <Text>
+                              {singleVariantsById?.rom
+                                ? singleVariantsById?.rom
+                                : 'N/A'}{' '}
+                              GB
+                            </Text>
+                          </Descriptions.Item>
+                          <Descriptions.Item label="Color">
+                            <Text>
+                              {singleVariantsById?.color
+                                ? singleVariantsById?.color
+                                : 'N/A'}
+                            </Text>
+                          </Descriptions.Item>
+                        </Descriptions>
                       </>
                     )
                   ) : null}
@@ -594,55 +652,62 @@ const PosPage = () => {
                   <Spin size="small" />
                 ) : (
                   <>
-                    <Text>
-                      <Text strong>Name:</Text>{' '}
-                      {`${
-                        singleCustomerById?.firstName
-                          ? singleCustomerById?.firstName
-                          : ''
-                      } ${
-                        singleCustomerById?.middleName
-                          ? singleCustomerById?.middleName
-                          : ''
-                      } ${
-                        singleCustomerById?.lastName
-                          ? singleCustomerById?.lastName
-                          : ''
-                      } ${
-                        !singleCustomerById?.firstName &&
-                        !singleCustomerById?.firstName
-                          ? 'N/A'
-                          : ''
-                      }`}
-                    </Text>
-                    <br />
-                    <Text>
-                      <Text strong>Phone:</Text>{' '}
-                      {singleCustomerById?.phoneNo
-                        ? singleCustomerById?.phoneNo
-                        : 'N/A'}
-                    </Text>
-                    <br />
-                    <Text>
-                      <Text strong>Email:</Text>{' '}
-                      {singleCustomerById?.email
-                        ? singleCustomerById?.email
-                        : 'N/A'}
-                    </Text>
-                    <br />
-                    <Text>
-                      <Text strong>NID:</Text>{' '}
-                      {singleCustomerById?.nid
-                        ? singleCustomerById?.nid
-                        : 'N/A'}
-                    </Text>
-                    <br />
-                    <Text>
-                      <Text strong>Address:</Text>{' '}
-                      {singleCustomerById?.presentAddress
-                        ? singleCustomerById?.presentAddress
-                        : 'N/A'}
-                    </Text>
+                    <Descriptions
+                      bordered
+                      column={1}
+                      size="small"
+                      style={{
+                        width: '100%',
+                        maxWidth: '100%',
+                        margin: '20px auto',
+                      }}
+                      contentStyle={{ padding: '8px 16px' }}
+                      labelStyle={{
+                        padding: '8px 16px',
+                        fontWeight: 'bold',
+                      }}
+                    >
+                      <Descriptions.Item label="Name">
+                        {`${
+                          singleCustomerById?.firstName
+                            ? singleCustomerById?.firstName
+                            : ''
+                        } ${
+                          singleCustomerById?.middleName
+                            ? singleCustomerById?.middleName
+                            : ''
+                        } ${
+                          singleCustomerById?.lastName
+                            ? singleCustomerById?.lastName
+                            : ''
+                        } ${
+                          !singleCustomerById?.firstName &&
+                          !singleCustomerById?.firstName
+                            ? 'N/A'
+                            : ''
+                        }`}
+                      </Descriptions.Item>
+                      <Descriptions.Item label="Phone">
+                        {singleCustomerById?.phoneNo
+                          ? singleCustomerById?.phoneNo
+                          : 'N/A'}
+                      </Descriptions.Item>
+                      <Descriptions.Item label="Email">
+                        {singleCustomerById?.email
+                          ? singleCustomerById?.email
+                          : 'N/A'}
+                      </Descriptions.Item>
+                      <Descriptions.Item label="NID">
+                        {singleCustomerById?.nid
+                          ? singleCustomerById?.nid
+                          : 'N/A'}
+                      </Descriptions.Item>
+                      <Descriptions.Item label="Address">
+                        {singleCustomerById?.presentAddress
+                          ? singleCustomerById?.presentAddress
+                          : 'N/A'}
+                      </Descriptions.Item>
+                    </Descriptions>
                   </>
                 )
               ) : null}

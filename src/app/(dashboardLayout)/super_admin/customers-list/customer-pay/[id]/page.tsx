@@ -148,7 +148,6 @@ const CustomerPayPage: React.FC<Props> = ({ params }) => {
             </Descriptions.Item>
             <Descriptions.Item label="Previous Due">
               <Text type="danger">
-                {currencyName}{' '}
                 {data?.totalPurchaseAmounts
                   ? data?.totalPurchaseAmounts <= data?.totalPay
                     ? 'Paid'
