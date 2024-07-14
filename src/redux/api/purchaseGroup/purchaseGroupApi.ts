@@ -45,10 +45,42 @@ export const purchaseGroupApi = baseApi.injectEndpoints({
       },
       providesTags: [tagTypes.purchaseGroup],
     }),
+    // Get purchase group by current week
+    getPurchaseGroupByCurrentWeek: build.query({
+      query: (arg: Record<string, any>) => ({
+        url: `${PURCHASE_GROUP_URL}/get-by-current-week`,
+        method: 'GET',
+        params: arg,
+      }),
+      transformResponse: (response: any, meta: IMeta) => {
+        return {
+          purchaseGroups: response,
+          meta: meta,
+        }
+      },
+      providesTags: [tagTypes.purchaseGroup],
+    }),
+    // Get purchase group by current month
+    getPurchaseGroupByCurrentMonth: build.query({
+      query: (arg: Record<string, any>) => ({
+        url: `${PURCHASE_GROUP_URL}/get-by-current-month`,
+        method: 'GET',
+        params: arg,
+      }),
+      transformResponse: (response: any, meta: IMeta) => {
+        return {
+          purchaseGroups: response,
+          meta: meta,
+        }
+      },
+      providesTags: [tagTypes.purchaseGroup],
+    }),
   }),
 })
 
 export const {
   useGetSinglePurchaseGroupQuery,
   useGetPurchaseGroupByCurrentDateQuery,
+  useGetPurchaseGroupByCurrentWeekQuery,
+  useGetPurchaseGroupByCurrentMonthQuery,
 } = purchaseGroupApi

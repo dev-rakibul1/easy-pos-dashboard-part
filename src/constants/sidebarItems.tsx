@@ -374,9 +374,9 @@ const sidebarItems = (role: string) => {
   const manageSuperAdmin = [
     ...defaultHomePage,
     ...manageSellItems,
+    ...managePurchaseItems,
     ...manageTransactionItems,
     ...manageProductItems,
-    ...managePurchaseItems,
     ...manageSupplierItems,
     ...manageCustomersItems,
     ...manageUsersItems,
@@ -391,9 +391,9 @@ const sidebarItems = (role: string) => {
   const manageAdmin = [
     ...defaultHomePage,
     ...manageSellItems,
+    ...managePurchaseItems,
     ...manageTransactionItems,
     ...manageProductItems,
-    ...managePurchaseItems,
     ...manageSupplierItems,
     ...manageCustomersItems,
     ...manageReturnItems,

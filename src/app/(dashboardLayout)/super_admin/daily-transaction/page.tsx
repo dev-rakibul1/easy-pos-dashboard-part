@@ -1,4 +1,5 @@
 'use client'
+
 import PosBreadcrumb from '@/components/breadcrumb/PosBreadcrumb'
 import DailyReport from '@/components/transaction/tabs/DailyReport'
 import DailyTransactionChart from '@/components/transaction/tabs/DailyTransactionChart'
@@ -12,44 +13,48 @@ import { useGetSellGroupByCurrentDateQuery } from '@/redux/api/sellGroups/sellGr
 import { useGetSellByCurrentDateQuery } from '@/redux/api/sells/sellsApi'
 import { getUserInfo } from '@/services/auth.services'
 import { calculateProfit } from '@/utils/calculateProfit'
-
 import { Card, Col, Row, Statistic, Tabs } from 'antd'
 import React from 'react'
 
-// Example type definition for SellData
 export interface SellData {
   uniqueId: string
-  createdAt: string // Assuming createdAt is a date string
+  createdAt: string
   totalSellPrice: number
   costPrice: number
-  customerId: string // Assuming customerId is a string
-  // Other properties as per your API response
+  customerId: string
 }
 
-// Define the component function
+interface ProfitAndCost {
+  totalProfit: number
+  totalCost: number
+}
+
+// Function to determine title based on profit value
+const getTitle = (profit: number): string =>
+  profit >= 0 ? 'Total Profit' : 'Total Loss'
+
+// Function to determine value style based on profit value
+const getValueStyle = (profit: number): React.CSSProperties => ({
+  color: profit >= 0 ? 'green' : 'red',
+})
+
 const DailyTransaction: React.FC = () => {
   const { role } = getUserInfo() as any
-  // Fetch data using the API query
-  const { data } = useGetSellByCurrentDateQuery({
-    limit: 100,
-  })
+
+  // Fetch data using the API queries
+  const { data } = useGetSellByCurrentDateQuery({ limit: 100 })
   const { data: purchases } = useGetAllPurchaseByCurrentDateQuery({
     limit: 100,
   })
-  const { data: sellGroups } = useGetSellGroupByCurrentDateQuery({
-    limit: 100,
-  })
+  const { data: sellGroups } = useGetSellGroupByCurrentDateQuery({ limit: 100 })
   const { data: purchaseGroups } = useGetPurchaseGroupByCurrentDateQuery({
     limit: 100,
   })
-  const { data: returns } = useGetAllReturnsByCurrentDateQuery({
-    limit: 100,
-  })
+  const { data: returns } = useGetAllReturnsByCurrentDateQuery({ limit: 100 })
   const { data: returnsGroups } = useGetAllReturnGroupByCurrentDateQuery({
     limit: 100,
   })
 
-  // Calculate total revenue, total customers, and total profit from sells data for the current day
   const today = new Date().toLocaleDateString('en-US', {
     year: 'numeric',
     month: 'short',
@@ -75,34 +80,17 @@ const DailyTransaction: React.FC = () => {
     sellsToday.map((sell: SellData) => sell.customerId)
   ).size
 
-  // ----------DAILY REPORT INFORMATION----------
-  const purchaseInfo = purchases?.purchases
-  const returnsInfo = returns?.returns
+  // calculate profit
   const sales = data
+  const profitAndCost: ProfitAndCost = calculateProfit(sales)
+  const totalProfit = profitAndCost?.totalProfit ?? 0
 
-  // -----------PROFIT CALCULATION------------
-  const profitAndCost = calculateProfit(sales)
-  const dailyReportData = {
-    purchase: purchaseInfo,
-    sales,
-    returns: returnsInfo,
-    profit: profitAndCost,
-  }
-  console.log(dailyReportData)
-
-  // Return the JSX for rendering
   return (
     <div style={{ padding: 24 }}>
       <PosBreadcrumb
         items={[
-          {
-            label: `${role}`,
-            link: `/${role}`,
-          },
-          {
-            label: `Daily transaction`,
-            link: `/${role}/daily-transaction`,
-          },
+          { label: `${role}`, link: `/${role}` },
+          { label: `Daily transaction`, link: `/${role}/daily-transaction` },
         ]}
       />
 
@@ -137,10 +125,11 @@ const DailyTransaction: React.FC = () => {
         <Col xs={24} sm={24} md={6} lg={6} xl={6}>
           <Card>
             <Statistic
-              title="Total Profit"
-              value={profitAndCost?.totalProfit}
+              title={getTitle(totalProfit)}
+              value={totalProfit}
               precision={2}
               prefix={currencyName}
+              valueStyle={getValueStyle(totalProfit)}
             />
           </Card>
         </Col>
@@ -153,7 +142,6 @@ const DailyTransaction: React.FC = () => {
             purchases={purchases}
             returns={returns}
           />
-          <Row gutter={[16, 16]} style={{ marginTop: 16 }}></Row>
         </Tabs.TabPane>
         <Tabs.TabPane tab="Daily report" key="2">
           <DailyReport
@@ -171,5 +159,4 @@ const DailyTransaction: React.FC = () => {
   )
 }
 
-// Export the component as default
 export default DailyTransaction

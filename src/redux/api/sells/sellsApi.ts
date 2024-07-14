@@ -33,6 +33,22 @@ export const sellsApi = baseApi.injectEndpoints({
       }),
       providesTags: [tagTypes.sell],
     }),
+    // get all sell depended current week
+    getSellByCurrentWeek: build.query({
+      query: () => ({
+        url: `${SELLS_URL}/get-sell-by-current-week/`,
+        method: 'GET',
+      }),
+      providesTags: [tagTypes.sell],
+    }),
+    // get all sell depended current month
+    getSellByCurrentMonth: build.query({
+      query: () => ({
+        url: `${SELLS_URL}/get-sell-by-current-month/`,
+        method: 'GET',
+      }),
+      providesTags: [tagTypes.sell],
+    }),
   }),
   overrideExisting: false,
 })
@@ -41,4 +57,6 @@ export const {
   useAddANewSellsMutation,
   useGetSellByCurrentDateQuery,
   useGetSellByCustomerPurchaseIdQuery,
+  useGetSellByCurrentWeekQuery,
+  useGetSellByCurrentMonthQuery,
 } = sellsApi

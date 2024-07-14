@@ -387,7 +387,7 @@ const PosPage = () => {
     router.push(`/${role}/add-customers`)
   }
 
-  console.log(formData)
+  // console.log(formData)
 
   // -----------Discounts modal-----------
   const [isDiscountsModal, setIsDiscountsModal] = useState(false)

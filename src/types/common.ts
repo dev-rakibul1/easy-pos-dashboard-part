@@ -207,6 +207,7 @@ export type IReturn = {
   supplier: ISupplier
   createdAt: Date
   updatedAt: Date
+  price:number
 }
 
 enum UserRole {

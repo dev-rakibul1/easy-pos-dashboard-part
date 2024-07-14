@@ -52,7 +52,7 @@ interface DailyReportProps {
   returns: any
 }
 
-const DailyReport: React.FC<DailyReportProps> = ({
+const WeeklyTransactionReport: React.FC<DailyReportProps> = ({
   sellGroups,
   sales,
   purchases,
@@ -320,4 +320,4 @@ const DailyReport: React.FC<DailyReportProps> = ({
   )
 }
 
-export default DailyReport
+export default WeeklyTransactionReport

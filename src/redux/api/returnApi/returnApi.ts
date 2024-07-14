@@ -43,8 +43,40 @@ export const returnApi = baseApi.injectEndpoints({
       },
       providesTags: [tagTypes.return],
     }),
+    getAllReturnsByCurrentWeek: build.query({
+      query: (arg: Record<string, any>) => ({
+        url: `${RETURN_URL}/get-by-current-week`,
+        method: 'GET',
+        params: arg,
+      }),
+      transformResponse: (response: any, meta: IMeta) => {
+        return {
+          returns: response,
+          meta: meta,
+        }
+      },
+      providesTags: [tagTypes.return],
+    }),
+    getAllReturnsByCurrentMonth: build.query({
+      query: (arg: Record<string, any>) => ({
+        url: `${RETURN_URL}/get-by-current-month`,
+        method: 'GET',
+        params: arg,
+      }),
+      transformResponse: (response: any, meta: IMeta) => {
+        return {
+          returns: response,
+          meta: meta,
+        }
+      },
+      providesTags: [tagTypes.return],
+    }),
   }),
 })
 
-export const { useAddANewReturnMutation, useGetAllReturnsByCurrentDateQuery } =
-  returnApi
+export const {
+  useAddANewReturnMutation,
+  useGetAllReturnsByCurrentDateQuery,
+  useGetAllReturnsByCurrentWeekQuery,
+  useGetAllReturnsByCurrentMonthQuery,
+} = returnApi

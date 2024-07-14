@@ -1,177 +1,232 @@
 'use client'
 
-import { UserOutlined } from '@ant-design/icons'
-import { Avatar, Card, Col, List, Row, Statistic, Table, Tag } from 'antd'
+import PosBreadcrumb from '@/components/breadcrumb/PosBreadcrumb'
+import WeeklyTransactionReport from '@/components/transaction/tabs/WeeklyTransaction/WeeklyTransactionReport'
+import { currencyName } from '@/constants/global'
+import { useGetAllPurchaseByCurrentWeekQuery } from '@/redux/api/purchaseApi/PurchaseApi'
+import { useGetPurchaseGroupByCurrentWeekQuery } from '@/redux/api/purchaseGroup/purchaseGroupApi'
+import { useGetAllReturnsByCurrentWeekQuery } from '@/redux/api/returnApi/returnApi'
+import { useGetAllReturnGroupByCurrentWeekQuery } from '@/redux/api/returnGroupApi/returnGroupApi'
+import { useGetSellGroupByCurrentWeekQuery } from '@/redux/api/sellGroups/sellGroupApi'
+import { useGetSellByCurrentWeekQuery } from '@/redux/api/sells/sellsApi'
+import { getUserInfo } from '@/services/auth.services'
+import { IPurchase, IReturn, ISell } from '@/types'
+import { calculateProfit } from '@/utils/calculateProfit'
+import { Card, Col, Row, Statistic } from 'antd'
+import { useEffect, useState } from 'react'
 import {
+  Bar,
+  BarChart,
   CartesianGrid,
   Legend,
-  Line,
-  LineChart,
   ResponsiveContainer,
   Tooltip,
   XAxis,
   YAxis,
 } from 'recharts'
 
-const data = [
-  { name: 'Sat', uv: 4000, pv: 2400, amt: 2400 },
-  { name: 'Sun', uv: 3000, pv: 1398, amt: 2210 },
-  { name: 'Mon', uv: 2000, pv: 9800, amt: 2290 },
-  { name: 'Tue', uv: 2780, pv: 3908, amt: 2000 },
-  { name: 'Wed', uv: 1890, pv: 4800, amt: 2181 },
-  { name: 'Thu', uv: 2390, pv: 3800, amt: 2500 },
-  { name: 'Fri', uv: 3490, pv: 4300, amt: 2100 },
+// Define TypeScript types for your aggregated data
+interface SalesData {
+  name: string
+  sales: number
+  purchases: number
+  returns: number
+}
+
+interface ProfitAndCost {
+  totalProfit: number
+  totalCost: number
+}
+
+const daysOfWeek = [
+  'Sunday',
+  'Monday',
+  'Tuesday',
+  'Wednesday',
+  'Thursday',
+  'Friday',
+  'Saturday',
 ]
 
-const columns = [
-  { title: 'NO', dataIndex: 'no', key: 'no' },
-  { title: 'ID', dataIndex: 'id', key: 'id' },
-  { title: 'Date', dataIndex: 'date', key: 'date' },
-  { title: 'Price', dataIndex: 'price', key: 'price' },
-  {
-    title: 'Status',
-    dataIndex: 'status',
-    key: 'status',
-    render: (status: any) => (
-      <Tag
-        color={
-          status === 'New order'
-            ? 'green'
-            : status === 'On Delivery'
-            ? 'orange'
-            : 'red'
-        }
-      >
-        {status}
-      </Tag>
-    ),
-  },
-]
+function getLast7Days(): string[] {
+  const last7Days: string[] = []
+  const today = new Date()
+  for (let i = 0; i < 7; i++) {
+    const day = new Date(today)
+    day.setDate(today.getDate() - i - 1) // end with yesterday
+    last7Days.push(daysOfWeek[day.getDay()])
+  }
+  return last7Days.reverse()
+}
 
-const dataSource = [
-  {
-    key: '1',
-    no: '01',
-    id: '#123456',
-    date: 'Nov 20th,22',
-    price: '$320.00',
-    status: 'New order',
-  },
-  {
-    key: '2',
-    no: '02',
-    id: '#234567',
-    date: 'Nov 19th,22',
-    price: '$920.00',
-    status: 'On Delivery',
-  },
-  {
-    key: '3',
-    no: '03',
-    id: '#345678',
-    date: 'Nov 25th,22',
-    price: '$520.00',
-    status: 'Not Available',
-  },
-]
+function mapDataToLast7Days(
+  sales: ISell[],
+  purchases: IPurchase[],
+  returns: IReturn[]
+): SalesData[] {
+  const last7Days = getLast7Days()
+  const salesData = last7Days.map(day => ({
+    name: day,
+    sales: 0,
+    purchases: 0,
+    returns: 0,
+  }))
+
+  sales?.forEach(transaction => {
+    const date = new Date(transaction.createdAt)
+    const dayName = daysOfWeek[date.getDay()]
+    const index = salesData.findIndex(item => item.name === dayName)
+    if (index !== -1) {
+      salesData[index].sales += transaction.totalSellPrice
+    }
+  })
+
+  purchases?.forEach(purchase => {
+    const date = new Date(purchase.createdAt)
+    const dayName = daysOfWeek[date.getDay()]
+    const index = salesData.findIndex(item => item.name === dayName)
+    if (index !== -1) {
+      salesData[index].purchases += purchase.totalPrice
+    }
+  })
+
+  returns?.forEach(returnItem => {
+    const date = new Date(returnItem.createdAt)
+    const dayName = daysOfWeek[date.getDay()]
+    const index = salesData.findIndex(item => item.name === dayName)
+    if (index !== -1) {
+      salesData[index].returns += returnItem.price
+    }
+  })
+
+  return salesData
+}
 
 function WeeklyTransaction() {
+  const { role } = getUserInfo() as any
+  const { data: salesData } = useGetSellByCurrentWeekQuery({ limit: 100 })
+  const { data: purchase } = useGetAllPurchaseByCurrentWeekQuery({ limit: 100 })
+  const { data: returns } = useGetAllReturnsByCurrentWeekQuery({ limit: 100 })
+  const { data: sellGroups } = useGetSellGroupByCurrentWeekQuery({ limit: 100 })
+  const { data: purchaseGroups } = useGetPurchaseGroupByCurrentWeekQuery({
+    limit: 100,
+  })
+  const { data: returnsGroups } = useGetAllReturnGroupByCurrentWeekQuery({
+    limit: 100,
+  })
+  const [weeklyData, setWeeklyData] = useState<SalesData[]>([])
+
+  // Function to determine title based on profit value
+  const getTitle = (profit: number): string =>
+    profit >= 0 ? 'Total Profit' : 'Total Loss'
+
+  // Function to determine value style based on profit value
+  const getValueStyle = (profit: number): React.CSSProperties => ({
+    color: profit >= 0 ? 'green' : 'red',
+  })
+
+  // @ts-ignore
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const purchaseData: IPurchase[] = purchase?.purchases || []
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const returnData: IReturn[] = returns?.returns || []
+
+  useEffect(() => {
+    if (salesData && purchaseData && returnData) {
+      const mappedData = mapDataToLast7Days(salesData, purchaseData, returnData)
+      setWeeklyData(mappedData)
+    }
+  }, [salesData, purchaseData, returnData])
+
+  // calculate profit
+  const sales = salesData
+  const profitAndCost: ProfitAndCost = calculateProfit(sales)
+  const totalProfit = profitAndCost?.totalProfit ?? 0
+
+  // total customers
+  const customerCount = new Set(
+    salesData?.map((sell: ISell) => sell.customerId)
+  ).size
+
+  const totalRevenue: number = salesData?.reduce(
+    (acc: number, sell: ISell) => acc + sell.totalSellPrice,
+    0
+  )
+
   return (
     <div style={{ padding: 24 }}>
-      <Row gutter={[16, 16]}>
-        <Col span={8}>
+      <PosBreadcrumb
+        items={[
+          { label: `${role}`, link: `/${role}` },
+          { label: `Weekly transaction`, link: `/${role}/weekly-transaction` },
+        ]}
+      />
+
+      <Row gutter={[16, 16]} style={{ marginTop: '15px' }}>
+        <Col xs={24} sm={24} md={6} lg={6} xl={6}>
           <Card>
             <Statistic
               title="Total Revenue"
-              value={11354}
+              value={totalRevenue}
               precision={2}
-              prefix="$"
+              prefix={currencyName}
             />
           </Card>
         </Col>
-        <Col span={8}>
+        <Col xs={24} sm={24} md={6} lg={6} xl={6}>
           <Card>
-            <Statistic title="Total Customer" value={45439} />
+            <Statistic title="Total Customers" value={customerCount} />
           </Card>
         </Col>
-        <Col span={8}>
+        <Col xs={24} sm={24} md={6} lg={6} xl={6}>
           <Card>
             <Statistic
-              title="Total Profit"
-              value={8354}
+              title="Total Cost"
+              value={profitAndCost?.totalCost}
               precision={2}
-              prefix="$"
+              prefix={currencyName}
+            />
+          </Card>
+        </Col>
+        <Col xs={24} sm={24} md={6} lg={6} xl={6}>
+          <Card>
+            <Statistic
+              title={getTitle(totalProfit)}
+              value={totalProfit}
+              precision={2}
+              prefix={currencyName}
+              valueStyle={getValueStyle(totalProfit)}
             />
           </Card>
         </Col>
       </Row>
+
       <Row gutter={[16, 16]} style={{ marginTop: 16 }}>
-        <Col span={16}>
-          <Card title="Spending Statistic">
-            <ResponsiveContainer width="100%" height={300}>
-              <LineChart
-                data={data}
-                margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
-              >
+        <Col xs={24} sm={24} md={24} lg={24} xl={24}>
+          <Card title="Weekly sales, purchase and return report">
+            <ResponsiveContainer width="100%" height={450}>
+              <BarChart data={weeklyData}>
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="name" />
                 <YAxis />
                 <Tooltip />
                 <Legend />
-                <Line type="monotone" dataKey="pv" stroke="#8884d8" />
-                <Line type="monotone" dataKey="uv" stroke="#82ca9d" />
-              </LineChart>
+                <Bar dataKey="sales" fill="#03B0B3" />
+                <Bar dataKey="purchases" fill="#18526A" />
+                <Bar dataKey="returns" fill="#0F67B1" />
+              </BarChart>
             </ResponsiveContainer>
           </Card>
         </Col>
-        <Col span={8}>
-          <Card title="Customer Growth">
-            <div style={{ textAlign: 'center' }}>
-              <h3>India</h3>
-              <p>45% Customer Loyalty</p>
-            </div>
-          </Card>
-        </Col>
-      </Row>
-      <Row gutter={[16, 16]} style={{ marginTop: 16 }}>
-        <Col span={16}>
-          <Card title="Lastest order">
-            <Table
-              dataSource={dataSource}
-              columns={columns}
-              pagination={false}
-            />
-          </Card>
-        </Col>
-        <Col span={8}>
-          <Card title="Recent Sales">
-            <List
-              itemLayout="horizontal"
-              dataSource={[
-                { name: 'Robert Fox', time: '01 Minutes Ago', amount: 89 },
-                { name: 'Jane Cooper', time: '02 Minutes Ago', amount: 112 },
-                { name: 'Dianne Russell', time: '02 Minutes Ago', amount: 54 },
-                {
-                  name: 'Leslie Alexander',
-                  time: '03 Minutes Ago',
-                  amount: 21,
-                },
-                { name: 'Darrell Steward', time: '04 Minutes Ago', amount: 32 },
-                { name: 'Jerome Bell', time: '05 Minutes Ago', amount: 65 },
-              ]}
-              renderItem={item => (
-                <List.Item>
-                  <List.Item.Meta
-                    avatar={<Avatar icon={<UserOutlined />} />}
-                    title={<a href="#">{item.name}</a>}
-                    description={item.time}
-                  />
-                  <div>+${item.amount}</div>
-                </List.Item>
-              )}
-            />
-          </Card>
-        </Col>
+        <WeeklyTransactionReport
+          sellGroups={sellGroups}
+          purchaseGroups={purchaseGroups}
+          sales={salesData}
+          // @ts-ignore
+          purchases={purchase}
+          returnsGroups={returnsGroups}
+          returns={returns}
+        />
       </Row>
     </div>
   )

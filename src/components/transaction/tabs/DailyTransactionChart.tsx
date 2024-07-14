@@ -108,8 +108,6 @@ const DailyTransactionChart: FC<Props> = ({ sales, purchases, returns }) => {
   const purchaseInformation = purchaseInfo || []
   const returnsInfo = returns?.returns || []
 
-  console.log('sales', sales)
-
   const data = sales?.map((sale: any, index: number) => {
     const purchase = purchaseInformation[index] || {}
     const returnData = returnsInfo[index] ?? {}
@@ -131,8 +129,6 @@ const DailyTransactionChart: FC<Props> = ({ sales, purchases, returns }) => {
       return: returnData?.price ?? 0,
     }
   })
-
-  console.log('data', data)
 
   const dataSource = sellsToday.map((sell: SellData, index: number) => ({
     key: index.toString(),
