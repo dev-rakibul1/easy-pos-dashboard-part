@@ -68,3 +68,19 @@ export const supplierAndCustomerCoverStyle: CSSProperties = {
 }
 export const textCapitalize: CSSProperties = { textTransform: 'capitalize' }
 export const textUpperCase: CSSProperties = { textTransform: 'uppercase' }
+export const warningIconStyle: CSSProperties = {
+  width: '50px',
+  height: '50px',
+  display: 'flex',
+  justifyContent: 'center',
+  alignItems: 'center',
+  fontSize: '35px',
+  color: 'orange',
+  borderRadius: '100%',
+}
+export const warningIconWrap: CSSProperties = {
+  width: '100%',
+  display: 'flex',
+  justifyContent: 'center',
+  alignItems: 'center',
+}

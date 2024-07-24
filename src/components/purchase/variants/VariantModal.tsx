@@ -15,7 +15,7 @@ const VariantModal = ({
         centered
         visible={openVariantModal}
         onCancel={() => setOpenVariantModal(false)}
-        width={700}
+        width={960}
         footer={null}
       >
         <DynamicForm

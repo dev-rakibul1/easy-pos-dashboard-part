@@ -8,6 +8,7 @@ import { IProduct, ISupplier, IVariant } from '@/types'
 import {
   Button,
   Col,
+  Descriptions,
   Form,
   Input,
   Row,
@@ -18,6 +19,7 @@ import {
 } from 'antd'
 const { Text } = Typography
 
+import { currencyName } from '@/constants/global'
 import DiscountsModal from '@/modals/discounts/DiscountsModal'
 import VatsModal from '@/modals/vats/VatsModal'
 import { useGetSinglePurchaseQuery } from '@/redux/api/purchaseApi/PurchaseApi'
@@ -294,10 +296,18 @@ const ReturnToSupplier = () => {
 
     // Reset other states
     setSelectVariant('')
-    setSelectCustomer('')
+    // setSelectCustomer('')
     setSelectProduct('')
     setSubtotal(0)
+
+    // Store the phone number
+    const supplier = `${singleSupplierById?.firstName} | ${singleSupplierById?.uniqueId}`
+
+    // Reset all fields
     form.resetFields()
+
+    // Set the phone number back
+    form.setFieldsValue({ supplier: supplier })
   }
 
   const handleProductChange = (value: string) => {
@@ -439,6 +449,120 @@ const ReturnToSupplier = () => {
                     <Spin size="small" />
                   ) : (
                     <>
+                      <Descriptions
+                        bordered
+                        column={1}
+                        size="small"
+                        style={{
+                          width: '100%',
+                          maxWidth: '100%',
+                          margin: '20px auto',
+                        }}
+                        contentStyle={{ padding: '8px 16px' }}
+                        labelStyle={{ padding: '8px 16px', fontWeight: 'bold' }}
+                      >
+                        <Descriptions.Item label="Name">
+                          {singleProductById?.productName || 'N/A'}
+                        </Descriptions.Item>
+                        <Descriptions.Item label="Brand">
+                          {singleProductById?.brandName || 'N/A'}
+                        </Descriptions.Item>
+                        <Descriptions.Item label="Selling price">
+                          <Text type="success">
+                            {' '}
+                            {singlePurchase?.sellingPrice
+                              ? `${singlePurchase.sellingPrice.toFixed(
+                                  2
+                                )} ${currencyName}`
+                              : 'N/A'}
+                          </Text>
+                        </Descriptions.Item>
+                        <Descriptions.Item label="Purchase rate">
+                          <Text type="danger">
+                            {' '}
+                            {subTotal ? `${subTotal} ${currencyName}` : 'N/A'}
+                          </Text>
+                        </Descriptions.Item>
+
+                        <Descriptions.Item label="Stock">
+                          {`${singleProductById?.variants?.length || 0} pics`}
+                        </Descriptions.Item>
+                      </Descriptions>
+                    </>
+                  )}
+                  {selectVariant !== '' ? (
+                    getSingleVariantLoading ? (
+                      <Spin size="small" />
+                    ) : (
+                      <>
+                        <Descriptions
+                          bordered
+                          column={1}
+                          size="small"
+                          style={{
+                            width: '100%',
+                            maxWidth: '100%',
+                            margin: '20px auto',
+                          }}
+                          contentStyle={{ padding: '8px 16px' }}
+                          labelStyle={{
+                            padding: '8px 16px',
+                            fontWeight: 'bold',
+                          }}
+                        >
+                          <Descriptions.Item label="IMEI Number">
+                            {singleVariantsById?.imeiNumber
+                              ? singleVariantsById?.imeiNumber
+                              : 'N/A'}
+                          </Descriptions.Item>
+                          <Descriptions.Item label="Ram">
+                            {singleVariantsById?.ram
+                              ? singleVariantsById?.ram
+                              : 'N/A'}{' '}
+                            GB
+                          </Descriptions.Item>
+                          <Descriptions.Item label="Rom">
+                            <Text>
+                              {singleVariantsById?.rom
+                                ? singleVariantsById?.rom
+                                : 'N/A'}{' '}
+                              GB
+                            </Text>
+                          </Descriptions.Item>
+                          <Descriptions.Item label="Color">
+                            <Text>
+                              {singleVariantsById?.color
+                                ? singleVariantsById?.color
+                                : 'N/A'}
+                            </Text>
+                          </Descriptions.Item>
+                        </Descriptions>
+                      </>
+                    )
+                  ) : null}
+                </div>
+              ) : null}
+
+              {/* {selectProduct !== '' ? (
+                <div>
+                  <Col xs={24} sm={24} md={24} lg={24}>
+                    <Form.Item label="Select variant" name="variants">
+                      <Select
+                        showSearch
+                        optionFilterProp="children"
+                        onChange={handleVariantChange}
+                        onSearch={onSearch}
+                        size="large"
+                        style={{ width: '100%' }}
+                        filterOption={filterOption}
+                        options={variantOptions}
+                      />
+                    </Form.Item>
+                  </Col>
+                  {isSingleProductLoading ? (
+                    <Spin size="small" />
+                  ) : (
+                    <>
                       <Text>
                         <Text strong>Name:</Text>{' '}
                         {singleProductById?.productName
@@ -502,7 +626,7 @@ const ReturnToSupplier = () => {
                     )
                   ) : null}
                 </div>
-              ) : null}
+              ) : null} */}
             </Col>
 
             <Col xs={24} sm={12} md={12} lg={12}>
@@ -533,55 +657,62 @@ const ReturnToSupplier = () => {
                   <Spin size="small" />
                 ) : (
                   <>
-                    <Text>
-                      <Text strong>Name:</Text>{' '}
-                      {`${
-                        singleSupplierById?.firstName
-                          ? singleSupplierById?.firstName
-                          : ''
-                      } ${
-                        singleSupplierById?.middleName
-                          ? singleSupplierById?.middleName
-                          : ''
-                      } ${
-                        singleSupplierById?.lastName
-                          ? singleSupplierById?.lastName
-                          : ''
-                      } ${
-                        !singleSupplierById?.firstName &&
-                        !singleSupplierById?.firstName
-                          ? 'N/A'
-                          : ''
-                      }`}
-                    </Text>
-                    <br />
-                    <Text>
-                      <Text strong>Phone:</Text>{' '}
-                      {singleSupplierById?.phoneNo
-                        ? singleSupplierById?.phoneNo
-                        : 'N/A'}
-                    </Text>
-                    <br />
-                    <Text>
-                      <Text strong>Email:</Text>{' '}
-                      {singleSupplierById?.email
-                        ? singleSupplierById?.email
-                        : 'N/A'}
-                    </Text>
-                    <br />
-                    <Text>
-                      <Text strong>NID:</Text>{' '}
-                      {singleSupplierById?.nid
-                        ? singleSupplierById?.nid
-                        : 'N/A'}
-                    </Text>
-                    <br />
-                    <Text>
-                      <Text strong>Address:</Text>{' '}
-                      {singleSupplierById?.presentAddress
-                        ? singleSupplierById?.presentAddress
-                        : 'N/A'}
-                    </Text>
+                    <Descriptions
+                      bordered
+                      column={1}
+                      size="small"
+                      style={{
+                        width: '100%',
+                        maxWidth: '100%',
+                        margin: '20px auto',
+                      }}
+                      contentStyle={{ padding: '8px 16px' }}
+                      labelStyle={{
+                        padding: '8px 16px',
+                        fontWeight: 'bold',
+                      }}
+                    >
+                      <Descriptions.Item label="Name">
+                        {`${
+                          singleSupplierById?.firstName
+                            ? singleSupplierById?.firstName
+                            : ''
+                        } ${
+                          singleSupplierById?.middleName
+                            ? singleSupplierById?.middleName
+                            : ''
+                        } ${
+                          singleSupplierById?.lastName
+                            ? singleSupplierById?.lastName
+                            : ''
+                        } ${
+                          !singleSupplierById?.firstName &&
+                          !singleSupplierById?.firstName
+                            ? 'N/A'
+                            : ''
+                        }`}
+                      </Descriptions.Item>
+                      <Descriptions.Item label="Phone">
+                        {singleSupplierById?.phoneNo
+                          ? singleSupplierById?.phoneNo
+                          : 'N/A'}
+                      </Descriptions.Item>
+                      <Descriptions.Item label="Email">
+                        {singleSupplierById?.email
+                          ? singleSupplierById?.email
+                          : 'N/A'}
+                      </Descriptions.Item>
+                      <Descriptions.Item label="NID">
+                        {singleSupplierById?.nid
+                          ? singleSupplierById?.nid
+                          : 'N/A'}
+                      </Descriptions.Item>
+                      <Descriptions.Item label="Address">
+                        {singleSupplierById?.presentAddress
+                          ? singleSupplierById?.presentAddress
+                          : 'N/A'}
+                      </Descriptions.Item>
+                    </Descriptions>
                   </>
                 )
               ) : null}
@@ -615,6 +746,7 @@ const ReturnToSupplier = () => {
         <ReturnTable
           payloads={sellPayloads}
           setSellPayloads={setSellPayloads}
+          singleSupplierById={singleSupplierById}
         />
       </div>
     </div>

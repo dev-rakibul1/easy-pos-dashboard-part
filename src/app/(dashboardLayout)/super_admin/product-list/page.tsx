@@ -10,7 +10,7 @@ import {
 } from '@/redux/api/productApi/productApi'
 import { useDebounced } from '@/redux/hooks'
 import { getUserInfo } from '@/services/auth.services'
-import { IProduct } from '@/types'
+import { IProduct, IVariant } from '@/types'
 import {
   DeleteOutlined,
   EditOutlined,
@@ -29,7 +29,7 @@ const ProductListPage = () => {
   const [sortBy, setSortBy] = useState<string>('')
   const [sortOrder, setSortOrder] = useState<string>('')
   const [searchTerm, setSearchTerm] = useState<string>('')
-  const [deleteId, setDeleteId] = useState<string | null>(null)
+  // const [deleteId, setDeleteId] = useState<string | null>(null)
 
   //Create Search debouncedTerms
   const debouncedSearchTerm = useDebounced({
@@ -77,14 +77,18 @@ const ProductListPage = () => {
       dataIndex: 'modelName',
     },
     {
-      title: 'Product Stock',
-      dataIndex: 'productStock',
+      title: 'Stock',
+      dataIndex: 'variants',
+      key: 'variants',
+      render: (data: IVariant[]) => {
+        return data?.length
+      },
     },
     {
       title: 'Created At',
       dataIndex: 'createdAt',
       sorter: true,
-      render: (data: any) => {
+      render: (data: string) => {
         return data && dayjs(data).format('D MMM, YYYY hh:mm A')
       },
     },

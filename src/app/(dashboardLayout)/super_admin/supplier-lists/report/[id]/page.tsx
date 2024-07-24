@@ -8,6 +8,8 @@ import { useGetSingleSupplierSellQuery } from '@/redux/api/supplierSells/supplie
 import { getUserInfo } from '@/services/auth.services'
 import { PrinterOutlined } from '@ant-design/icons'
 import { Button } from 'antd'
+import { useRef } from 'react'
+import { useReactToPrint } from 'react-to-print'
 
 const SupplierSellReport = ({ params }: any) => {
   const { role } = getUserInfo() as any
@@ -15,6 +17,12 @@ const SupplierSellReport = ({ params }: any) => {
 
   const { data } = useGetSingleSupplierSellQuery(paramsId)
   const supplier = data?.supplier
+
+  const componentRef = useRef()
+  const handlePrint = useReactToPrint({
+    // @ts-ignore
+    content: () => componentRef.current,
+  })
 
   return (
     <div>
@@ -38,13 +46,17 @@ const SupplierSellReport = ({ params }: any) => {
 
       <div style={flexBetween}>
         <ActionBar title="Report details"></ActionBar>
-        <Button>
+        <Button onClick={handlePrint}>
           {' '}
           Print <PrinterOutlined />
         </Button>
       </div>
       <div style={{ marginTop: '15px' }}>
-        <SupplierReport id={paramsId} supplier={supplier} />
+        <SupplierReport
+          id={paramsId}
+          supplier={supplier}
+          componentRef={componentRef}
+        />
       </div>
     </div>
   )

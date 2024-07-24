@@ -71,6 +71,20 @@ export const returnApi = baseApi.injectEndpoints({
       },
       providesTags: [tagTypes.return],
     }),
+    getAllReturnsByCurrentYear: build.query({
+      query: (arg: Record<string, any>) => ({
+        url: `${RETURN_URL}/get-by-current-year`,
+        method: 'GET',
+        params: arg,
+      }),
+      transformResponse: (response: any, meta: IMeta) => {
+        return {
+          returns: response,
+          meta: meta,
+        }
+      },
+      providesTags: [tagTypes.return],
+    }),
   }),
 })
 
@@ -79,4 +93,5 @@ export const {
   useGetAllReturnsByCurrentDateQuery,
   useGetAllReturnsByCurrentWeekQuery,
   useGetAllReturnsByCurrentMonthQuery,
+  useGetAllReturnsByCurrentYearQuery,
 } = returnApi

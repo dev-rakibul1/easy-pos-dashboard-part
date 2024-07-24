@@ -8,6 +8,8 @@ import { useGetSingleCustomerPurchaseQuery } from '@/redux/api/customerPurchase/
 import { getUserInfo } from '@/services/auth.services'
 import { PrinterOutlined } from '@ant-design/icons'
 import { Button } from 'antd'
+import { useRef } from 'react'
+import { useReactToPrint } from 'react-to-print'
 
 const CustomerPurchaseReport = ({ params }: any) => {
   const { role } = getUserInfo() as any
@@ -15,7 +17,12 @@ const CustomerPurchaseReport = ({ params }: any) => {
 
   const { data } = useGetSingleCustomerPurchaseQuery(paramsId)
   const customer = data?.customer
-  // console.log(customer)
+
+  const componentRef = useRef()
+  const handlePrint = useReactToPrint({
+    // @ts-ignore
+    content: () => componentRef.current,
+  })
 
   return (
     <div>
@@ -39,14 +46,17 @@ const CustomerPurchaseReport = ({ params }: any) => {
 
       <div style={flexBetween}>
         <ActionBar title="Customer report details"></ActionBar>
-        <Button>
+        <Button onClick={handlePrint}>
           {' '}
           Print <PrinterOutlined />
         </Button>
       </div>
       <div style={{ marginTop: '15px' }}>
-        <CustomerReport id={paramsId} customer={customer} />
-        {/* <SupplierReport id={paramsId} supplier={customer} /> */}
+        <CustomerReport
+          id={paramsId}
+          customer={customer}
+          componentRef={componentRef}
+        />
       </div>
     </div>
   )

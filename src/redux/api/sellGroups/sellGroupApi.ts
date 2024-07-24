@@ -66,10 +66,34 @@ export const sellGroupApi = baseApi.injectEndpoints({
       },
       providesTags: [tagTypes.sellGroup],
     }),
+    // Get sell group by current year
+    getSellGroupByCurrentYear: build.query({
+      query: (arg: Record<string, any>) => ({
+        url: `${SELL_GROUP_URL}/get-by-current-year`,
+        method: 'GET',
+        params: arg,
+      }),
+      transformResponse: (response: any, meta: IMeta) => {
+        return {
+          sellGroups: response,
+          meta: meta,
+        }
+      },
+      providesTags: [tagTypes.sellGroup],
+    }),
 
     getSingleSellGroup: build.query({
       query: (id: string) => ({
         url: `${SELL_GROUP_URL}/${id}`,
+        method: 'GET',
+      }),
+
+      providesTags: [tagTypes.purchaseGroup],
+    }),
+    // Get by own id
+    getSingleSellGroupByOwnId: build.query({
+      query: (id: string) => ({
+        url: `${SELL_GROUP_URL}/get-by-own-id/${id}`,
         method: 'GET',
       }),
 
@@ -84,4 +108,6 @@ export const {
   useGetSellGroupByCurrentDateQuery,
   useGetSellGroupByCurrentWeekQuery,
   useGetSellGroupByCurrentMonthQuery,
+  useGetSellGroupByCurrentYearQuery,
+  useGetSingleSellGroupByOwnIdQuery,
 } = sellGroupApi

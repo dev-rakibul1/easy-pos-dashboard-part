@@ -14,6 +14,7 @@ const { Title, Text } = Typography
 interface SupplierInvoiceProps {
   id: string
   customer: ICustomer
+  componentRef: any
 }
 
 interface Variant {
@@ -40,7 +41,11 @@ interface CustomerPurchaseProduct {
   sell: Sell
 }
 
-const CustomerReport: React.FC<SupplierInvoiceProps> = ({ id, customer }) => {
+const CustomerReport: React.FC<SupplierInvoiceProps> = ({
+  id,
+  customer,
+  componentRef,
+}) => {
   const { data, isLoading } = useGetSingleSellGroupQuery(id)
 
   if (isLoading) {
@@ -202,6 +207,7 @@ const CustomerReport: React.FC<SupplierInvoiceProps> = ({ id, customer }) => {
 
   return (
     <div
+      ref={componentRef}
       className="invoice-container"
       style={{ padding: '15px', border: '1px solid #ddd' }}
     >

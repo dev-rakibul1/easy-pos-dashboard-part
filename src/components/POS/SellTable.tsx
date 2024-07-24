@@ -1,7 +1,8 @@
 import { Table, TableColumnsType } from 'antd'
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 // @ts-ignore
-import SellPay, { ISellPay } from './SellPay'
+import ReportTitle from '../companyReportTitle/ReportTitle'
+import SellPay, { ISellPayISellPay } from './SellPay'
 
 interface DataType {
   key: React.Key
@@ -17,8 +18,13 @@ interface DataType {
   total: number
 }
 
-const SellTable = ({ payloads, setSellPayloads }: any) => {
-  const [payAmountInfo, setPayAmountInfo] = useState<ISellPay>({
+const SellTable = ({
+  payloads,
+  setSellPayloads,
+  singleCustomerById,
+  setSelectCustomer,
+}: any) => {
+  const [payAmountInfo, setPayAmountInfo] = useState<ISellPayISellPay>({
     amount: 0,
     paymentMethod: '',
   })
@@ -131,83 +137,96 @@ const SellTable = ({ payloads, setSellPayloads }: any) => {
   const paid = Number(payAmountInfo.amount) || 0
   const due = totalNet - paid
 
+  // Print
+  const componentRef = useRef()
+
   return (
     <>
       {payloads?.length && (
         <div>
-          <Table
-            columns={columns}
-            dataSource={data}
-            size="small"
-            bordered
-            pagination={false}
-            summary={() => (
-              <>
-                <Table.Summary.Row>
-                  <Table.Summary.Cell index={0}>Total</Table.Summary.Cell>
-                  <Table.Summary.Cell index={1} />
-                  <Table.Summary.Cell index={2}>
-                    {quantities} Items
-                  </Table.Summary.Cell>
-                  <Table.Summary.Cell index={3}></Table.Summary.Cell>
-                  <Table.Summary.Cell index={4}>
-                    {totalAmount.toFixed(2)}
-                  </Table.Summary.Cell>
-                  <Table.Summary.Cell index={5}></Table.Summary.Cell>
-                  <Table.Summary.Cell index={6}>
-                    {totalDiscountAmount.toFixed(2)}
-                  </Table.Summary.Cell>
-                  <Table.Summary.Cell index={7}></Table.Summary.Cell>
-                  <Table.Summary.Cell index={8}>
-                    {totalVatAmount.toFixed(2)}
-                  </Table.Summary.Cell>
-                  <Table.Summary.Cell index={9}>
-                    {totalNet.toFixed(2)}
-                  </Table.Summary.Cell>
-                </Table.Summary.Row>
-                <Table.Summary.Row style={{ textAlign: 'right' }}>
-                  <Table.Summary.Cell index={0} colSpan={8}>
-                    Total
-                  </Table.Summary.Cell>
-                  <Table.Summary.Cell index={1} colSpan={2}>
-                    {totalNet.toFixed(2)}
-                  </Table.Summary.Cell>
-                </Table.Summary.Row>
-                <Table.Summary.Row style={{ textAlign: 'right' }}>
-                  <Table.Summary.Cell index={0} colSpan={8}>
-                    Discount
-                  </Table.Summary.Cell>
-                  <Table.Summary.Cell index={1} colSpan={2}>
-                    {totalDiscountAmount.toFixed(2)}
-                  </Table.Summary.Cell>
-                </Table.Summary.Row>
-                <Table.Summary.Row style={{ textAlign: 'right' }}>
-                  <Table.Summary.Cell index={0} colSpan={8}>
-                    Net Total
-                  </Table.Summary.Cell>
-                  <Table.Summary.Cell index={1} colSpan={2}>
-                    {totalNet.toFixed(2)}
-                  </Table.Summary.Cell>
-                </Table.Summary.Row>
-                <Table.Summary.Row style={{ textAlign: 'right' }}>
-                  <Table.Summary.Cell index={0} colSpan={8}>
-                    Pay
-                  </Table.Summary.Cell>
-                  <Table.Summary.Cell index={1} colSpan={2}>
-                    {paid.toFixed(2)}
-                  </Table.Summary.Cell>
-                </Table.Summary.Row>
-                <Table.Summary.Row style={{ textAlign: 'right' }}>
-                  <Table.Summary.Cell index={0} colSpan={8}>
-                    Due
-                  </Table.Summary.Cell>
-                  <Table.Summary.Cell index={1} colSpan={2}>
-                    {due.toFixed(2)}
-                  </Table.Summary.Cell>
-                </Table.Summary.Row>
-              </>
-            )}
-          />
+          {/* @ts-ignore */}
+          <div ref={componentRef}>
+            {
+              <ReportTitle
+                buyer={singleCustomerById}
+                title="Customer information"
+                invoiceType="Sales invoice"
+              />
+            }
+            <Table
+              columns={columns}
+              dataSource={data}
+              size="small"
+              bordered
+              pagination={false}
+              summary={() => (
+                <>
+                  <Table.Summary.Row>
+                    <Table.Summary.Cell index={0}>Total</Table.Summary.Cell>
+                    <Table.Summary.Cell index={1} />
+                    <Table.Summary.Cell index={2}>
+                      {quantities} Items
+                    </Table.Summary.Cell>
+                    <Table.Summary.Cell index={3}></Table.Summary.Cell>
+                    <Table.Summary.Cell index={4}>
+                      {totalAmount.toFixed(2)}
+                    </Table.Summary.Cell>
+                    <Table.Summary.Cell index={5}></Table.Summary.Cell>
+                    <Table.Summary.Cell index={6}>
+                      {totalDiscountAmount.toFixed(2)}
+                    </Table.Summary.Cell>
+                    <Table.Summary.Cell index={7}></Table.Summary.Cell>
+                    <Table.Summary.Cell index={8}>
+                      {totalVatAmount.toFixed(2)}
+                    </Table.Summary.Cell>
+                    <Table.Summary.Cell index={9}>
+                      {totalNet.toFixed(2)}
+                    </Table.Summary.Cell>
+                  </Table.Summary.Row>
+                  <Table.Summary.Row style={{ textAlign: 'right' }}>
+                    <Table.Summary.Cell index={0} colSpan={8}>
+                      Total
+                    </Table.Summary.Cell>
+                    <Table.Summary.Cell index={1} colSpan={2}>
+                      {totalNet.toFixed(2)}
+                    </Table.Summary.Cell>
+                  </Table.Summary.Row>
+                  <Table.Summary.Row style={{ textAlign: 'right' }}>
+                    <Table.Summary.Cell index={0} colSpan={8}>
+                      Discount
+                    </Table.Summary.Cell>
+                    <Table.Summary.Cell index={1} colSpan={2}>
+                      {totalDiscountAmount.toFixed(2)}
+                    </Table.Summary.Cell>
+                  </Table.Summary.Row>
+                  <Table.Summary.Row style={{ textAlign: 'right' }}>
+                    <Table.Summary.Cell index={0} colSpan={8}>
+                      Net Total
+                    </Table.Summary.Cell>
+                    <Table.Summary.Cell index={1} colSpan={2}>
+                      {totalNet.toFixed(2)}
+                    </Table.Summary.Cell>
+                  </Table.Summary.Row>
+                  <Table.Summary.Row style={{ textAlign: 'right' }}>
+                    <Table.Summary.Cell index={0} colSpan={8}>
+                      Pay
+                    </Table.Summary.Cell>
+                    <Table.Summary.Cell index={1} colSpan={2}>
+                      {paid.toFixed(2)}
+                    </Table.Summary.Cell>
+                  </Table.Summary.Row>
+                  <Table.Summary.Row style={{ textAlign: 'right' }}>
+                    <Table.Summary.Cell index={0} colSpan={8}>
+                      Due
+                    </Table.Summary.Cell>
+                    <Table.Summary.Cell index={1} colSpan={2}>
+                      {due.toFixed(2)}
+                    </Table.Summary.Cell>
+                  </Table.Summary.Row>
+                </>
+              )}
+            />
+          </div>
 
           {/* Sell pay */}
           <SellPay
@@ -215,6 +234,8 @@ const SellTable = ({ payloads, setSellPayloads }: any) => {
             dueBalance={totalNet}
             sellPayloads={payloads}
             setSellPayloads={setSellPayloads}
+            componentRef={componentRef}
+            setSelectCustomer={setSelectCustomer}
           />
         </div>
       )}

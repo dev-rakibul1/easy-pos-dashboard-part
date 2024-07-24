@@ -5,6 +5,7 @@ import { flexBetween } from '@/components/styles/style'
 import MonthlyTransactionReport from '@/components/transaction/tabs/monthlyTransaction/MonthlyTransactionReport'
 import ActionBar from '@/components/ui/ActionBar'
 import { currencyName } from '@/constants/global'
+import { useGetAllAdditionalExpenseByCurrentMonthQuery } from '@/redux/api/additionalExpense/additionalExpenseApi'
 import { useGetAllPurchaseByCurrentMonthQuery } from '@/redux/api/purchaseApi/PurchaseApi'
 import { useGetPurchaseGroupByCurrentMonthQuery } from '@/redux/api/purchaseGroup/purchaseGroupApi'
 import { useGetAllReturnsByCurrentMonthQuery } from '@/redux/api/returnApi/returnApi'
@@ -15,6 +16,7 @@ import { useGetSellByCurrentMonthQuery } from '@/redux/api/sells/sellsApi'
 import { getUserInfo } from '@/services/auth.services'
 import { IPurchase, IReturn, ISell } from '@/types'
 import { calculateProfit } from '@/utils/calculateProfit'
+import { calculateTotalExpense } from '@/utils/VATDiscountCal'
 import { Button, Card, Col, Row, Statistic } from 'antd'
 import Link from 'next/link'
 import { FC, useEffect, useState } from 'react'
@@ -140,6 +142,11 @@ function MonthlyTransaction() {
   })
   const [dailyData, setDailyData] = useState<SalesData[]>([])
 
+  const { data: additionalExpense } =
+    useGetAllAdditionalExpenseByCurrentMonthQuery({
+      limit: 100,
+    })
+
   // @ts-ignore
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const purchaseData: IPurchase[] = purchase?.purchases || []
@@ -169,12 +176,19 @@ function MonthlyTransaction() {
     salesData?.map((sell: ISell) => sell.customerId)
   ).size
 
+  // Assuming additionalExpense is of type AdditionalExpenseData | undefined
+  const expenseAmount = calculateTotalExpense(
+    // @ts-ignore
+    additionalExpense?.expenses.length ? additionalExpense.expenses : []
+  )
+
+  // calculate profit and cost
   const sales = salesData
-  const profitAndCost: ProfitAndCost = calculateProfit(sales)
+  const profitAndCost: ProfitAndCost = calculateProfit(sales, expenseAmount)
   const totalProfit = profitAndCost?.totalProfit ?? 0
 
-  console.log(salesData)
-  console.log(sellGroups)
+  // console.log(salesData)
+  // console.log(sellGroups)
 
   return (
     <div style={{ padding: 24 }}>
@@ -264,6 +278,7 @@ function MonthlyTransaction() {
           purchases={purchase}
           returnsGroups={returnsGroups}
           returns={returns}
+          expenseAmount={expenseAmount}
         />
       </Row>
     </div>

@@ -35,6 +35,7 @@ interface DailyReportProps {
   sellGroups?: {
     sellGroups: SellGroupInfo[]
   }
+  expenseAmount: number
   returnsGroups: any
   sales: ISell[]
   purchases: {
@@ -59,6 +60,7 @@ const DailyReport: React.FC<DailyReportProps> = ({
   purchaseGroups,
   returnsGroups,
   returns,
+  expenseAmount,
 }) => {
   // ----------------------Purchase information----------------------
   const purchaseInfo = purchases?.purchases
@@ -194,6 +196,11 @@ const DailyReport: React.FC<DailyReportProps> = ({
               <Descriptions.Item label="Total exp. selling price">
                 {totalSells
                   ? `${currencyName} ${totalSells.toFixed(2)} `
+                  : 'N/A'}
+              </Descriptions.Item>
+              <Descriptions.Item label="Additional cost">
+                {expenseAmount
+                  ? `${currencyName} ${expenseAmount.toFixed(2)} `
                   : 'N/A'}
               </Descriptions.Item>
             </Descriptions>

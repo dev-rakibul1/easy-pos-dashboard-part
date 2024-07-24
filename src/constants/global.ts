@@ -54,6 +54,32 @@ export const gender = [
     value: 'others',
   },
 ]
+export const UserRoleArray = [
+  // {
+  //   label: 'Super admin',
+  //   value: 'super_admin',
+  // },
+  {
+    label: 'Admin',
+    value: 'admin',
+  },
+  {
+    label: 'Moderator',
+    value: 'moderator',
+  },
+  {
+    label: 'Content manager',
+    value: 'content_manager',
+  },
+  {
+    label: 'Marketing manager',
+    value: 'marketing_manager',
+  },
+  {
+    label: 'User',
+    value: 'user',
+  },
+]
 export const supplier = [
   {
     label: 'Abor hassan',

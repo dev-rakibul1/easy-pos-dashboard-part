@@ -75,6 +75,21 @@ export const purchaseApi = baseApi.injectEndpoints({
       },
       providesTags: [tagTypes.purchase],
     }),
+    // Get by current year
+    getAllPurchaseByCurrentYear: build.query({
+      query: (arg: Record<string, any>) => ({
+        url: `${PURCHASE_URL}/get-by-current-year`,
+        method: 'GET',
+        params: arg,
+      }),
+      transformResponse: (response: IPurchase, meta: IMeta) => {
+        return {
+          purchases: response,
+          meta: meta,
+        }
+      },
+      providesTags: [tagTypes.purchase],
+    }),
 
     getPurchaseBySupplierAndUser: build.query({
       query: (id: string) => ({
@@ -114,4 +129,5 @@ export const {
   useGetAllPurchaseByCurrentDateQuery,
   useGetAllPurchaseByCurrentWeekQuery,
   useGetAllPurchaseByCurrentMonthQuery,
+  useGetAllPurchaseByCurrentYearQuery,
 } = purchaseApi

@@ -1,10 +1,11 @@
-import { payments } from '@/constants/global'
-import {
-  useAddANewPurchaseMutation,
-  useGetPurchaseBySupplierAndUserQuery,
-} from '@/redux/api/purchaseApi/PurchaseApi'
+import { currencyName, payments } from '@/constants/global'
+import { useAddANewPurchaseMutation } from '@/redux/api/purchaseApi/PurchaseApi'
 import { useGetSingleSupplierQuery } from '@/redux/api/supplierApi/supplierApi'
-import { useSupplierPaymentBySupplierUserQuery } from '@/redux/api/supplierPayments/supplierPayments'
+import { useGetSupplierSellsBySupplierAndUserQuery } from '@/redux/api/supplierSells/supplierSellApi'
+import { useGetSingleUserQuery } from '@/redux/api/userApi/userApi'
+import { getUserInfo } from '@/services/auth.services'
+import { ISupplierSells } from '@/types'
+import numberConvert from '@/utils/numberConvert'
 import { UserOutlined } from '@ant-design/icons'
 import {
   Avatar,
@@ -19,6 +20,10 @@ import {
   Typography,
   message,
 } from 'antd'
+import millify from 'millify'
+import { useState } from 'react'
+import { useReactToPrint } from 'react-to-print'
+import DownloadModal from '../downloadModal/DownloadModal'
 import { userInfoSupplierPay, userInfoSupplierSpin } from '../styles/style'
 import { IFormValues } from './Purchase'
 
@@ -33,16 +38,54 @@ const UserInfo = ({
   handlePayChange,
   payloads,
   setPayloads,
+  componentRef
 }: any) => {
-  const id = supplierId
-  const { data, isLoading } = useGetSingleSupplierQuery(id)
+  const { uniqueId: id } = getUserInfo() as any
+  const [isModalVisible, setIsModalVisible] = useState(false)
+  const { data, isLoading: isUserLoading } = useGetSingleUserQuery(id)
+  const { data: supplier } =
+    useGetSingleSupplierQuery(supplierId)
+  const userId = data?.id
 
-  const ids = `${data?.id},${userData?.id}`
-  const { data: supplierPayment } = useSupplierPaymentBySupplierUserQuery(ids)
+  // Print
+  const handlePrint = useReactToPrint({
+    // @ts-ignore
+    content: () => componentRef.current,
+  })
 
-  const userSupplierIds = `${data?.id},${userData?.id}`
-  const { data: purchaseCount } =
-    useGetPurchaseBySupplierAndUserQuery(userSupplierIds)
+  const showDownloadModal = () => {
+    setIsModalVisible(true)
+  }
+
+  const { data: userSellInfo, isLoading } =
+    useGetSupplierSellsBySupplierAndUserQuery(supplierId, userId)
+
+  const totalQuantity = userSellInfo?.reduce(
+    (acc: number, item: ISupplierSells) => acc + item.quantity,
+    0
+  )
+
+  const totalPrice = userSellInfo?.reduce(
+    (acc: number, item: ISupplierSells) => acc + item.totalSellAmounts,
+    0
+  )
+  const dueAmount = userSellInfo?.reduce(
+    (acc: number, item: ISupplierSells) => acc + item.totalDue,
+    0
+  )
+  const totalPay = userSellInfo?.reduce(
+    (acc: number, item: ISupplierSells) => acc + item.totalPay,
+    0
+  )
+
+  const sellInformation = {
+    totalQuantity,
+    totalPrice,
+    totalPay,
+    dueAmount,
+  }
+
+  console.log(payloads)
 
   // ----------FROM--------
   const [form] = Form.useForm()
@@ -54,7 +97,9 @@ const UserInfo = ({
     payloads.supplierPayment.paymentType = values?.paymentMethod
     message.loading({ content: 'Creating purchase...', key: 'creating' })
 
-    // console.log(payloads)
+    
+    message.success('Sell successfully!')
+    showDownloadModal()
 
     try {
       const res = await addANewPurchase(payloads).unwrap()
@@ -81,6 +126,21 @@ const UserInfo = ({
     // console.log('Search:', value)
   }
 
+  const handleDownloadOk = () => {
+    setIsModalVisible(false)
+    form.resetFields()
+    // setSelectCustomer('')
+    // setSellPayloads([])
+  }
+
+  const handleDownloadCancel = () => {
+    setIsModalVisible(false)
+    form.resetFields()
+    // setSellPayloads([])
+    // setSelectCustomer('')
+  }
+
+
   const filterOption = (
     input: string,
     option?: { label: string; value: string }
@@ -90,6 +150,15 @@ const UserInfo = ({
     <div
       style={{ border: '1px solid #ddd', padding: '15px', marginTop: '10px' }}
     >
+      <DownloadModal
+        title="Download purchase report"
+        isModalVisible={isModalVisible}
+        handleDownloadOk={handleDownloadOk}
+        handleDownloadCancel={handleDownloadCancel}
+        handlePrint={handlePrint}
+        body="Do you want to download the purchase report?"
+      />
+
       <Row gutter={16} style={{ height: '100%' }}>
         <Col
           xs={24}
@@ -110,42 +179,51 @@ const UserInfo = ({
                   size={120}
                   icon={<UserOutlined />}
                   src={
-                    data?.profileImage
-                      ? `http://localhost:7000${data?.profileImage}`
+                    supplier?.profileImage
+                      ? `http://localhost:7000${supplier?.profileImage}`
                       : 'https://via.placeholder.com/300'
                   }
                   style={{ marginBottom: 16 }}
                 />
                 <Title level={4} style={{ marginBottom: 0 }}>
-                  {`${data?.firstName} ${data?.middleName} ${data?.lastName}`}
+                  {`${supplier?.firstName} ${
+                    supplier?.middleName ? supplier?.middleName : ''
+                  } ${supplier?.lastName}`}
                 </Title>
                 <Row justify="space-around" style={{ marginTop: 16 }}>
                   <Col style={userInfoSupplierPay}>
-                    <Text strong>
-                      {purchaseCount?.length ? purchaseCount?.length : 0}
-                    </Text>
-                    <Text>Total transitions</Text>
+                    <Text strong>{numberConvert(totalQuantity)}</Text>
+                    <Text>Product sell</Text>
                   </Col>
                   <Col style={userInfoSupplierPay}>
                     <Text strong>
-                      {supplierPayment?.totalSellPrice
-                        ? supplierPayment?.totalSellPrice
+                      {sellInformation?.totalPrice
+                        ? `${currencyName} ${millify(
+                            sellInformation?.totalPrice,
+                            {
+                              units: ['', 'k', 'M', 'B', 'T'],
+                              space: true,
+                            }
+                          )}`
                         : 0}
                     </Text>
                     <Text>Total Sells</Text>
                   </Col>
                   <Col style={userInfoSupplierPay}>
                     <Text strong>
-                      {supplierPayment?.totalDue
-                        ? supplierPayment?.totalDue
+                      {sellInformation?.dueAmount
+                        ? `${currencyName} ${millify(
+                            sellInformation?.dueAmount,
+                            {
+                              units: ['', 'k', 'M', 'B', 'T'],
+                              space: true,
+                            }
+                          )}`
                         : 0}
                     </Text>
                     <Text>Total Due</Text>
                   </Col>
                 </Row>
-                <Text style={{ marginTop: '10px', display: 'inline-block' }}>
-                  {data?.presentAddress}
-                </Text>
               </Card>
             </div>
           )}
@@ -158,7 +236,7 @@ const UserInfo = ({
           lg={12}
           style={{ height: '100%', maxHeight: '100%' }}
         >
-          {isLoading ? (
+          {isUserLoading ? (
             <div>
               <Spin size="small" />
             </div>
@@ -170,38 +248,54 @@ const UserInfo = ({
                   size={120}
                   icon={<UserOutlined />}
                   src={
-                    userData?.profileImage
-                      ? `http://localhost:7000${userData?.profileImage}`
+                    data?.profileImage
+                      ? `http://localhost:7000${data?.profileImage}`
                       : 'https://via.placeholder.com/300'
                   }
                   style={{ marginBottom: 16 }}
                 />
                 <Title level={4} style={{ marginBottom: 0 }}>
-                  {`${userData?.firstName} ${userData?.middleName} ${userData?.lastName}`}
+                  {`${data?.firstName} ${data?.middleName} ${data?.lastName}`}
                 </Title>
                 <Row justify="space-around" style={{ marginTop: 16 }}>
                   <Col style={userInfoSupplierPay}>
                     <Text strong>
-                      {supplierPayment?.totalPay
-                        ? supplierPayment?.totalPay
+                      {sellInformation?.totalPay
+                        ? `${currencyName} ${millify(
+                            sellInformation?.totalPay,
+                            {
+                              units: ['', 'k', 'M', 'B', 'T'],
+                              space: true,
+                            }
+                          )}`
                         : 0}
                     </Text>
                     <Text>Total Pay</Text>
                   </Col>
                   <Col style={userInfoSupplierPay}>
                     <Text strong>
-                      {supplierPayment?.totalDue
-                        ? supplierPayment?.totalDue
-                        : 0 + supplierPayment?.totalSellPrice
-                        ? supplierPayment?.totalSellPrice
+                      {sellInformation?.totalPrice
+                        ? `${currencyName} ${millify(
+                            sellInformation?.totalPrice,
+                            {
+                              units: ['', 'k', 'M', 'B', 'T'],
+                              space: true,
+                            }
+                          )}`
                         : 0}
                     </Text>
                     <Text>Total buy</Text>
                   </Col>
                   <Col style={userInfoSupplierPay}>
                     <Text strong>
-                      {supplierPayment?.totalDue
-                        ? supplierPayment?.totalDue
+                      {sellInformation?.dueAmount
+                        ? `${currencyName} ${millify(
+                            sellInformation?.dueAmount,
+                            {
+                              units: ['', 'k', 'M', 'B', 'T'],
+                              space: true,
+                            }
+                          )}`
                         : 0}
                     </Text>
                     <Text>Total Due</Text>

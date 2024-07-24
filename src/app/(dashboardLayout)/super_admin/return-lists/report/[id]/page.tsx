@@ -9,6 +9,8 @@ import { useGetSingleSupplierReturnPaymentQuery } from '@/redux/api/supplierRetu
 import { getUserInfo } from '@/services/auth.services'
 import { PrinterOutlined } from '@ant-design/icons'
 import { Button } from 'antd'
+import { useRef } from 'react'
+import { useReactToPrint } from 'react-to-print'
 
 const ReturnReportPage = ({ params }: any) => {
   const { role } = getUserInfo() as any
@@ -16,6 +18,12 @@ const ReturnReportPage = ({ params }: any) => {
   const { data } = useGetSingleSupplierReturnPaymentQuery(paramsId)
   const supplierId = data?.supplierId
   const { data: supplier } = useGetSingleSupplierQuery(supplierId)
+
+  const componentRef = useRef()
+  const handlePrint = useReactToPrint({
+    // @ts-ignore
+    content: () => componentRef.current,
+  })
 
   console.log(data)
 
@@ -41,13 +49,17 @@ const ReturnReportPage = ({ params }: any) => {
 
       <div style={flexBetween}>
         <ActionBar title="Report details"></ActionBar>
-        <Button>
+        <Button onClick={handlePrint}>
           {' '}
           Print <PrinterOutlined />
         </Button>
       </div>
       <div style={{ marginTop: '15px' }}>
-        <ReturnInvoice id={paramsId} supplier={supplier} />
+        <ReturnInvoice
+          id={paramsId}
+          supplier={supplier}
+          componentRef={componentRef}
+        />
       </div>
     </div>
   )

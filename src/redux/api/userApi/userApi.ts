@@ -11,6 +11,7 @@ export const userApi = baseApi.injectEndpoints({
         url: `${USER_URL}/create-user/`,
         method: 'POST',
         data: data,
+        contentType: 'multipart/form-data',
       }),
       invalidatesTags: [tagTypes.user],
     }),
@@ -71,4 +72,5 @@ export const {
   useGetSingleUserQuery,
   useGetSingleUserByIdQuery,
   useGetAllUserQuery,
+  useAddANewUserMutation,
 } = userApi

@@ -1,5 +1,29 @@
-const SuperAdminPage = () => {
-  return <div>This is a super page</div>;
-};
+'use client'
 
-export default SuperAdminPage;
+import PosBreadcrumb from '@/components/breadcrumb/PosBreadcrumb'
+import ActionBar from '@/components/ui/ActionBar'
+import { useGetSingleUserQuery } from '@/redux/api/userApi/userApi'
+import { getUserInfo } from '@/services/auth.services'
+
+const SuperAdminPage = () => {
+  const { role, uniqueId: id } = getUserInfo() as any
+
+  const { data } = useGetSingleUserQuery(id)
+
+  return (
+    <div>
+      <PosBreadcrumb
+        items={[
+          {
+            label: `${role}`,
+            link: `/${role}`,
+          },
+        ]}
+      />
+
+      <ActionBar title="Super admin page"></ActionBar>
+    </div>
+  )
+}
+
+export default SuperAdminPage

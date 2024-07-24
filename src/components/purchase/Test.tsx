@@ -1,7 +1,10 @@
 import { currencyName } from '@/constants/global'
+import { useGetSingleSupplierQuery } from '@/redux/api/supplierApi/supplierApi'
 import type { TableColumnsType } from 'antd'
 import { Table } from 'antd'
 import React from 'react'
+import ReportTitle from '../companyReportTitle/ReportTitle'
+import { IFormValues } from './Purchase'
 
 interface DataType {
   key: React.Key
@@ -12,6 +15,9 @@ interface DataType {
   purchaseRate: number
   totalPrice: number
   productId: string
+  othersStock: number
+  sellingPrice: number
+  supplierId: string
 }
 
 interface ExpandedDataType {
@@ -30,9 +36,17 @@ interface PayloadsType {
 
 interface TestTableProps {
   payloads: PayloadsType
+  formValues: IFormValues
+  componentRef: any
+  supplierId: string
 }
 
-const TestTable: React.FC<TestTableProps> = ({ payloads }) => {
+const TestTable: React.FC<TestTableProps> = ({
+  payloads,
+  formValues,
+  componentRef,
+  supplierId,
+}) => {
   const expandedRowRender = (record: DataType) => {
     const columns: TableColumnsType<ExpandedDataType> = [
       { title: 'IMEI Number', dataIndex: 'imeiNumber', key: 'imeiNumber' },
@@ -54,6 +68,31 @@ const TestTable: React.FC<TestTableProps> = ({ payloads }) => {
       />
     )
   }
+
+  // -------------------------------------------
+  console.log(payloads)
+
+  // payloads.purchase.map(pur => {
+  //   payloads.variants.map(variant => {
+  //     if (pur.productId === variant.productId) {
+  //       return {
+  //         productName: pur.productName,
+  //         productStock: pur.productStock,
+  //         othersStock: pur.othersStock,
+  //         sellingPrice: pur.sellingPrice,
+  //         purchaseRate: pur.purchaseRate,
+  //         vats: pur.vats,
+  //         discounts: pur.discounts,
+  //         productId: pur.productId,
+  //         supplierId: pur.supplierId,
+  //         totalPrice: pur.totalPrice,
+  //         variants: variant.
+  //       }
+  //     }
+  //   })
+  // })
+
+  // -------------------------------------------
 
   const columns: TableColumnsType<DataType> = [
     {
@@ -117,29 +156,40 @@ const TestTable: React.FC<TestTableProps> = ({ payloads }) => {
     0
   )
 
+  const { data: supplier } = useGetSingleSupplierQuery(supplierId)
+
   return (
-    <Table
-      columns={columns}
-      expandable={{ expandedRowRender }}
-      dataSource={data}
-      size="small"
-      bordered
-      summary={() => (
-        <Table.Summary.Row>
-          <Table.Summary.Cell index={0}>Total</Table.Summary.Cell>
-          <Table.Summary.Cell index={1}></Table.Summary.Cell>
-          <Table.Summary.Cell index={2}>{totalProductCount}</Table.Summary.Cell>
-          <Table.Summary.Cell index={3}>{totalDiscounts}</Table.Summary.Cell>
-          <Table.Summary.Cell index={4}>{totalVATs}</Table.Summary.Cell>
-          <Table.Summary.Cell index={5}>
-            {currencyName} {totalPurchaseRate}
-          </Table.Summary.Cell>
-          <Table.Summary.Cell index={6}>
-            {currencyName} {totalPrice}
-          </Table.Summary.Cell>
-        </Table.Summary.Row>
-      )}
-    />
+    <div ref={componentRef}>
+      <ReportTitle
+        buyer={supplier}
+        title="Supplier information"
+        invoiceType="Purchase invoice"
+      />
+      <Table
+        columns={columns}
+        expandable={{ expandedRowRender }}
+        dataSource={data}
+        size="small"
+        bordered
+        summary={() => (
+          <Table.Summary.Row>
+            <Table.Summary.Cell index={0}>Total</Table.Summary.Cell>
+            <Table.Summary.Cell index={1}></Table.Summary.Cell>
+            <Table.Summary.Cell index={2}>
+              {totalProductCount}
+            </Table.Summary.Cell>
+            <Table.Summary.Cell index={3}>{totalDiscounts}</Table.Summary.Cell>
+            <Table.Summary.Cell index={4}>{totalVATs}</Table.Summary.Cell>
+            <Table.Summary.Cell index={5}>
+              {currencyName} {totalPurchaseRate}
+            </Table.Summary.Cell>
+            <Table.Summary.Cell index={6}>
+              {currencyName} {totalPrice - formValues.amount}
+            </Table.Summary.Cell>
+          </Table.Summary.Row>
+        )}
+      />
+    </div>
   )
 }
 

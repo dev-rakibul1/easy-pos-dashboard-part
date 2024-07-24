@@ -96,12 +96,7 @@ const PurchaseTable = ({
       key: 'purchaseRate',
       render: (text: string | undefined) => `${currencyName} ${text}` || '-',
     },
-    // {
-    //   title: 'S. Price',
-    //   dataIndex: 'sellingPrice',
-    //   key: 'sellingPrice',
-    //   render: (text: string | undefined) => text || '-',
-    // },
+
     {
       title: 'Total Price',
       dataIndex: 'totalPrice',

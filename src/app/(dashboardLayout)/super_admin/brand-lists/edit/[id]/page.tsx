@@ -89,6 +89,7 @@ const BrandEditPage = ({ params }: any) => {
                 name="description"
                 size="large"
                 label="Description (optional)"
+                rows={5}
               />
             </Col>
           </Row>

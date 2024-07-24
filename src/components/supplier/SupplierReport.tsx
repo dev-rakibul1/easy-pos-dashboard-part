@@ -11,9 +11,14 @@ const { Title, Text } = Typography
 interface SupplierInvoiceProps {
   id: string
   supplier: ISupplier
+  componentRef: any
 }
 
-const SupplierInvoice: React.FC<SupplierInvoiceProps> = ({ id, supplier }) => {
+const SupplierInvoice: React.FC<SupplierInvoiceProps> = ({
+  id,
+  supplier,
+  componentRef,
+}) => {
   const { data, isLoading } = useGetSinglePurchaseGroupQuery(id)
 
   // console.log(data)
@@ -197,7 +202,10 @@ const SupplierInvoice: React.FC<SupplierInvoiceProps> = ({ id, supplier }) => {
   }))
 
   return (
-    <div style={{ padding: '15px', border: '1px solid #ddd' }}>
+    <div
+      style={{ padding: '15px', border: '1px solid #ddd' }}
+      ref={componentRef}
+    >
       <Row gutter={[16, 16]} style={{ textAlign: 'center' }}>
         <Col span={24}>
           <Title level={4} style={{ margin: '0', padding: '0' }}>

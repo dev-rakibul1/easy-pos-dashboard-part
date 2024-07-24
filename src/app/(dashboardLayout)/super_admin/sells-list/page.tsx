@@ -1,19 +1,17 @@
 'use client'
 
 import PosBreadcrumb from '@/components/breadcrumb/PosBreadcrumb'
-import DeleteModal from '@/components/deleteModal/DeleteModal'
 import ActionBar from '@/components/ui/ActionBar'
 import POSTable from '@/components/ui/POSTable'
-import UnitModals from '@/modals/unit/UnitModals'
 import { useGetAllSellGroupQuery } from '@/redux/api/sellGroups/sellGroupApi'
-import { useDeleteUnitMutation } from '@/redux/api/unitApi/unitApi'
 import { useDebounced } from '@/redux/hooks'
 import { getUserInfo } from '@/services/auth.services'
-import { ICustomer, IUnitDataResponse } from '@/types'
-import { DeleteOutlined, EditOutlined, ReloadOutlined } from '@ant-design/icons'
-import { Button, Input, message } from 'antd'
+import { ICustomer } from '@/types'
+import { EyeOutlined, ReloadOutlined } from '@ant-design/icons'
+import { Button, Input } from 'antd'
 import dayjs from 'dayjs'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 
 const SellsListPage = () => {
@@ -23,7 +21,7 @@ const SellsListPage = () => {
   const [sortBy, setSortBy] = useState<string>('')
   const [sortOrder, setSortOrder] = useState<string>('')
   const [searchTerm, setSearchTerm] = useState<string>('')
-  const [deleteId, setDeleteId] = useState<string | null>(null)
+  // const [deleteId, setDeleteId] = useState<string | null>(null)
 
   interface CustomerPurchase {
     quantity?: number
@@ -56,6 +54,7 @@ const SellsListPage = () => {
   const meta = data?.meta
   const sellGroups = data?.sellGroups
   // console.log(sellGroups)
+  const router = useRouter()
 
   const columns = [
     {
@@ -112,7 +111,7 @@ const SellsListPage = () => {
       title: 'P. DATE',
       dataIndex: 'createdAt',
       sorter: true,
-      render: (data: any) => {
+      render: (data: string) => {
         return data && dayjs(data).format('D MMM, YYYY hh:mm A')
       },
     },
@@ -121,7 +120,13 @@ const SellsListPage = () => {
       render: (data: any) => {
         return (
           <>
-            <Button
+            <Link href={`/${role}/sells-list/details/${data.id}`}>
+              <Button style={{ margin: '0 3px' }} size="small" type="text">
+                <EyeOutlined />
+              </Button>
+            </Link>
+
+            {/* <Button
               style={{ margin: '0 3px' }}
               onClick={() => handleDeleteClick(data)}
               size="small"
@@ -129,12 +134,7 @@ const SellsListPage = () => {
               danger
             >
               <DeleteOutlined />
-            </Button>
-            <Link href={`/${role}/unit-lists/edit/${data.id}`}>
-              <Button style={{ margin: '0 3px' }} size="small" type="text">
-                <EditOutlined />
-              </Button>
-            </Link>
+            </Button> */}
           </>
         )
       },
@@ -154,68 +154,59 @@ const SellsListPage = () => {
     setSortOrder(order === 'ascend' ? 'asc' : 'desc')
   }
 
-  // -----------Unit modal-----------
-  const [isUnitModal, setIsUnitModal] = useState(false)
-  const showUnitModal = () => {
-    setIsUnitModal(true)
-  }
-
-  const handleUnitOk = () => {
-    setIsUnitModal(false)
-  }
-
-  const handleUnitCancel = () => {
-    setIsUnitModal(false)
+  // Redirect
+  const handleAddSells = () => {
+    router.push(`/${role}/add-sells`)
   }
 
   // -----------Delete modal-----------
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
-  const [selectedRecord, setSelectedRecord] =
-    useState<IUnitDataResponse | null>(null)
-  const [deleteRecord] = useDeleteUnitMutation()
+  // const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
+  // const [selectedRecord, setSelectedRecord] =
+  //   useState<IUnitDataResponse | null>(null)
+  // const [deleteRecord] = useDeleteUnitMutation()
 
-  type IRecord = {
-    name?: string
-    id?: string
-  }
+  // type IRecord = {
+  //   name?: string
+  //   id?: string
+  // }
 
-  const recordPayloads: IRecord = {
-    name: selectedRecord?.unitName,
-    id: selectedRecord?.id,
-  }
+  // const recordPayloads: IRecord = {
+  //   name: selectedRecord?.unitName,
+  //   id: selectedRecord?.id,
+  // }
 
-  const handleDeleteClick = (record: IUnitDataResponse) => {
-    setSelectedRecord(record)
-    setIsDeleteModalOpen(true)
-  }
+  // const handleDeleteClick = (record: IUnitDataResponse) => {
+  //   setSelectedRecord(record)
+  //   setIsDeleteModalOpen(true)
+  // }
 
   // Confirm button for delete
-  const handleConfirmDelete = async () => {
-    if (selectedRecord) {
-      message.loading({ content: 'Deleting...', key: 'deleting' })
-      const id = selectedRecord.id
-      try {
-        const res = await deleteRecord(id)
-        if (res) {
-          message.success({
-            content: 'Deleted successfully!',
-            key: 'deleting',
-            duration: 2,
-          })
-        } else {
-          message.error({
-            content: 'Delete failed!',
-            key: 'deleting',
-            duration: 2,
-          })
-        }
-      } catch (error: any) {
-        console.error(error)
-      } finally {
-        setIsDeleteModalOpen(false)
-      }
-    }
-  }
+  // const handleConfirmDelete = async () => {
+  //   if (selectedRecord) {
+  //     message.loading({ content: 'Deleting...', key: 'deleting' })
+  //     const id = selectedRecord.id
+  //     try {
+  //       const res = await deleteRecord(id)
+  //       if (res) {
+  //         message.success({
+  //           content: 'Deleted successfully!',
+  //           key: 'deleting',
+  //           duration: 2,
+  //         })
+  //       } else {
+  //         message.error({
+  //           content: 'Delete failed!',
+  //           key: 'deleting',
+  //           duration: 2,
+  //         })
+  //       }
+  //     } catch (error: any) {
+  //       console.error(error)
+  //     } finally {
+  //       setIsDeleteModalOpen(false)
+  //     }
+  //   }
+  // }
 
   // Reset filter
   const resetFilters = () => {
@@ -228,13 +219,13 @@ const SellsListPage = () => {
   return (
     <div>
       {/* Delete modal */}
-      <DeleteModal
+      {/* <DeleteModal
         isOpen={isDeleteModalOpen}
         onClose={() => setIsDeleteModalOpen(false)}
         onConfirm={handleConfirmDelete}
         entityType="Unit"
         entityName={recordPayloads}
-      />
+      /> */}
       <PosBreadcrumb
         items={[
           {
@@ -242,13 +233,13 @@ const SellsListPage = () => {
             link: `/${role}`,
           },
           {
-            label: `Sell list`,
+            label: `Sells list`,
             link: `/${role}/sells-list`,
           },
         ]}
       />
 
-      <ActionBar title="Sell lists">
+      <ActionBar title="Sells list">
         <Input
           type="text"
           size="large"
@@ -263,21 +254,12 @@ const SellsListPage = () => {
               <ReloadOutlined />
             </Button>
           ) : (
-            <Button type="primary" onClick={showUnitModal}>
-              Create
+            <Button type="primary" onClick={handleAddSells}>
+              Add new sell
             </Button>
           )}
         </div>
       </ActionBar>
-
-      {/* Start Create a Unit */}
-      <UnitModals
-        handleUnitOk={handleUnitOk}
-        showUnitModal={showUnitModal}
-        handleUnitCancel={handleUnitCancel}
-        isUnitModal={isUnitModal}
-        setIsUnitModal={setIsUnitModal}
-      />
 
       <div style={{ marginTop: '15px' }}>
         <POSTable

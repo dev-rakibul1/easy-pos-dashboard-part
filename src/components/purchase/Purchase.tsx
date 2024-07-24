@@ -19,28 +19,20 @@ import {
   IPurchaseFormData,
   IVats,
 } from '@/types'
+import { OtherVariants } from '@/utils/otherVariants/otherVariants'
 import { PlusOutlined } from '@ant-design/icons'
-import {
-  Button,
-  Col,
-  Form,
-  Input,
-  Row,
-  Select,
-  Typography,
-  message,
-} from 'antd'
+import { Button, Col, Form, Input, Row, Select, message } from 'antd'
 import { useRouter } from 'next/navigation'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { inputFormStyle, inputPlusBtnStyle } from '../styles/style'
 import ActionBar from '../ui/ActionBar'
+import { TransformPurchaseApiResponse } from './purchaseDataConvert'
 import PurchaseTable from './PurchaseTable'
+import PurchaseTables from './PurchaseTables'
 import TestTable from './Test'
 import UserInfo from './UserInfo'
 import VariantModal from './variants/VariantModal'
-const { Item } = Form
 const { Option } = Select
-const { Text } = Typography
 
 export interface IFormValues {
   amount: number
@@ -48,6 +40,8 @@ export interface IFormValues {
 }
 
 const PurchaseForm = ({ isChecked, userData }: any) => {
+  // Print
+  const componentRef = useRef()
   const { role } = getUserInfo() as any
   const router = useRouter()
   const [form] = Form.useForm()
@@ -271,11 +265,14 @@ const PurchaseForm = ({ isChecked, userData }: any) => {
       return newItem
     })
 
-    // const newPurchaseData = [formData, ...purchaseData]
-    // newPurchaseData.forEach(item => {
-    //   item.productName = singleProduct.productName
-    //   item.brandName = singleProduct.brandName
-    // })
+    // other stock or cover and glass and so on feature develop
+    const otherStocks: number = formData?.othersStock || 0
+    const ram: string = formData?.ram
+    const rom: string = formData?.room
+    const color: string = formData?.color
+    // let i: number = 0
+
+    const otherVariants = OtherVariants(otherStocks, ram, rom, color, productId)
 
     setPurchaseData(newPurchaseData)
     setPayloads({
@@ -285,7 +282,7 @@ const PurchaseForm = ({ isChecked, userData }: any) => {
         userId: userData?.id,
         productId: productId,
       },
-      variants: storeVariants,
+      variants: !storeVariants.length ? otherVariants : storeVariants,
       purchase: newPurchaseData, // Use the updated purchaseData
     })
     // reset form data after submit
@@ -403,6 +400,9 @@ const PurchaseForm = ({ isChecked, userData }: any) => {
   const handleColorCancel = () => {
     setIsColorModal(false)
   }
+
+  const newData = TransformPurchaseApiResponse(payloads)
+  console.log(newData)
 
   return (
     <div style={{ background: '#f0f2f5' }}>
@@ -744,12 +744,19 @@ const PurchaseForm = ({ isChecked, userData }: any) => {
           </Button>
         </Form>
       </div>
+      <PurchaseTables payloads={payloads} />
 
       {purchaseData.length && (
         <div style={{ marginTop: '15px' }}>
           {/* @ts-ignore */}
           {payloads.variants ? (
-            <TestTable payloads={payloads} isChecked={isChecked} />
+            <TestTable
+              componentRef={componentRef}
+              payloads={payloads}
+              isChecked={isChecked}
+              formValues={formValues}
+              supplierId={supplierId}
+            />
           ) : (
             <PurchaseTable payloads={payloads} formValues={formValues} />
           )}
@@ -769,6 +776,7 @@ const PurchaseForm = ({ isChecked, userData }: any) => {
             handleFinish={handleFinish}
             payloads={payloads}
             setPayloads={setPayloads}
+            componentRef={componentRef}
           />
         </div>
       )}

@@ -12,3 +12,9 @@
   left: -10px;
   width: 2px;
 }
+
+@media print {
+  @page {
+    size: horizontal;
+  }
+}

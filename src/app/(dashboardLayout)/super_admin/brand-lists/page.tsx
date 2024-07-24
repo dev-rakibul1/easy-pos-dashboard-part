@@ -12,6 +12,7 @@ import {
 import { useDebounced } from '@/redux/hooks'
 import { getUserInfo } from '@/services/auth.services'
 import { IBrandResponse } from '@/types'
+import { TruncateDescription } from '@/utils/TruncateDescriptions'
 import { DeleteOutlined, EditOutlined, ReloadOutlined } from '@ant-design/icons'
 import { Button, Input, message } from 'antd'
 import dayjs from 'dayjs'
@@ -25,7 +26,7 @@ const BrandLists = () => {
   const [sortBy, setSortBy] = useState<string>('')
   const [sortOrder, setSortOrder] = useState<string>('')
   const [searchTerm, setSearchTerm] = useState<string>('')
-  const [deleteId, setDeleteId] = useState<string | null>(null)
+  // const [deleteId, setDeleteId] = useState<string | null>(null)
 
   //Create Search debouncedTerms
   const debouncedSearchTerm = useDebounced({
@@ -45,13 +46,6 @@ const BrandLists = () => {
   const meta = data?.meta
   const brands = data?.brands
 
-  const truncateDescription = (description: string, maxLength: number) => {
-    if (description.length > maxLength) {
-      return description.substring(0, maxLength) + '...'
-    }
-    return description
-  }
-
   const columns = [
     {
       title: 'Brand Name',
@@ -61,7 +55,7 @@ const BrandLists = () => {
       title: 'Summery',
       dataIndex: 'description',
       render: (data: any) => {
-        return data ? truncateDescription(data, 15) : ''
+        return data ? TruncateDescription(data, 15) : ''
       },
     },
     {

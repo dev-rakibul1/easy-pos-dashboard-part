@@ -40,6 +40,7 @@ const AddCustomers = () => {
     const formData = new FormData()
     formData.append('file', file as Blob)
     formData.append('data', data)
+
     try {
       message.loading({ content: 'Add customer...', key: 'adding' })
       const res = await addANewCustomer(formData)

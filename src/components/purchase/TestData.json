@@ -79,108 +79,77 @@
 
 
  
-
-
-
 [
-  
   {
-      "id": "cbed1eb9-056b-48a6-85ea-563a6e231bec",
-      "supplierId": "4a0924c4-87b1-4de8-aba4-21b4805d130e",
-      "userId": "057ada90-04b9-41c4-8732-095649e413c0",
-      "uniqueId": "RIN-00036",
-      "createdAt": "2024-07-04T05:37:26.882Z",
-      "updatedAt": "2024-07-04T05:37:26.882Z",
-      "supplierReturnPayments": [
-          {
-              "id": "0f296e34-1763-4a9a-90dc-56d212df5a73",
-              "quantity": 2,
-              "totalReturnAmount": 13,
-              "totalDue": 8,
-              "totalPay": 5,
-              "supplierId": "4a0924c4-87b1-4de8-aba4-21b4805d130e",
-              "userId": "057ada90-04b9-41c4-8732-095649e413c0",
-              "productId": "aaf21901-81d5-4090-9f36-aca1aec51e21",
-              "returnGroupId": "cbed1eb9-056b-48a6-85ea-563a6e231bec",
-              "createdAt": "2024-07-04T05:37:26.882Z",
-              "updatedAt": "2024-07-04T05:37:26.882Z"
-          }
-      ],
-      "userReturnProducts": [
-          {
-              "id": "5f3ee778-e9f6-4771-81d0-bd07fd319ba0",
-              "productName": "Nathing",
-              "brandName": "Nathing",
-              "modelName": "Nathing X50",
-              "processor": "NX50 8",
-              "unit": "pics",
-              "category": "Mobile",
-              "reOrderAlert": 4,
-              "productImage": "/undefinedundefined",
-              "description": null,
-              "productStock": null,
-              "othersStock": null,
-              "supplierId": "4a0924c4-87b1-4de8-aba4-21b4805d130e",
-              "userId": "057ada90-04b9-41c4-8732-095649e413c0",
-              "productId": "aaf21901-81d5-4090-9f36-aca1aec51e21",
-              "returnGroupId": "cbed1eb9-056b-48a6-85ea-563a6e231bec",
-              "createdAt": "2024-07-02T14:57:39.179Z",
-              "updatedAt": "2024-07-02T14:57:39.179Z",
-              "returns": [
-                  {
-                      "id": "a28d39d4-9869-49b2-8582-b6a7fce31ff2",
-                      "uniqueId": "R-1111111111111111200",
-                      "imeiNumber": "578897",
-                      "ram": "4",
-                      "rom": "128",
-                      "color": "red",
-                      "variantId": "8d111002-6285-4c3c-bc42-5a82657cd0b0",
-                      "userId": "057ada90-04b9-41c4-8732-095649e413c0",
-                      "productId": "aaf21901-81d5-4090-9f36-aca1aec51e21",
-                      "supplierId": "4a0924c4-87b1-4de8-aba4-21b4805d130e",
-                      "userReturnProductsId": "5f3ee778-e9f6-4771-81d0-bd07fd319ba0",
-                      "createdAt": "2024-07-04T05:37:26.882Z",
-                      "updatedAt": "2024-07-04T05:37:26.882Z"
-                  }
-              ]
-          },
-          {
-              "id": "cc4bd927-e4f7-43c9-b047-088afbee6b02",
-              "productName": "Nathing",
-              "brandName": "Nathing",
-              "modelName": "Nathing X50",
-              "processor": "NX50 8",
-              "unit": "pics",
-              "category": "Mobile",
-              "reOrderAlert": 4,
-              "productImage": "/undefinedundefined",
-              "description": null,
-              "productStock": null,
-              "othersStock": null,
-              "supplierId": "4a0924c4-87b1-4de8-aba4-21b4805d130e",
-              "userId": "057ada90-04b9-41c4-8732-095649e413c0",
-              "productId": "aaf21901-81d5-4090-9f36-aca1aec51e21",
-              "returnGroupId": "cbed1eb9-056b-48a6-85ea-563a6e231bec",
-              "createdAt": "2024-07-02T14:57:39.179Z",
-              "updatedAt": "2024-07-02T14:57:39.179Z",
-              "returns": [
-                  {
-                      "id": "560aae24-35cd-419d-bd7d-9a8dc2c050da",
-                      "uniqueId": "R-1111111111111111201",
-                      "imeiNumber": "354345",
-                      "ram": "8",
-                      "rom": "264",
-                      "color": "green",
-                      "variantId": "a09b6593-bad4-4cc1-911e-4d44a9958b06",
-                      "userId": "057ada90-04b9-41c4-8732-095649e413c0",
-                      "productId": "aaf21901-81d5-4090-9f36-aca1aec51e21",
-                      "supplierId": "4a0924c4-87b1-4de8-aba4-21b4805d130e",
-                      "userReturnProductsId": "cc4bd927-e4f7-43c9-b047-088afbee6b02",
-                      "createdAt": "2024-07-04T05:37:26.882Z",
-                      "updatedAt": "2024-07-04T05:37:26.882Z"
-                  }
-              ]
-          }
-      ]
+    "productName":"Vivo S50",
+    "variants":[
+      {
+        "imei":"54845",
+        "ram": 2,
+        "rom":16,
+        "color":"green"
+      }
+    ],
+    "othersStock":0,
+    "productStock":1,
+    "purchaseRate": 50,
+    "sellingPrice":60,
+    "vats":5,
+    "discounts":7,
+    "totalPrice": 48,
+    "productId":1,
+    "supplierId":1
   }
 ]
+
+// ----------------------
+{
+  "variants": [
+      {
+          "imeiNumber": "7257",
+          "ram": "8",
+          "rom": "128",
+          "color": "purple",
+          "productId": "4a04aee7-8cdc-4f5e-958e-609cbda47e55"
+      },
+      {
+          "imeiNumber": "556",
+          "ram": "4",
+          "rom": "256",
+          "color": "pink",
+          "productId": "7ca05092-86ac-4fe6-bb2e-c276eba9ab24"
+      }
+  ],
+  "purchase": [
+      {
+          "purchaseRate": 100,
+          "sellingPrice": 120,
+          "productStock": 1,
+          "userId": "fae855c4-f045-4eaf-a718-4621b81115b9",
+          "supplierId": "dd772463-5968-42b2-ba96-dbe7df0fac32",
+          "productId": "7ca05092-86ac-4fe6-bb2e-c276eba9ab24",
+          "totalPrice": 105,
+          "color": "",
+          "othersStock": 0,
+          "vats": 5,
+          "discounts": 0,
+          "productName": "Vivo ",
+          "brandName": "Vivo"
+      },
+      {
+          "purchaseRate": 50,
+          "sellingPrice": 70,
+          "productStock": 1,
+          "userId": "fae855c4-f045-4eaf-a718-4621b81115b9",
+          "supplierId": "dd772463-5968-42b2-ba96-dbe7df0fac32",
+          "productId": "4a04aee7-8cdc-4f5e-958e-609cbda47e55",
+          "totalPrice": 49,
+          "color": "",
+          "othersStock": 0,
+          "vats": 5,
+          "discounts": 7,
+          "productName": "samsung s25",
+          "brandName": "Samsung"
+      }
+  ]
+}

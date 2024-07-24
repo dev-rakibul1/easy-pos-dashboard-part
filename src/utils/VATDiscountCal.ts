@@ -1,4 +1,4 @@
-import { IPurchase, ISell } from '@/types'
+import { IAdditionalExpense, IPurchase, ISell } from '@/types'
 
 interface CalculatedValues {
   vatAmount: number
@@ -81,3 +81,52 @@ export function purchaseCalculatePriceWithVAT(data: IPurchase[]): Totals {
     totalPrice: totals.totalPrice.toFixed(2),
   }
 }
+
+// ------------------------ADDITIONAL EXPENSE CALCULATION------------------------
+
+// Calculate the total expense amount from an array of expenses
+export function calculateTotalExpense(
+  expenses: IAdditionalExpense[] | []
+): number {
+  return expenses.reduce((total, expense) => total + expense.expenseAmount, 0)
+}
+
+// ------------------------MONTHLY VATS CALCULATIONS------------------------
+// import dayjs from 'dayjs'
+
+// // Function to get the transactions and filter them based on the current month
+// export const calculateMonthlyVat = async api => {
+//   try {
+//     // Fetch data from the API
+//     const response = await api()
+//     const transactions = response.data
+
+//     // Get the current month
+//     const now = dayjs()
+//     const start = now.startOf('month')
+//     const end = now.endOf('month')
+//     const daysInMonth = end.date() - start.date() + 1
+
+//     // Adjust the range based on the number of days in the month
+//     const adjustedEnd = end.add(2, 'day')
+
+//     // Format dates for comparison
+//     const formattedStart = start.format('YYYY-MM-DD')
+//     const formattedEnd = adjustedEnd.format('YYYY-MM-DD')
+
+//     // Filter transactions within the current month
+//     const filteredTransactions = transactions.filter(transaction => {
+//       const createdAt = dayjs(transaction.createdAt)
+//       const formattedCreatedAt = createdAt.format('YYYY-MM-DD')
+//       return (
+//         formattedCreatedAt >= formattedStart &&
+//         formattedCreatedAt <= formattedEnd
+//       )
+//     })
+
+//     return filteredTransactions
+//   } catch (error) {
+//     console.error('Error fetching or filtering transactions:', error)
+//     return []
+//   }
+// }

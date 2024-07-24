@@ -36,7 +36,7 @@ export const sellsApi = baseApi.injectEndpoints({
     // get all sell depended current week
     getSellByCurrentWeek: build.query({
       query: () => ({
-        url: `${SELLS_URL}/get-sell-by-current-week/`,
+        url: `${SELLS_URL}/get-sell-by-current-week`,
         method: 'GET',
       }),
       providesTags: [tagTypes.sell],
@@ -45,6 +45,23 @@ export const sellsApi = baseApi.injectEndpoints({
     getSellByCurrentMonth: build.query({
       query: () => ({
         url: `${SELLS_URL}/get-sell-by-current-month/`,
+        method: 'GET',
+      }),
+      providesTags: [tagTypes.sell],
+    }),
+    // get all sell depended current year
+    getSellByCurrentYear: build.query({
+      query: () => ({
+        url: `${SELLS_URL}/get-sell-by-current-year/`,
+        method: 'GET',
+      }),
+      providesTags: [tagTypes.sell],
+    }),
+
+    // get single sell api
+    getSingleSell: build.query({
+      query: (id: string) => ({
+        url: `${SELLS_URL}/${id}`,
         method: 'GET',
       }),
       providesTags: [tagTypes.sell],
@@ -59,4 +76,6 @@ export const {
   useGetSellByCustomerPurchaseIdQuery,
   useGetSellByCurrentWeekQuery,
   useGetSellByCurrentMonthQuery,
+  useGetSellByCurrentYearQuery,
+  useGetSingleSellQuery,
 } = sellsApi

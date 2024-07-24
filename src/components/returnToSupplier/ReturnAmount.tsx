@@ -4,6 +4,8 @@ import { useGetSingleUserQuery } from '@/redux/api/userApi/userApi'
 import { getUserInfo } from '@/services/auth.services'
 import { Button, Col, Form, Input, Row, Select, message } from 'antd'
 import { Dispatch, SetStateAction, useState } from 'react'
+import { useReactToPrint } from 'react-to-print'
+import DownloadModal from '../downloadModal/DownloadModal'
 import { IProductData, ISellVariant } from './Return'
 
 const { Item } = Form
@@ -18,6 +20,7 @@ interface ISellPayProps {
   dueBalance: number
   returnPayloads: IProductData[]
   setReturnPayloads: any
+  componentRef: any
 }
 
 const ReturnAmounts: React.FC<ISellPayProps> = ({
@@ -25,18 +28,29 @@ const ReturnAmounts: React.FC<ISellPayProps> = ({
   dueBalance,
   returnPayloads,
   setReturnPayloads,
+  componentRef,
 }) => {
   const { uniqueId } = getUserInfo() as any
   const [form] = Form.useForm<ISellPayISellPay>()
   const [concatVariants, setConcatVariants] = useState<ISellVariant[]>([])
   const { data: userData } = useGetSingleUserQuery(uniqueId)
   const [addANewReturn] = useAddANewReturnMutation()
+  const [isModalVisible, setIsModalVisible] = useState(false)
+
+  const handlePrint = useReactToPrint({
+    // @ts-ignore
+    content: () => componentRef.current,
+  })
 
   const handlePayChange = (
     changedValues: Partial<ISellPayISellPay>,
     allValues: ISellPayISellPay
   ) => {
     setPayAmountInfo(allValues)
+  }
+
+  const showDownloadModal = () => {
+    setIsModalVisible(true)
   }
 
   const handleFinish = async (values: ISellPayISellPay) => {
@@ -113,18 +127,12 @@ const ReturnAmounts: React.FC<ISellPayProps> = ({
       payloads: returnsInfo,
     }
 
-    message.loading({ content: 'Return...', key: 'creating' })
-
-    console.log(finalSellInformation)
-
     try {
       const res = await addANewReturn(finalSellInformation)
 
       if (res?.data) {
         message.success('Return successfully!')
-
-        form.resetFields()
-        setReturnPayloads([])
+        showDownloadModal()
       } else {
         message.error('Return fail!')
       }
@@ -133,9 +141,20 @@ const ReturnAmounts: React.FC<ISellPayProps> = ({
     } finally {
       message.destroy('creating')
     }
+  }
 
-    // form.resetFields()
-    // setReturnPayloads([])
+  const handleDownloadOk = () => {
+    setIsModalVisible(false)
+    form.resetFields()
+    // setSelectCustomer('')
+    setReturnPayloads([])
+  }
+
+  const handleDownloadCancel = () => {
+    setIsModalVisible(false)
+    form.resetFields()
+    // setSelectCustomer('')
+    setReturnPayloads([])
   }
 
   const filterOption = (
@@ -144,66 +163,77 @@ const ReturnAmounts: React.FC<ISellPayProps> = ({
   ) => (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
 
   return (
-    <Form
-      form={form}
-      name="name_email_form"
-      onValuesChange={handlePayChange}
-      onFinish={handleFinish}
-      layout="vertical"
-      style={{ marginTop: '15px' }}
-    >
-      <Row gutter={16}>
-        <Col xs={24} sm={20} md={8} lg={8}>
-          <Item
-            name="amount"
-            rules={[
-              {
-                required: true,
-                message: 'Please enter your amount',
-              },
-              {
-                max: 50,
-                message: 'Amount cannot exceed 50 characters',
-              },
-            ]}
-          >
-            <Input
-              placeholder="Enter your amount"
-              type="number"
-              maxLength={10}
-              max={9999999}
-            />
-          </Item>
-        </Col>
-        <Col xs={24} sm={20} md={8} lg={8}>
-          <Item
-            name="paymentMethod"
-            rules={[
-              {
-                required: true,
-                message: 'Please select a payment method',
-              },
-            ]}
-          >
-            <Select
-              showSearch
-              placeholder="Select a payment"
-              optionFilterProp="children"
-              options={payments}
-              filterOption={filterOption}
-              style={{ width: '100%' }}
-            />
-          </Item>
-        </Col>
-        <Col xs={24} sm={24} md={5} lg={5}>
-          <Item>
-            <Button type="primary" htmlType="submit">
-              Sell product
-            </Button>
-          </Item>
-        </Col>
-      </Row>
-    </Form>
+    <>
+      <DownloadModal
+        title="Download return report"
+        isModalVisible={isModalVisible}
+        handleDownloadOk={handleDownloadOk}
+        handleDownloadCancel={handleDownloadCancel}
+        handlePrint={handlePrint}
+        body="Do you want to download the return report?"
+      />
+
+      <Form
+        form={form}
+        name="name_email_form"
+        onValuesChange={handlePayChange}
+        onFinish={handleFinish}
+        layout="vertical"
+        style={{ marginTop: '15px' }}
+      >
+        <Row gutter={16}>
+          <Col xs={24} sm={20} md={8} lg={8}>
+            <Item
+              name="amount"
+              rules={[
+                {
+                  required: true,
+                  message: 'Please enter your amount',
+                },
+                {
+                  max: 50,
+                  message: 'Amount cannot exceed 50 characters',
+                },
+              ]}
+            >
+              <Input
+                placeholder="Enter your amount"
+                type="number"
+                maxLength={10}
+                max={9999999}
+              />
+            </Item>
+          </Col>
+          <Col xs={24} sm={20} md={8} lg={8}>
+            <Item
+              name="paymentMethod"
+              rules={[
+                {
+                  required: true,
+                  message: 'Please select a payment method',
+                },
+              ]}
+            >
+              <Select
+                showSearch
+                placeholder="Select a payment"
+                optionFilterProp="children"
+                options={payments}
+                filterOption={filterOption}
+                style={{ width: '100%' }}
+              />
+            </Item>
+          </Col>
+          <Col xs={24} sm={24} md={5} lg={5}>
+            <Item>
+              <Button type="primary" htmlType="submit">
+                Sell product
+              </Button>
+            </Item>
+          </Col>
+        </Row>
+      </Form>
+    </>
   )
 }
 

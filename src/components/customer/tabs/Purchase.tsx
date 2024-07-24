@@ -1,9 +1,11 @@
 'use client'
 
+import { currencyName } from '@/constants/global'
 import { useGetCustomerPurchasesByCustomerAndUserQuery } from '@/redux/api/customerPurchase/customerPurchaseApi'
 import { useGetSingleUserQuery } from '@/redux/api/userApi/userApi'
 import { getUserInfo } from '@/services/auth.services'
 import { ICustomer, ICustomerPurchase } from '@/types'
+import numberConvert from '@/utils/numberConvert'
 import { Button, Table, Tooltip } from 'antd'
 import dayjs from 'dayjs'
 import Link from 'next/link'
@@ -21,7 +23,7 @@ const Purchase: React.FC<SupplierActionsProps> = ({ customer }) => {
   const customerId = customer?.id
   const userId = data?.id
 
-  const { data: customerPurchase } =
+  const { data: customerPurchase, isLoading } =
     useGetCustomerPurchasesByCustomerAndUserQuery(customerId, userId)
 
   const columns = [
@@ -100,6 +102,7 @@ const Purchase: React.FC<SupplierActionsProps> = ({ customer }) => {
   return (
     <div>
       <Table
+        loading={isLoading}
         columns={columns}
         dataSource={customerPurchase}
         size="small"
@@ -111,10 +114,18 @@ const Purchase: React.FC<SupplierActionsProps> = ({ customer }) => {
         summary={() => (
           <Table.Summary.Row>
             <Table.Summary.Cell index={0}>Total Sum</Table.Summary.Cell>
-            <Table.Summary.Cell index={1}>{totalQuantity}</Table.Summary.Cell>
-            <Table.Summary.Cell index={2}>{totalPrice}</Table.Summary.Cell>
-            <Table.Summary.Cell index={3}>{totalPay}</Table.Summary.Cell>
-            <Table.Summary.Cell index={4}>{dueAmount}</Table.Summary.Cell>
+            <Table.Summary.Cell index={1}>
+              {numberConvert(totalQuantity)}
+            </Table.Summary.Cell>
+            <Table.Summary.Cell index={2}>
+              {numberConvert(totalPrice, currencyName)}
+            </Table.Summary.Cell>
+            <Table.Summary.Cell index={3}>
+              {numberConvert(totalPay, currencyName)}
+            </Table.Summary.Cell>
+            <Table.Summary.Cell index={4}>
+              {numberConvert(dueAmount, currencyName)}
+            </Table.Summary.Cell>
           </Table.Summary.Row>
         )}
       />

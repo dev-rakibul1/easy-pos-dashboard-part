@@ -5,6 +5,7 @@ import DailyReport from '@/components/transaction/tabs/DailyReport'
 import DailyTransactionChart from '@/components/transaction/tabs/DailyTransactionChart'
 import ActionBar from '@/components/ui/ActionBar'
 import { currencyName } from '@/constants/global'
+import { useGetAllAdditionalExpenseByCurrentDateQuery } from '@/redux/api/additionalExpense/additionalExpenseApi'
 import { useGetAllPurchaseByCurrentDateQuery } from '@/redux/api/purchaseApi/PurchaseApi'
 import { useGetPurchaseGroupByCurrentDateQuery } from '@/redux/api/purchaseGroup/purchaseGroupApi'
 import { useGetAllReturnsByCurrentDateQuery } from '@/redux/api/returnApi/returnApi'
@@ -13,6 +14,7 @@ import { useGetSellGroupByCurrentDateQuery } from '@/redux/api/sellGroups/sellGr
 import { useGetSellByCurrentDateQuery } from '@/redux/api/sells/sellsApi'
 import { getUserInfo } from '@/services/auth.services'
 import { calculateProfit } from '@/utils/calculateProfit'
+import { calculateTotalExpense } from '@/utils/VATDiscountCal'
 import { Card, Col, Row, Statistic, Tabs } from 'antd'
 import React from 'react'
 
@@ -54,6 +56,10 @@ const DailyTransaction: React.FC = () => {
   const { data: returnsGroups } = useGetAllReturnGroupByCurrentDateQuery({
     limit: 100,
   })
+  const { data: additionalExpense } =
+    useGetAllAdditionalExpenseByCurrentDateQuery({
+      limit: 100,
+    })
 
   const today = new Date().toLocaleDateString('en-US', {
     year: 'numeric',
@@ -80,10 +86,18 @@ const DailyTransaction: React.FC = () => {
     sellsToday.map((sell: SellData) => sell.customerId)
   ).size
 
-  // calculate profit
+  // Assuming additionalExpense is of type AdditionalExpenseData | undefined
+  const expenseAmount = calculateTotalExpense(
+    // @ts-ignore
+    additionalExpense?.expenses.length ? additionalExpense.expenses : []
+  )
+
+  // calculate profit and cost
   const sales = data
-  const profitAndCost: ProfitAndCost = calculateProfit(sales)
+  const profitAndCost: ProfitAndCost = calculateProfit(sales, expenseAmount)
   const totalProfit = profitAndCost?.totalProfit ?? 0
+
+  console.log(additionalExpense)
 
   return (
     <div style={{ padding: 24 }}>
@@ -152,6 +166,7 @@ const DailyTransaction: React.FC = () => {
             purchases={purchases}
             returnsGroups={returnsGroups}
             returns={returns}
+            expenseAmount={expenseAmount}
           />
         </Tabs.TabPane>
       </Tabs>

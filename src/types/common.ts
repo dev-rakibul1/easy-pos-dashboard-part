@@ -35,6 +35,14 @@ export interface IBrandResponse {
   createdAt: string
   updatedAt: string
 }
+export interface IAdditionalExpense {
+  id: string
+  expenseAmount: number
+  details?: string
+  uniqueId: string
+  createdAt: string
+  updatedAt: string
+}
 
 export type ICategoryResponse = {
   id: string
@@ -207,10 +215,10 @@ export type IReturn = {
   supplier: ISupplier
   createdAt: Date
   updatedAt: Date
-  price:number
+  price: number
 }
 
-enum UserRole {
+export enum UserRole {
   SuperAdmin = 'super_admin',
   Admin = 'admin',
   User = 'user',
@@ -361,4 +369,11 @@ export interface ICustomerPurchase {
   productId: string
   createdAt: string // You can use Date if you prefer handling dates as Date objects
   updatedAt: string // You can use Date if you prefer handling dates as Date objects
+}
+
+export interface ISupplierInformation {
+  totalQuantity: number
+  totalPrice: number
+  totalPay: number
+  dueAmount: number
 }

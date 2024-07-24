@@ -72,6 +72,20 @@ export const returnGroupApi = baseApi.injectEndpoints({
       },
       providesTags: [tagTypes.returnGroup],
     }),
+    getAllReturnGroupByCurrentYear: build.query({
+      query: (arg: Record<string, any>) => ({
+        url: `${RETURN_GROUP_URL}/get-by-current-year`,
+        method: 'GET',
+        params: arg,
+      }),
+      transformResponse: (response: any, meta: IMeta) => {
+        return {
+          returnGroups: response,
+          meta: meta,
+        }
+      },
+      providesTags: [tagTypes.returnGroup],
+    }),
   }),
 })
 
@@ -81,4 +95,5 @@ export const {
   useGetAllReturnGroupByCurrentDateQuery,
   useGetAllReturnGroupByCurrentWeekQuery,
   useGetAllReturnGroupByCurrentMonthQuery,
+  useGetAllReturnGroupByCurrentYearQuery,
 } = returnGroupApi

@@ -3,6 +3,7 @@
 import PosBreadcrumb from '@/components/breadcrumb/PosBreadcrumb'
 import WeeklyTransactionReport from '@/components/transaction/tabs/WeeklyTransaction/WeeklyTransactionReport'
 import { currencyName } from '@/constants/global'
+import { useGetAllAdditionalExpenseByCurrentWeekQuery } from '@/redux/api/additionalExpense/additionalExpenseApi'
 import { useGetAllPurchaseByCurrentWeekQuery } from '@/redux/api/purchaseApi/PurchaseApi'
 import { useGetPurchaseGroupByCurrentWeekQuery } from '@/redux/api/purchaseGroup/purchaseGroupApi'
 import { useGetAllReturnsByCurrentWeekQuery } from '@/redux/api/returnApi/returnApi'
@@ -12,6 +13,7 @@ import { useGetSellByCurrentWeekQuery } from '@/redux/api/sells/sellsApi'
 import { getUserInfo } from '@/services/auth.services'
 import { IPurchase, IReturn, ISell } from '@/types'
 import { calculateProfit } from '@/utils/calculateProfit'
+import { calculateTotalExpense } from '@/utils/VATDiscountCal'
 import { Card, Col, Row, Statistic } from 'antd'
 import { useEffect, useState } from 'react'
 import {
@@ -111,10 +113,16 @@ function WeeklyTransaction() {
   const { data: purchaseGroups } = useGetPurchaseGroupByCurrentWeekQuery({
     limit: 100,
   })
+
   const { data: returnsGroups } = useGetAllReturnGroupByCurrentWeekQuery({
     limit: 100,
   })
   const [weeklyData, setWeeklyData] = useState<SalesData[]>([])
+
+  const { data: additionalExpense } =
+    useGetAllAdditionalExpenseByCurrentWeekQuery({
+      limit: 100,
+    })
 
   // Function to determine title based on profit value
   const getTitle = (profit: number): string =>
@@ -138,9 +146,15 @@ function WeeklyTransaction() {
     }
   }, [salesData, purchaseData, returnData])
 
-  // calculate profit
+  // Assuming additionalExpense is of type AdditionalExpenseData | undefined
+  const expenseAmount = calculateTotalExpense(
+    // @ts-ignore
+    additionalExpense?.expenses.length ? additionalExpense.expenses : []
+  )
+
+  // calculate profit and cost
   const sales = salesData
-  const profitAndCost: ProfitAndCost = calculateProfit(sales)
+  const profitAndCost: ProfitAndCost = calculateProfit(sales, expenseAmount)
   const totalProfit = profitAndCost?.totalProfit ?? 0
 
   // total customers
@@ -152,6 +166,8 @@ function WeeklyTransaction() {
     (acc: number, sell: ISell) => acc + sell.totalSellPrice,
     0
   )
+
+  console.log(additionalExpense)
 
   return (
     <div style={{ padding: 24 }}>
@@ -226,6 +242,7 @@ function WeeklyTransaction() {
           purchases={purchase}
           returnsGroups={returnsGroups}
           returns={returns}
+          expenseAmount={expenseAmount}
         />
       </Row>
     </div>

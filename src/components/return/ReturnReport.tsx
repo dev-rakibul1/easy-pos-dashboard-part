@@ -11,12 +11,15 @@ const { Title, Text } = Typography
 interface ReturnInvoiceProps {
   id: string
   supplier: ISupplier
+  componentRef: any
 }
 
-const ReturnInvoice: React.FC<ReturnInvoiceProps> = ({ id, supplier }) => {
+const ReturnInvoice: React.FC<ReturnInvoiceProps> = ({
+  id,
+  supplier,
+  componentRef,
+}) => {
   const { data, isLoading } = useGetSingleReturnGroupQuery(id)
-
-  console.log(data)
 
   if (isLoading) {
     return <Spin size="small" />
@@ -130,7 +133,10 @@ const ReturnInvoice: React.FC<ReturnInvoiceProps> = ({ id, supplier }) => {
   }))
 
   return (
-    <div style={{ padding: '15px', border: '1px solid #ddd' }}>
+    <div
+      ref={componentRef}
+      style={{ padding: '15px', border: '1px solid #ddd' }}
+    >
       <Row gutter={[16, 16]} style={{ textAlign: 'center' }}>
         <Col span={24}>
           <Title level={4} style={{ margin: '0', padding: '0' }}>

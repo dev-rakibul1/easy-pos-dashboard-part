@@ -37,6 +37,11 @@ const UserUi = ({ user }: any) => {
               {user?.lastName}
             </Title>
             <Text type="secondary">User Information</Text>
+            <br />
+            <Text type="secondary">
+              Role:{' '}
+              <span style={{ textTransform: 'capitalize' }}>{user?.role}</span>
+            </Text>
             {/* <Text type="secondary">Los Angeles, California, USA</Text> */}
           </Col>
         </Row>

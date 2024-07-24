@@ -6,21 +6,63 @@ import FormInput from '@/components/form/FormInput'
 import InputSelect from '@/components/form/InputSelect'
 import ActionBar from '@/components/ui/ActionBar'
 import UploadImage from '@/components/ui/UploadImage'
-import { gender } from '@/constants/global'
+import { gender, UserRoleArray } from '@/constants/global'
+import { useAddANewUserMutation } from '@/redux/api/userApi/userApi'
 import { CreateUserYupSchema } from '@/schemas/userSchema/userSchema'
 import { getUserInfo } from '@/services/auth.services'
-import CustomButton from '@/utils/Button'
+import { UserRole } from '@/types'
 import { yupResolver } from '@hookform/resolvers/yup'
-import { Col, Row } from 'antd'
+import { Button, Col, message, Row } from 'antd'
 import { FormProvider, useForm } from 'react-hook-form'
+
+type IUserValues = {
+  firstName: string
+  middleName?: string | null
+  lastName: string
+  email: string
+  phoneNo: number | string
+  nid?: number | null | string
+  presentAddress?: string | null
+  permanentAddress?: string | null
+  file?: File | null
+  role?: UserRole
+  password: string
+}
 
 const AddUsers = () => {
   const { role } = getUserInfo() as any
   const methods = useForm()
 
-  const onSubmit = async (data: any) => {
+  const [addANewUser] = useAddANewUserMutation()
+
+  const onSubmit = async (values: IUserValues) => {
+    values.phoneNo = String(values.phoneNo)
+    values.nid = String(values.nid)
+
+    const obj = { ...values }
+    const file = obj['file']
+    delete obj['file']
+    const data = JSON.stringify(obj)
+    const formData = new FormData()
+    formData.append('file', file as Blob)
+    formData.append('data', data)
+
     try {
-      console.log('from login page', data)
+      message.loading({ content: 'Add user...', key: 'adding' })
+      const res = await addANewUser(formData)
+      if (res.data) {
+        message.success({
+          content: 'User added successfully!',
+          key: 'adding',
+          duration: 2,
+        })
+      } else {
+        message.error({
+          content: 'Added failed!',
+          key: 'adding',
+          duration: 2,
+        })
+      }
     } catch (error: any) {
       console.error(error.message)
     }
@@ -146,6 +188,22 @@ const AddUsers = () => {
                 md={{ span: 8 }}
                 lg={{ span: 6 }}
               >
+                <InputSelect
+                  name="role"
+                  label="Role"
+                  options={UserRoleArray}
+                  size="large"
+                />
+              </Col>
+
+              <Col
+                style={{ marginTop: '15px' }}
+                className="gutter-row"
+                xs={{ span: 24 }}
+                sm={{ span: 12 }}
+                md={{ span: 8 }}
+                lg={{ span: 6 }}
+              >
                 <FormInput
                   type="number"
                   name="nid"
@@ -207,12 +265,12 @@ const AddUsers = () => {
                 md={{ span: 8 }}
                 lg={{ span: 6 }}
               >
-                <UploadImage />
+                <UploadImage name="file" />
               </Col>
             </Row>
-            <CustomButton type="primary" htmlType="submit">
-              Submit
-            </CustomButton>
+            <Button type="primary" htmlType="submit">
+              Create user
+            </Button>
           </Form>
         </div>
       </div>

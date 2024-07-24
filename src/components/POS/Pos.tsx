@@ -328,7 +328,7 @@ const PosPage = () => {
       setSellPayloads([sellObject, ...sellPayloads])
     }
 
-    // Reset form fields except selectCustomer
+    // Reset form fields
     setFormData({
       ...formData,
       selectProduct: '',
@@ -339,7 +339,6 @@ const PosPage = () => {
       totalPrice: 0,
       modelName: '',
       productName: '',
-      customerName: '',
       ram: '',
       rom: '',
       color: '',
@@ -350,10 +349,17 @@ const PosPage = () => {
 
     // Reset other states
     setSelectVariant('')
-    setSelectCustomer('')
     setSelectProduct('')
     setSubtotal(0)
+
+    // Store the phone number
+    const customer = `${singleCustomerById?.firstName} | ${singleCustomerById?.uniqueId}`
+
+    // Reset all fields
     form.resetFields()
+
+    // Set the phone number back
+    form.setFieldsValue({ customer: customer })
   }
 
   const handleProductChange = (value: string) => {
@@ -635,16 +641,29 @@ const PosPage = () => {
                   },
                 ]}
               >
-                <Select
-                  showSearch
-                  optionFilterProp="children"
-                  onChange={handleCustomerChange}
-                  onSearch={onSearch}
-                  size="large"
-                  style={{ width: '100%' }}
-                  filterOption={filterOption}
-                  options={customerOptions}
-                />
+                {sellPayloads?.length ? (
+                  <Select
+                    showSearch
+                    optionFilterProp="children"
+                    onChange={handleCustomerChange}
+                    onSearch={onSearch}
+                    size="large"
+                    style={{ width: '100%' }}
+                    filterOption={filterOption}
+                    options={[]}
+                  />
+                ) : (
+                  <Select
+                    showSearch
+                    optionFilterProp="children"
+                    onChange={handleCustomerChange}
+                    onSearch={onSearch}
+                    size="large"
+                    style={{ width: '100%' }}
+                    filterOption={filterOption}
+                    options={customerOptions}
+                  />
+                )}
               </Form.Item>
 
               {selectCustomer !== '' ? (
@@ -752,7 +771,7 @@ const PosPage = () => {
                     style={{ width: '100%' }}
                     filterOption={filterOption}
                     options={discountsOptions}
-                  ></Select>
+                  />
                   <div style={inputPlusBtnStyle} onClick={showDiscountsModal}>
                     <PlusOutlined />
                   </div>
@@ -778,7 +797,7 @@ const PosPage = () => {
                     style={{ width: '100%' }}
                     filterOption={filterOption}
                     options={vatsOptions}
-                  ></Select>
+                  />
                   <div style={inputPlusBtnStyle} onClick={showVatsModal}>
                     <PlusOutlined />
                   </div>
@@ -811,7 +830,12 @@ const PosPage = () => {
       </Form>
 
       <div style={{ marginTop: '15px' }}>
-        <SellTable payloads={sellPayloads} setSellPayloads={setSellPayloads} />
+        <SellTable
+          payloads={sellPayloads}
+          singleCustomerById={singleCustomerById}
+          setSellPayloads={setSellPayloads}
+          setSelectCustomer={setSelectCustomer}
+        />
       </div>
     </div>
   )

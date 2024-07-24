@@ -20,13 +20,11 @@ export const CreateCustomerYupSchema = yup.object().shape({
     .string()
     .required('Email is required')
     .matches(emailRegex, 'Invalid email address'),
-  phoneNo: yup
-    .number()
-    .required('Phone number is required')
-    .max(15, 'Phone number must be less than or equal to 15 characters'),
+  phoneNo: yup.number().required('Phone number is required'),
+  // .max(15, 'Phone number must be less than or equal to 15 characters'),
   nid: yup
     .number()
-    .max(20, 'NID must be less than or equal to 20 characters')
+    // .max(20, 'NID must be less than or equal to 20 characters')
     .optional(),
   presentAddress: yup
     .string()

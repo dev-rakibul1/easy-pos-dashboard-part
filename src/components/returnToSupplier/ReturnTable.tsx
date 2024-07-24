@@ -1,7 +1,8 @@
 import { Table, TableColumnsType } from 'antd'
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 // @ts-ignore
 import { currencyName } from '@/constants/global'
+import ReportTitle from '../companyReportTitle/ReportTitle'
 import ReturnAmounts from './ReturnAmount'
 
 interface DataType {
@@ -18,7 +19,11 @@ interface DataType {
   total: number
 }
 
-const ReturnTable = ({ payloads, setSellPayloads }: any) => {
+const ReturnTable = ({
+  payloads,
+  setSellPayloads,
+  singleSupplierById,
+}: any) => {
   const [payAmountInfo, setPayAmountInfo] = useState({
     amount: 0,
     paymentMethod: '',
@@ -84,62 +89,73 @@ const ReturnTable = ({ payloads, setSellPayloads }: any) => {
   const paid = Number(payAmountInfo.amount) || 0
   const due = totalNet - paid
 
+  // Print
+  const componentRef = useRef()
+
   return (
     <>
       {payloads?.length > 0 && (
         <div>
-          <Table
-            columns={columns}
-            dataSource={data}
-            size="small"
-            bordered
-            pagination={false}
-            summary={() => (
-              <>
-                <Table.Summary.Row>
-                  <Table.Summary.Cell index={0}>Total</Table.Summary.Cell>
-                  <Table.Summary.Cell index={1} />
-                  <Table.Summary.Cell index={2} />
-                  <Table.Summary.Cell index={3}>
-                    {quantities} Items
-                  </Table.Summary.Cell>
-                  <Table.Summary.Cell index={4}>
-                    {currencyName} {totalNet.toFixed(2)}
-                  </Table.Summary.Cell>
-                </Table.Summary.Row>
+          {/* @ts-ignore */}
+          <div ref={componentRef}>
+            <ReportTitle
+              buyer={singleSupplierById}
+              title="Supplier information"
+              invoiceType="Return invoice"
+            />
+            <Table
+              columns={columns}
+              dataSource={data}
+              size="small"
+              bordered
+              pagination={false}
+              summary={() => (
+                <>
+                  <Table.Summary.Row>
+                    <Table.Summary.Cell index={0}>Total</Table.Summary.Cell>
+                    <Table.Summary.Cell index={1} />
+                    <Table.Summary.Cell index={2} />
+                    <Table.Summary.Cell index={3}>
+                      {quantities} Items
+                    </Table.Summary.Cell>
+                    <Table.Summary.Cell index={4}>
+                      {currencyName} {totalNet.toFixed(2)}
+                    </Table.Summary.Cell>
+                  </Table.Summary.Row>
 
-                <Table.Summary.Row>
-                  <Table.Summary.Cell index={0} />
-                  <Table.Summary.Cell index={1} colSpan={3} align="right">
-                    Net Total
-                  </Table.Summary.Cell>
-                  <Table.Summary.Cell index={2}>
-                    {currencyName} {totalNet.toFixed(2)}
-                  </Table.Summary.Cell>
-                </Table.Summary.Row>
+                  <Table.Summary.Row>
+                    <Table.Summary.Cell index={0} />
+                    <Table.Summary.Cell index={1} colSpan={3} align="right">
+                      Net Total
+                    </Table.Summary.Cell>
+                    <Table.Summary.Cell index={2}>
+                      {currencyName} {totalNet.toFixed(2)}
+                    </Table.Summary.Cell>
+                  </Table.Summary.Row>
 
-                <Table.Summary.Row>
-                  <Table.Summary.Cell index={0} />
-                  <Table.Summary.Cell index={1} colSpan={3} align="right">
-                    Pay
-                  </Table.Summary.Cell>
-                  <Table.Summary.Cell index={2}>
-                    {currencyName} {paid.toFixed(2)}
-                  </Table.Summary.Cell>
-                </Table.Summary.Row>
+                  <Table.Summary.Row>
+                    <Table.Summary.Cell index={0} />
+                    <Table.Summary.Cell index={1} colSpan={3} align="right">
+                      Return
+                    </Table.Summary.Cell>
+                    <Table.Summary.Cell index={2}>
+                      {currencyName} {paid.toFixed(2)}
+                    </Table.Summary.Cell>
+                  </Table.Summary.Row>
 
-                <Table.Summary.Row>
-                  <Table.Summary.Cell index={0} />
-                  <Table.Summary.Cell index={1} colSpan={3} align="right">
-                    Due
-                  </Table.Summary.Cell>
-                  <Table.Summary.Cell index={2}>
-                    {currencyName} {due.toFixed(2)}
-                  </Table.Summary.Cell>
-                </Table.Summary.Row>
-              </>
-            )}
-          />
+                  <Table.Summary.Row>
+                    <Table.Summary.Cell index={0} />
+                    <Table.Summary.Cell index={1} colSpan={3} align="right">
+                      Due
+                    </Table.Summary.Cell>
+                    <Table.Summary.Cell index={2}>
+                      {currencyName} {due.toFixed(2)}
+                    </Table.Summary.Cell>
+                  </Table.Summary.Row>
+                </>
+              )}
+            />
+          </div>
 
           {/* Sell pay */}
           <ReturnAmounts
@@ -147,6 +163,7 @@ const ReturnTable = ({ payloads, setSellPayloads }: any) => {
             dueBalance={totalNet}
             returnPayloads={payloads}
             setReturnPayloads={setSellPayloads}
+            componentRef={componentRef}
           />
         </div>
       )}

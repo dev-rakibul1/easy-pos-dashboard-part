@@ -289,6 +289,21 @@ const sidebarItems = (role: string) => {
       ],
     },
   ]
+  // Stock
+  const manageStockItems: MenuProps['items'] = [
+    {
+      label: 'Manage Stock',
+      key: 'stock',
+      icon: <ReconciliationOutlined />,
+      children: [
+        {
+          label: <Link href={`/${role}/manage-stock`}>Stock</Link>,
+          key: `/${role}/manage-stock`,
+          icon: <FaArrowRightLong />,
+        },
+      ],
+    },
+  ]
   // Add others
   const manageOthersItems: MenuProps['items'] = [
     {
@@ -296,6 +311,13 @@ const sidebarItems = (role: string) => {
       key: 'others',
       icon: <QuestionCircleOutlined />,
       children: [
+        {
+          label: (
+            <Link href={`/${role}/additional-expense`}>Additional expense</Link>
+          ),
+          key: `/${role}/additional-expense`,
+          icon: <FaArrowRightLong />,
+        },
         {
           label: <Link href={`/${role}/discount-lists`}>Discounts</Link>,
           key: `/${role}/discount-lists`,
@@ -376,6 +398,7 @@ const sidebarItems = (role: string) => {
     ...manageSellItems,
     ...managePurchaseItems,
     ...manageTransactionItems,
+    ...manageStockItems,
     ...manageProductItems,
     ...manageSupplierItems,
     ...manageCustomersItems,
@@ -393,6 +416,7 @@ const sidebarItems = (role: string) => {
     ...manageSellItems,
     ...managePurchaseItems,
     ...manageTransactionItems,
+    ...manageStockItems,
     ...manageProductItems,
     ...manageSupplierItems,
     ...manageCustomersItems,
@@ -408,6 +432,7 @@ const sidebarItems = (role: string) => {
     ...defaultHomePage,
     ...manageSellItems,
     ...manageCustomersItems,
+    ...manageStockItems,
     ...manageWarrantyItems,
     ...manageReportItems,
     ...manageOthersItems,

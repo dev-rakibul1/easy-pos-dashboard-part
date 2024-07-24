@@ -1,5 +1,6 @@
 import { inputFormStyle, inputPlusBtnStyle } from '@/components/styles/style'
-import { color } from '@/constants/global'
+import ColorModal from '@/modals/color/ColorModal'
+import { useGetAllColorQuery } from '@/redux/api/colorApi/colorApi'
 import { PlusOutlined } from '@ant-design/icons'
 import {
   Button,
@@ -43,10 +44,6 @@ const DynamicForm = ({
   }
 
   // Filter `option.label` match the user type `input`
-  const filterOption = (
-    input: string,
-    option?: { label: string; value: string }
-  ) => (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
 
   const handleColorChange = (index: number, value: string) => {
     const newProductColors = [...productColors]
@@ -56,6 +53,38 @@ const DynamicForm = ({
 
   const onSearch = (value: string) => {
     // console.log('search:', value)
+  }
+
+  // Filter `option.label` match the user type `input`
+  const colorFilterOption = (
+    input: string,
+    option?: { label: string; value: string | number }
+  ) => (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
+
+  // Color options
+  const { data: colorData } = useGetAllColorQuery({
+    limit: 100,
+    page: 1,
+  })
+  // @ts-ignore
+  const colorArray: IColor[] = colorData?.colors || []
+  const colorOptions = colorArray?.map(color => ({
+    label: `${color.name} ${color.colorCode}`,
+    value: `${color.name} ${color.colorCode}`,
+  }))
+
+  // -----------Color modal-----------
+  const [isColorModal, setIsColorModal] = useState(false)
+  const showColorModal = () => {
+    setIsColorModal(true)
+  }
+
+  const handleColorOk = () => {
+    setIsColorModal(false)
+  }
+
+  const handleColorCancel = () => {
+    setIsColorModal(false)
   }
 
   const renderFormItems = () => {
@@ -104,7 +133,32 @@ const DynamicForm = ({
               <Input />
             </Item>
           </Col>
+          {/* ---------------------- */}
           <Col xs={24} sm={12} md={8} lg={6}>
+            <Item
+              name={`color_${index}`}
+              label="Color"
+              labelCol={{ span: 24 }}
+              wrapperCol={{ span: 24 }}
+            >
+              <div style={inputFormStyle}>
+                <Select
+                  showSearch
+                  optionFilterProp="children"
+                  onChange={value => handleColorChange(index, value)}
+                  onSearch={onSearch}
+                  style={{ width: '100%' }}
+                  filterOption={colorFilterOption}
+                  options={colorOptions}
+                ></Select>
+                <div style={inputPlusBtnStyle} onClick={showColorModal}>
+                  <PlusOutlined />
+                </div>
+              </div>
+            </Item>
+          </Col>
+          {/* ---------------------- */}
+          {/* <Col xs={24} sm={12} md={8} lg={6}>
             <Item
               name={`color_${index}`}
               label="Color"
@@ -127,7 +181,7 @@ const DynamicForm = ({
                 </div>
               </div>
             </Item>
-          </Col>
+          </Col> */}
         </div>
       </Row>
     ))
@@ -135,6 +189,14 @@ const DynamicForm = ({
 
   return (
     <div>
+      {/* Start Crate a color */}
+      <ColorModal
+        handleColorOk={handleColorOk}
+        showColorModal={showColorModal}
+        handleColorCancel={handleColorCancel}
+        isColorModal={isColorModal}
+        setIsColorModal={setIsColorModal}
+      />
       <Space direction="vertical" size="middle" style={{ width: '100%' }}>
         <Form form={form} name="dynamic_form" onFinish={handleFinish}>
           {renderFormItems()}
