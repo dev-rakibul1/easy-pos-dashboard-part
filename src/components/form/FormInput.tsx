@@ -14,6 +14,7 @@ interface IInput {
   validate?: object
   label?: string
   addonAfter?: React.ReactNode
+  required: boolean
 }
 
 const inputStyle = {
@@ -33,6 +34,7 @@ const FormInput = ({
   value,
   label,
   addonAfter,
+  required,
 }: IInput) => {
   const {
     control,
@@ -43,6 +45,7 @@ const FormInput = ({
 
   return (
     <>
+      {required ? <span style={{ color: 'red' }}>*</span> : null}
       {label ? label : null}
       <Controller
         control={control}

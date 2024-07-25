@@ -1,37 +1,33 @@
 'use client'
 
+import { useGetSingleSupplierQuery } from '@/redux/api/supplierApi/supplierApi'
 import { IVariant } from '@/types'
 import { Table } from 'antd'
-import { TransformPurchaseApiResponse } from './purchaseDataConvert'
-
-interface Variant {
-  imeiNumber: string
-  ram: number
-  rom: number
-  color: string
-  productId: string
-}
-
-interface IProduct {
-  productName: string
-  variants: Variant[]
-  othersStock: number
-  productStock: number
-  purchaseRate: number
-  sellingPrice: number
-  vats: number
-  discounts: number
-  totalPrice: number
-  productId: string
-  supplierId: string
-}
+import ReportTitle from '../companyReportTitle/ReportTitle'
+import { IFormValues } from './Purchase'
+import {
+  IPurchaseApiResponse,
+  TransformPurchaseApiResponse,
+} from './purchaseDataConvert'
 
 type Props = {
-  payloads: IProduct[]
+  payloads: IPurchaseApiResponse
+  supplierId: string
+  formValues: IFormValues
+  componentRef: any
 }
 
-const PurchaseTables: React.FC<Props> = ({ payloads }) => {
+const PurchaseTables = ({
+  payloads,
+  supplierId,
+  formValues,
+  componentRef,
+}: Props) => {
   const convertData = TransformPurchaseApiResponse(payloads)
+
+  // console.log(payloads)
+  // console.log(convertData)
+
   const data = convertData?.map((item: any) => ({
     key: item.productId,
     productName: item.productName,
@@ -114,14 +110,105 @@ const PurchaseTables: React.FC<Props> = ({ payloads }) => {
     },
   ]
 
+  const quantities = data.reduce((acc, item) => acc + item.qty, 0).toFixed(2)
+  const totalAmount = data.reduce((acc, item) => acc + item.total, 0)
+  const totalVatAmount = data.reduce((acc, item) => acc + item.vatAmount, 0)
+  const totalDiscountAmount = data.reduce(
+    (acc, item) => acc + item.discountAmount,
+    0
+  )
+  // @ts-ignore
+  const totalPay = parseFloat(formValues?.amount) || 0
+
+  const totalNet = data.reduce((acc, item) => acc + item.subtotal, 0)
+  const paid = totalPay
+  const due = totalNet - paid
+
+  // Get supplier
+  const { data: supplier } = useGetSingleSupplierQuery(supplierId)
+
   return (
-    <Table
-      columns={columns}
-      dataSource={data}
-      pagination={false}
-      bordered
-      rowKey="key"
-    />
+    <div ref={componentRef}>
+      <ReportTitle
+        buyer={supplier}
+        title="Supplier information"
+        invoiceType="Purchase invoice"
+      />
+
+      <Table
+        columns={columns}
+        dataSource={data}
+        size="small"
+        bordered
+        pagination={false}
+        summary={() => (
+          <>
+            <Table.Summary.Row>
+              <Table.Summary.Cell index={0}>Total</Table.Summary.Cell>
+              <Table.Summary.Cell index={1} />
+              <Table.Summary.Cell index={2}>
+                {quantities} Items
+              </Table.Summary.Cell>
+              <Table.Summary.Cell index={3}></Table.Summary.Cell>
+              <Table.Summary.Cell index={4}>
+                {totalAmount?.toFixed(2)}
+              </Table.Summary.Cell>
+              <Table.Summary.Cell index={5}></Table.Summary.Cell>
+              <Table.Summary.Cell index={6}>
+                {totalVatAmount?.toFixed(2)}
+              </Table.Summary.Cell>
+              <Table.Summary.Cell index={7}></Table.Summary.Cell>
+              <Table.Summary.Cell index={8}>
+                {totalDiscountAmount?.toFixed(2)}
+              </Table.Summary.Cell>
+              <Table.Summary.Cell index={9}>
+                {totalNet?.toFixed(2)}
+              </Table.Summary.Cell>
+            </Table.Summary.Row>
+            <Table.Summary.Row style={{ textAlign: 'right' }}>
+              <Table.Summary.Cell index={0} colSpan={8}>
+                Total
+              </Table.Summary.Cell>
+              <Table.Summary.Cell index={1} colSpan={2}>
+                {totalNet?.toFixed(2)}
+              </Table.Summary.Cell>
+            </Table.Summary.Row>
+            <Table.Summary.Row style={{ textAlign: 'right' }}>
+              <Table.Summary.Cell index={0} colSpan={8}>
+                Discount
+              </Table.Summary.Cell>
+              <Table.Summary.Cell index={1} colSpan={2}>
+                {totalDiscountAmount?.toFixed(2)}
+              </Table.Summary.Cell>
+            </Table.Summary.Row>
+            <Table.Summary.Row style={{ textAlign: 'right' }}>
+              <Table.Summary.Cell index={0} colSpan={8}>
+                Net Total
+              </Table.Summary.Cell>
+              <Table.Summary.Cell index={1} colSpan={2}>
+                {totalNet?.toFixed(2)}
+              </Table.Summary.Cell>
+            </Table.Summary.Row>
+            <Table.Summary.Row style={{ textAlign: 'right' }}>
+              <Table.Summary.Cell index={0} colSpan={8}>
+                Pay
+              </Table.Summary.Cell>
+              <Table.Summary.Cell index={1} colSpan={2}>
+                {paid?.toFixed(2)}
+              </Table.Summary.Cell>
+            </Table.Summary.Row>
+            <Table.Summary.Row style={{ textAlign: 'right' }}>
+              <Table.Summary.Cell index={0} colSpan={8}>
+                Due
+              </Table.Summary.Cell>
+              <Table.Summary.Cell index={1} colSpan={2}>
+                {due?.toFixed(2)}
+              </Table.Summary.Cell>
+            </Table.Summary.Row>
+          </>
+        )}
+      />
+    </div>
   )
 }
 

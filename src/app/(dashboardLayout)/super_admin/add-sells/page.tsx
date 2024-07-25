@@ -30,7 +30,13 @@ const AddSells = () => {
         <Col xs={24} sm={18} md={18} lg={18}>
           <PosPage />
         </Col>
-        <Col xs={24} sm={6} md={6} lg={6}>
+        <Col
+          xs={24}
+          sm={6}
+          md={6}
+          lg={6}
+          style={{ overflowX: 'hidden', width: '100%', height: '100vh' }}
+        >
           <PosSidebar />
         </Col>
       </Row>

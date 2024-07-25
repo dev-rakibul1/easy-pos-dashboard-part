@@ -32,19 +32,16 @@ const { Text, Title } = Typography
 
 const UserInfo = ({
   supplierId,
-  userData,
   formValues,
-  setFormValues,
   handlePayChange,
   payloads,
   setPayloads,
-  componentRef
+  componentRef,
 }: any) => {
   const { uniqueId: id } = getUserInfo() as any
   const [isModalVisible, setIsModalVisible] = useState(false)
   const { data, isLoading: isUserLoading } = useGetSingleUserQuery(id)
-  const { data: supplier } =
-    useGetSingleSupplierQuery(supplierId)
+  const { data: supplier } = useGetSingleSupplierQuery(supplierId)
   const userId = data?.id
 
   // Print
@@ -85,8 +82,6 @@ const UserInfo = ({
     dueAmount,
   }
 
-  console.log(payloads)
-
   // ----------FROM--------
   const [form] = Form.useForm()
   const [addANewPurchase] = useAddANewPurchaseMutation()
@@ -97,19 +92,14 @@ const UserInfo = ({
     payloads.supplierPayment.paymentType = values?.paymentMethod
     message.loading({ content: 'Creating purchase...', key: 'creating' })
 
-    
     message.success('Sell successfully!')
     showDownloadModal()
 
     try {
       const res = await addANewPurchase(payloads).unwrap()
-      // console.log(res)
 
       if (res) {
         message.success('Purchase successfully!')
-
-        form.resetFields()
-        setPayloads({})
       } else {
         message.error('Purchase fail!')
       }
@@ -129,17 +119,14 @@ const UserInfo = ({
   const handleDownloadOk = () => {
     setIsModalVisible(false)
     form.resetFields()
-    // setSelectCustomer('')
-    // setSellPayloads([])
+    setPayloads({})
   }
 
   const handleDownloadCancel = () => {
     setIsModalVisible(false)
     form.resetFields()
-    // setSellPayloads([])
-    // setSelectCustomer('')
+    setPayloads({})
   }
-
 
   const filterOption = (
     input: string,

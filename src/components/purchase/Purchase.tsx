@@ -26,10 +26,7 @@ import { useRouter } from 'next/navigation'
 import { useEffect, useRef, useState } from 'react'
 import { inputFormStyle, inputPlusBtnStyle } from '../styles/style'
 import ActionBar from '../ui/ActionBar'
-import { TransformPurchaseApiResponse } from './purchaseDataConvert'
-import PurchaseTable from './PurchaseTable'
 import PurchaseTables from './PurchaseTables'
-import TestTable from './Test'
 import UserInfo from './UserInfo'
 import VariantModal from './variants/VariantModal'
 const { Option } = Select
@@ -185,10 +182,10 @@ const PurchaseForm = ({ isChecked, userData }: any) => {
   useEffect(() => {
     const vatRate = formData?.vats || 0
     const productStockAmount = productStock || 0
-    const otherStockAmount = othersStock || 0
+    // const otherStockAmount = othersStock || 0
 
     // Calculate the purchase rate amount considering the stock
-    const stockAmount = isChecked ? productStockAmount : otherStockAmount
+    const stockAmount = isChecked ? productStockAmount : productStockAmount
     const purchaseRateAmount = (formData?.purchaseRate || 0) * stockAmount
 
     const vatAmount = purchaseRateAmount * (vatRate / 100)
@@ -266,7 +263,7 @@ const PurchaseForm = ({ isChecked, userData }: any) => {
     })
 
     // other stock or cover and glass and so on feature develop
-    const otherStocks: number = formData?.othersStock || 0
+    const otherStocks: number = formData?.productStock || 0
     const ram: string = formData?.ram
     const rom: string = formData?.room
     const color: string = formData?.color
@@ -400,9 +397,6 @@ const PurchaseForm = ({ isChecked, userData }: any) => {
   const handleColorCancel = () => {
     setIsColorModal(false)
   }
-
-  const newData = TransformPurchaseApiResponse(payloads)
-  console.log(newData)
 
   return (
     <div style={{ background: '#f0f2f5' }}>
@@ -591,7 +585,7 @@ const PurchaseForm = ({ isChecked, userData }: any) => {
               <>
                 <Col xs={24} sm={12} md={8} lg={6}>
                   <Form.Item
-                    name="othersStock"
+                    name="productStock"
                     label="Stock"
                     rules={[
                       {
@@ -744,22 +738,15 @@ const PurchaseForm = ({ isChecked, userData }: any) => {
           </Button>
         </Form>
       </div>
-      <PurchaseTables payloads={payloads} />
-
-      {purchaseData.length && (
+      {purchaseData?.length && (
         <div style={{ marginTop: '15px' }}>
-          {/* @ts-ignore */}
-          {payloads.variants ? (
-            <TestTable
-              componentRef={componentRef}
-              payloads={payloads}
-              isChecked={isChecked}
-              formValues={formValues}
-              supplierId={supplierId}
-            />
-          ) : (
-            <PurchaseTable payloads={payloads} formValues={formValues} />
-          )}
+          <PurchaseTables
+            // @ts-ignore
+            payloads={payloads}
+            supplierId={supplierId}
+            formValues={formValues}
+            componentRef={componentRef}
+          />
         </div>
       )}
 
@@ -769,9 +756,7 @@ const PurchaseForm = ({ isChecked, userData }: any) => {
           <ActionBar title="User payment information"></ActionBar>
           <UserInfo
             supplierId={supplierId}
-            userData={userData}
             formValues={formValues}
-            setFormValues={setFormValues}
             handlePayChange={handlePayChange}
             handleFinish={handleFinish}
             payloads={payloads}

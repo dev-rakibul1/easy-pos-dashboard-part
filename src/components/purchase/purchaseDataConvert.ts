@@ -22,9 +22,17 @@ type Purchase = {
   brandName: string
 }
 
-type ApiResponse = {
+type SupplierPayment = {
+  totalPay: number
+  supplierId: string
+  userId: string
+  productId: string
+}
+
+export type IPurchaseApiResponse = {
   variants: Variant[]
   purchase: Purchase[]
+  supplierPayment: SupplierPayment
 }
 
 type TransformedProduct = {
@@ -42,12 +50,18 @@ type TransformedProduct = {
 }
 
 export function TransformPurchaseApiResponse(
-  apiResponse: ApiResponse
+  apiResponse: IPurchaseApiResponse
 ): TransformedProduct[] {
   const { variants, purchase } = apiResponse
+  let previousData: TransformedProduct[] = []
 
-  return purchase?.map(purchaseItem => {
-    const associatedVariants = variants?.filter(
+  if (!purchase || purchase.length === 0) {
+    // If there are no new purchases, return the previous data as is
+    return previousData
+  }
+
+  const newData: TransformedProduct[] = purchase.map(purchaseItem => {
+    const associatedVariants = variants.filter(
       variant => variant.productId === purchaseItem.productId
     )
 
@@ -65,4 +79,10 @@ export function TransformPurchaseApiResponse(
       supplierId: purchaseItem.supplierId,
     }
   })
+
+  // Merge new data with previous data
+  previousData = [...previousData, ...newData]
+
+  // Return the updated data
+  return previousData
 }
