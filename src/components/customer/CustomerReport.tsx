@@ -47,6 +47,7 @@ const CustomerReport: React.FC<SupplierInvoiceProps> = ({
   componentRef,
 }) => {
   const { data, isLoading } = useGetSingleSellGroupQuery(id)
+  // console.log(data)
 
   if (isLoading) {
     return <Spin size="small" />

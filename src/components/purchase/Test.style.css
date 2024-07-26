@@ -1,0 +1,33 @@
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+th,
+td {
+  border: 1px solid #ddd;
+  padding: 8px;
+}
+th {
+  background-color: #f2f2f2;
+  text-align: left;
+}
+td {
+  text-align: right;
+}
+.total-row th,
+.total-row td {
+  font-weight: bold;
+}
+.summary {
+  width: 30%;
+  float: right;
+  border: 1px solid #ddd;
+  padding: 10px;
+  margin-top: 20px;
+}
+.summary div {
+  margin-bottom: 5px;
+}
+.summary div span {
+  float: right;
+}
