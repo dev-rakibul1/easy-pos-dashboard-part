@@ -174,6 +174,21 @@ export type ICustomer = {
   updatedAt: Date
 }
 
+type SupplierSell = {
+  id: string
+  quantity: number
+  totalSellAmounts: number
+  totalDue: number
+  totalPay: number
+  paymentType: string | null
+  supplierId: string
+  userId: string
+  productId: string
+  purchaseGroupId: string
+  createdAt: string
+  updatedAt: string
+}
+
 export type ISupplier = {
   id: string
   firstName: string
@@ -191,6 +206,7 @@ export type ISupplier = {
   payments: ISupplierPayment[]
   purchase: IPurchase[]
   returnHistory: IReturn[]
+  supplierSell: SupplierSell[]
   createdAt: Date
   updatedAt: Date
 }
@@ -376,4 +392,13 @@ export interface ISupplierInformation {
   totalPrice: number
   totalPay: number
   dueAmount: number
+}
+
+// Token info
+export type ITokenObj = {
+  uniqueId: string
+  role: string
+  status: boolean
+  iat: number
+  exp: number
 }

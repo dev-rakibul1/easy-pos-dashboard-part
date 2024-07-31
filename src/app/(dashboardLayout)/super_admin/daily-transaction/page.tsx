@@ -89,15 +89,13 @@ const DailyTransaction: React.FC = () => {
   // Assuming additionalExpense is of type AdditionalExpenseData | undefined
   const expenseAmount = calculateTotalExpense(
     // @ts-ignore
-    additionalExpense?.expenses.length ? additionalExpense.expenses : []
+    additionalExpense?.expenses?.length ? additionalExpense.expenses : []
   )
 
   // calculate profit and cost
   const sales = data
   const profitAndCost: ProfitAndCost = calculateProfit(sales, expenseAmount)
   const totalProfit = profitAndCost?.totalProfit ?? 0
-
-  console.log(additionalExpense)
 
   return (
     <div style={{ padding: 24 }}>

@@ -3,6 +3,8 @@
 import PosBreadcrumb from '@/components/breadcrumb/PosBreadcrumb'
 import StockIn from '@/components/manageStock/StockIn'
 import StockOut from '@/components/manageStock/StockOut'
+import TotalCustomerDebt from '@/components/manageStock/TotalCustomerDebt'
+import TotalDebt from '@/components/manageStock/TotalDebt'
 import {
   userInfoSupplierSpin,
   warningIconStyle,
@@ -11,7 +13,7 @@ import {
 import { useGetAllProductQuery } from '@/redux/api/productApi/productApi'
 import { useDebounced } from '@/redux/hooks'
 import { getUserInfo } from '@/services/auth.services'
-import { IProduct } from '@/types'
+import { IProduct, ITokenObj } from '@/types'
 import { Modal, Tabs, TabsProps, Typography } from 'antd'
 import { useEffect, useState } from 'react'
 import { ImWarning } from 'react-icons/im'
@@ -19,7 +21,7 @@ import { ImWarning } from 'react-icons/im'
 const { Text } = Typography
 
 const ManageStockPage = () => {
-  const { role } = getUserInfo() as any
+  const { role } = getUserInfo() as ITokenObj
   const [page, setPage] = useState<number>(1)
   const [limit, setLimit] = useState<number>(10)
   const [sortBy, setSortBy] = useState<string>('')
@@ -129,6 +131,18 @@ const ManageStockPage = () => {
           onTableChange={onTableChange}
         />
       ),
+    },
+    {
+      key: '3',
+      // @ts-ignore
+      label: `Total debt`,
+      children: <TotalDebt />,
+    },
+    {
+      key: '4',
+      // @ts-ignore
+      label: `Customer debt`,
+      children: <TotalCustomerDebt />,
     },
   ]
 

@@ -73,6 +73,7 @@ const LoginInfoPage = () => {
                 placeholder="uniqueId"
                 size="large"
                 label="Unique Id"
+                required
               />
             </div>
             <div style={{ margin: '10px 0' }}>
@@ -82,6 +83,7 @@ const LoginInfoPage = () => {
                 placeholder="Password"
                 size="large"
                 label="Password"
+                required
               />
             </div>
 

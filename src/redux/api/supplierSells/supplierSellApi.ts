@@ -13,6 +13,14 @@ export const supplierSellsApi = baseApi.injectEndpoints({
 
       providesTags: [tagTypes.supplierSells],
     }),
+    getSupplierSellsByUserId: build.query({
+      query: (id: string) => ({
+        url: `${SUPPLIER_SELLS_URL}/get-by-user/${id}`,
+        method: 'GET',
+      }),
+
+      providesTags: [tagTypes.supplierSells],
+    }),
     getSingleSupplierSell: build.query({
       query: (id: string) => ({
         url: `${SUPPLIER_SELLS_URL}/${id}`,
@@ -27,4 +35,5 @@ export const supplierSellsApi = baseApi.injectEndpoints({
 export const {
   useGetSupplierSellsBySupplierAndUserQuery,
   useGetSingleSupplierSellQuery,
+  useGetSupplierSellsByUserIdQuery,
 } = supplierSellsApi

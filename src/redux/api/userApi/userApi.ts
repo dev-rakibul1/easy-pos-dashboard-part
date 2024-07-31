@@ -31,6 +31,7 @@ export const userApi = baseApi.injectEndpoints({
       providesTags: [tagTypes.user],
     }),
 
+    // get by uniqueId like (U-00001)
     getSingleUser: build.query({
       query: (id: string) => ({
         url: `${USER_URL}/${id}`,
@@ -40,6 +41,7 @@ export const userApi = baseApi.injectEndpoints({
       providesTags: [tagTypes.user],
     }),
 
+    // get by own id
     getSingleUserById: build.query({
       query: (id: string) => ({
         url: `${USER_URL}/single-user-by-id/${id}`,

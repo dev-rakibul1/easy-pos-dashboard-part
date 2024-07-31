@@ -3,6 +3,7 @@
 import { authKey } from '@/constants/storageKey'
 import { useGetSingleUserQuery } from '@/redux/api/userApi/userApi'
 import { getUserInfo, isLoggedOut } from '@/services/auth.services'
+import { ITokenObj } from '@/types'
 import { LogoutOutlined, UserOutlined } from '@ant-design/icons'
 import {
   Avatar,
@@ -24,7 +25,7 @@ const { Text } = Typography
 const Header = () => {
   const [isLoading, setIsLoading] = useState<boolean>(true)
   const router = useRouter()
-  const { role, uniqueId: id } = getUserInfo() as any
+  const { role, uniqueId: id } = getUserInfo() as ITokenObj
   const { data } = useGetSingleUserQuery(id)
 
   useEffect(() => {

@@ -57,6 +57,8 @@ const UserInfo = ({
   const { data: userSellInfo, isLoading } =
     useGetSupplierSellsBySupplierAndUserQuery(supplierId, userId)
 
+  console.log(userSellInfo)
+
   const totalQuantity = userSellInfo?.reduce(
     (acc: number, item: ISupplierSells) => acc + item.quantity,
     0

@@ -47,7 +47,7 @@ const CustomerReport: React.FC<SupplierInvoiceProps> = ({
   componentRef,
 }) => {
   const { data, isLoading } = useGetSingleSellGroupQuery(id)
-  // console.log(data)
+  console.log(data)
 
   if (isLoading) {
     return <Spin size="small" />
@@ -94,12 +94,12 @@ const CustomerReport: React.FC<SupplierInvoiceProps> = ({
     },
     {
       title: 'AMOUNT',
-      dataIndex: ['sell', 'totalSellPrice'],
-      key: 'totalSellPrice',
-      render: (amount: number) => {
+      key: 'amount',
+      render: (_, record) => {
+        const amount = record.sell.sellingPrice * record.sell.quantity
         return (
           <span>
-            {currencyName} {amount}
+            {currencyName} {amount.toFixed(2)}
           </span>
         )
       },
@@ -114,7 +114,9 @@ const CustomerReport: React.FC<SupplierInvoiceProps> = ({
       key: 'discountAmount',
       render: (_, record) => {
         const discountAmount =
-          record.sell.totalSellPrice * (record.sell.discounts / 100)
+          record.sell.sellingPrice *
+          record.sell.quantity *
+          (record.sell.discounts / 100)
         return `${currencyName} ${discountAmount.toFixed(2)}`
       },
     },
@@ -127,7 +129,10 @@ const CustomerReport: React.FC<SupplierInvoiceProps> = ({
       title: 'V. AMOUNT',
       key: 'vatAmount',
       render: (_, record) => {
-        const vatAmount = record.sell.totalSellPrice * (record.sell.vats / 100)
+        const vatAmount =
+          record.sell.sellingPrice *
+          record.sell.quantity *
+          (record.sell.vats / 100)
         return `${currencyName} ${vatAmount.toFixed(2)}`
       },
     },
@@ -136,9 +141,18 @@ const CustomerReport: React.FC<SupplierInvoiceProps> = ({
       key: 'total',
       render: (_, record) => {
         const discountAmount =
-          record.sell.totalSellPrice * (record.sell.discounts / 100)
-        const vatAmount = record.sell.totalSellPrice * (record.sell.vats / 100)
-        const total = record.sell.totalSellPrice - discountAmount + vatAmount
+          record.sell.sellingPrice *
+          record.sell.quantity *
+          (record.sell.discounts / 100)
+
+        const vatAmount =
+          record.sell.sellingPrice *
+          record.sell.quantity *
+          (record.sell.vats / 100)
+        const total =
+          record.sell.sellingPrice * record.sell.quantity -
+          discountAmount +
+          vatAmount
         return `${currencyName} ${total.toFixed(2)}`
       },
     },
@@ -176,7 +190,10 @@ const CustomerReport: React.FC<SupplierInvoiceProps> = ({
   const totalDiscount = data?.customerPurchaseProducts
     .reduce(
       (acc: number, item: any) =>
-        acc + item.sell.totalSellPrice * (item.sell.discounts / 100),
+        acc +
+        item.sell.sellingPrice *
+          item.sell.quantity *
+          (item.sell.discounts / 100),
       0
     )
     .toFixed(2)
@@ -184,13 +201,18 @@ const CustomerReport: React.FC<SupplierInvoiceProps> = ({
   const totalVat = data?.customerPurchaseProducts
     .reduce(
       (acc: number, item: any) =>
-        acc + item.sell.totalSellPrice * (item.sell.vats / 100),
+        acc +
+        item.sell.sellingPrice * item.sell.quantity * (item.sell.vats / 100),
       0
     )
     .toFixed(2)
 
   const totalAmount = data?.customerPurchaseProducts
-    .reduce((acc: number, item: any) => acc + item?.sell?.totalSellPrice, 0)
+    .reduce(
+      (acc: number, item: any) =>
+        acc + item?.sell?.sellingPrice * item.sell.quantity,
+      0
+    )
     .toFixed(2)
 
   const totalQuantity = data?.customerPurchaseProducts
@@ -200,9 +222,17 @@ const CustomerReport: React.FC<SupplierInvoiceProps> = ({
   const totalSum = data?.customerPurchaseProducts
     .reduce((acc: number, item: any) => {
       const discountAmount =
-        item.sell.totalSellPrice * (item.sell.discounts / 100)
-      const vatAmount = item.sell.totalSellPrice * (item.sell.vats / 100)
-      return acc + (item.sell.totalSellPrice - discountAmount + vatAmount)
+        item.sell.sellingPrice *
+        item.sell.quantity *
+        (item.sell.discounts / 100)
+      const vatAmount =
+        item.sell.sellingPrice * item.sell.quantity * (item.sell.vats / 100)
+      return (
+        acc +
+        (item.sell.sellingPrice * item.sell.quantity -
+          discountAmount +
+          vatAmount)
+      )
     }, 0)
     .toFixed(2)
 

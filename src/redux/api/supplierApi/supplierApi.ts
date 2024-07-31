@@ -73,6 +73,15 @@ export const supplierApi = baseApi.injectEndpoints({
 
       providesTags: [tagTypes.supplier],
     }),
+    // get supplier by user id
+    getSuppliersByUserId: build.query({
+      query: (id: string) => ({
+        url: `${SUPPLIER_URL}/get-by-user-id/${id}`,
+        method: 'GET',
+      }),
+
+      providesTags: [tagTypes.supplier],
+    }),
   }),
   overrideExisting: false,
 })
@@ -84,4 +93,5 @@ export const {
   useDeleteSupplierMutation,
   useUpdateSupplierMutation,
   useGetSuppliersBySupplierUserProductQuery,
+  useGetSuppliersByUserIdQuery,
 } = supplierApi

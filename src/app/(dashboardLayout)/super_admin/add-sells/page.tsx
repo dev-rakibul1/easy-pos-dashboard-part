@@ -3,7 +3,6 @@
 import PosPage from '@/components/POS/Pos'
 import PosSidebar from '@/components/POS/PosSidebar'
 import PosBreadcrumb from '@/components/breadcrumb/PosBreadcrumb'
-import Test from '@/components/purchase/Test'
 import ActionBar from '@/components/ui/ActionBar'
 import { getUserInfo } from '@/services/auth.services'
 import { Col, Row } from 'antd'
@@ -27,7 +26,6 @@ const AddSells = () => {
       />
 
       <ActionBar title="Point of sales (POS)"></ActionBar>
-br
 
       <Row gutter={[0, 0]}>
         <Col xs={24} sm={18} md={18} lg={18}>

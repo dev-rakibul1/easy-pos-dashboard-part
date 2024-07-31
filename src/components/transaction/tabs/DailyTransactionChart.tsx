@@ -25,7 +25,7 @@ type Props = {
 
 const CustomizedLabel: FC<any> = ({ x, y, stroke, value }) => {
   return (
-    <text x={x} y={y} dy={-4} fill={stroke} fontSize={8} textAnchor="middle">
+    <text x={x} y={y} dy={-4} fill={stroke} fontSize={10} textAnchor="middle">
       {value}
     </text>
   )
@@ -49,8 +49,6 @@ const CustomizedAxisTick: FC<any> = ({ x, y, stroke, payload }) => {
 }
 
 const DailyTransactionChart: FC<Props> = ({ sales, purchases, returns }) => {
-  const purchaseInfo = purchases?.purchases
-
   // Prepare data for recent customers list
   const recentCustomers =
     sales?.map((customer: any) => {
@@ -103,34 +101,7 @@ const DailyTransactionChart: FC<Props> = ({ sales, purchases, returns }) => {
       ),
     },
   ]
-
-  // Ensure purchaseInfo is defined and is an array
-  const purchaseInformation = purchaseInfo || []
-  const returnsInfo = returns?.returns || []
-
-  const data = sales?.map((sale: any, index: number) => {
-    const purchase = purchaseInformation[index] || {}
-    const returnData = returnsInfo[index] ?? {}
-
-    // Calculate discount amount and format to 2 decimal places
-    const discountAmount = (
-      sale?.sellingPrice * (sale?.discounts / 100) ?? 0
-    ).toFixed(2)
-
-    // Calculate VAT amount and format to 2 decimal places
-    const vatAmount = (sale?.sellingPrice * (sale?.vats / 100) ?? 0).toFixed(2)
-
-    return {
-      name: `Sale ${String.fromCharCode(65 + index)}`,
-      sales: sale?.sellingPrice ?? 0,
-      discount: discountAmount,
-      vat: vatAmount,
-      purchase: purchase?.purchaseRate ?? 0,
-      return: returnData?.price ?? 0,
-    }
-  })
-
-  const dataSource = sellsToday.map((sell: SellData, index: number) => ({
+  const dataSource = sellsToday?.map((sell: SellData, index: number) => ({
     key: index.toString(),
     no: index + 1,
     id: sell.uniqueId,
@@ -143,32 +114,126 @@ const DailyTransactionChart: FC<Props> = ({ sales, purchases, returns }) => {
     status: 'On Delivery', // You can set the actual status here based on your data
   }))
 
+  // Ensure purchaseInfo is defined and is an array
+  const purchaseInfo = purchases?.purchases || []
+  const returnsInfo = returns?.returns || []
+  const salesData = sales || []
+
+  const purchaseData = purchaseInfo.map((pur: any, i: number) => ({
+    category: `TXN ${i + 1}`,
+    value: pur?.totalPrice,
+  }))
+
+  const returnData = returnsInfo.map((ret: any, i: number) => ({
+    category: `TXN ${i + 1}`,
+    value: ret?.price,
+  }))
+
+  const salesChartData = salesData.map((sale: any, i: number) => ({
+    category: `TXN ${i + 1}`,
+    value: sale?.totalSellPrice,
+  }))
+
+  const series = [
+    {
+      name: 'Purchases',
+      data: purchaseData,
+      color: 'RoyalBlue',
+    },
+    {
+      name: 'Return',
+      data: returnData,
+      color: 'Magenta',
+    },
+    {
+      name: 'Sales',
+      data: salesChartData,
+      color: 'Lime',
+    },
+  ]
+
+  // const series = [
+  //   {
+  //     name: 'Series 1',
+  //     data: [
+  //       { category: 'A', value: Math.random() },
+  //       { category: 'B', value: Math.random() },
+  //       { category: 'C', value: Math.random() },
+  //     ],
+  //   },
+  //   {
+  //     name: 'Series 2',
+  //     data: [
+  //       { category: 'B', value: Math.random() },
+  //       { category: 'C', value: Math.random() },
+  //       { category: 'D', value: Math.random() },
+  //       { category: 'E', value: Math.random() },
+  //       { category: 'F', value: Math.random() },
+  //       { category: 'G', value: Math.random() },
+  //     ],
+  //   },
+  //   {
+  //     name: 'Series 3',
+  //     data: [
+  //       { category: 'C', value: Math.random() },
+  //       { category: 'D', value: Math.random() },
+  //       { category: 'E', value: Math.random() },
+  //     ],
+  //   },
+  // ]
+
   return (
     <>
       <Row gutter={[16, 16]} style={{ marginTop: 16 }}>
         <Col xs={24} sm={24} md={16} lg={16} xl={16}>
           <Card title="Spending Statistic">
-            <ResponsiveContainer width="100%" height={400}>
-              <LineChart
-                data={data || []}
-                margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
-              >
+            {/* <ResponsiveContainer width="100%" height={400}>
+              <LineChart>
                 <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="name" tick={<CustomizedAxisTick />} />
+                <XAxis
+                  dataKey="category"
+                  type="number"
+                  tick={<CustomizedAxisTick />}
+                />
+                <YAxis />
+                <Tooltip />
+                <Legend />
+                {series.map(s => (
+                  <Line
+                    key={s.name}
+                    dataKey="value"
+                    data={s.data}
+                    name={s.name}
+                    // stroke={s.color}
+                    // label={<CustomizedLabel />}
+                  />
+                ))}
+              </LineChart>
+            </ResponsiveContainer> */}
+            <ResponsiveContainer width="100%" height={400}>
+              <LineChart>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis
+                  dataKey="category"
+                  type="category"
+                  allowDuplicatedCategory={false}
+                  tick={<CustomizedAxisTick />}
+                />
                 <YAxis />
                 <Tooltip />
                 <Legend />
 
-                <Line
-                  type="monotone"
-                  dataKey="sales"
-                  stroke="green"
-                  label={<CustomizedLabel />}
-                />
-                <Line type="monotone" dataKey="discount" stroke="orange" />
-                <Line type="monotone" dataKey="purchase" stroke="blue" />
-                <Line type="monotone" dataKey="return" stroke="red" />
-                <Line type="monotone" dataKey="vat" stroke="black" />
+                {series.map(s => (
+                  <Line
+                    // type="monotone"
+                    dataKey="value"
+                    data={s.data}
+                    name={s.name}
+                    key={s.name}
+                    stroke={s.color}
+                    label={<CustomizedLabel />}
+                  />
+                ))}
               </LineChart>
             </ResponsiveContainer>
           </Card>

@@ -149,7 +149,7 @@ function WeeklyTransaction() {
   // Assuming additionalExpense is of type AdditionalExpenseData | undefined
   const expenseAmount = calculateTotalExpense(
     // @ts-ignore
-    additionalExpense?.expenses.length ? additionalExpense.expenses : []
+    additionalExpense?.expenses?.length ? additionalExpense.expenses : []
   )
 
   // calculate profit and cost
