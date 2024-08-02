@@ -1,0 +1,28 @@
+.product-card {
+  text-align: left;
+  margin: 0 auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  width: 100%;
+}
+
+.product-price {
+  display: flex;
+  align-items: flex-start;
+}
+
+.currency {
+  font-size: 22px;
+  color: #ff4d4f !important;
+  margin-right: 4px;
+}
+
+.price {
+  font-size: 48px;
+  color: #ff4d4f !important;
+  margin: 0;
+  line-height: 1;
+  font-weight: 400 !important;
+}

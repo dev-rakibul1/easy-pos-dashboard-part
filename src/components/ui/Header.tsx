@@ -4,20 +4,13 @@ import { authKey } from '@/constants/storageKey'
 import { useGetSingleUserQuery } from '@/redux/api/userApi/userApi'
 import { getUserInfo, isLoggedOut } from '@/services/auth.services'
 import { ITokenObj } from '@/types'
-import { LogoutOutlined, UserOutlined } from '@ant-design/icons'
-import {
-  Avatar,
-  Dropdown,
-  Layout,
-  MenuProps,
-  Row,
-  Space,
-  Spin,
-  Typography,
-} from 'antd'
+import { LogoutOutlined } from '@ant-design/icons'
+import { Dropdown, Layout, MenuProps, Row, Space, Spin, Typography } from 'antd'
+import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { RiProfileLine } from 'react-icons/ri'
+import { ImageStyle } from '../styles/style'
 const { Header: AntdHeader } = Layout
 
 const { Text } = Typography
@@ -91,15 +84,17 @@ const Header = () => {
           {/* <a href=""> */}
           <Space wrap size={16} style={{ cursor: 'pointer' }}>
             {/* <Avatar size="small" icon={<UserOutlined />} /> */}
-
-            <Avatar
-              size={40}
-              icon={<UserOutlined />}
+            <Image
+              width={80}
+              height={80}
+              // layout="responsive"
+              alt="supplier"
               src={
                 data?.profileImage
-                  ? `http://localhost:7000${data?.profileImage}`
-                  : 'https://via.placeholder.com/300'
+                  ? `${data?.profileImage}`
+                  : 'https://via.placeholder.com/80'
               }
+              style={ImageStyle}
             />
           </Space>
           {/* </a> */}

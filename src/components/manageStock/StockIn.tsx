@@ -2,17 +2,31 @@
 
 import ActionBar from '@/components/ui/ActionBar'
 import POSTable from '@/components/ui/POSTable'
+import { currencyName } from '@/constants/global'
+import { useLastStockVariantsQuery } from '@/redux/api/variantApi/variantApi'
 import { getUserInfo } from '@/services/auth.services'
 import { IProduct, IVariant } from '@/types'
+import numberConvert from '@/utils/numberConvert'
 import {
   DeleteOutlined,
   EditOutlined,
   EyeOutlined,
   ReloadOutlined,
 } from '@ant-design/icons'
-import { Button, Input, Tooltip } from 'antd'
+import { Button, Input, Table, Tooltip, Typography } from 'antd'
 import dayjs from 'dayjs'
 import Link from 'next/link'
+import StockChart from './StockChart'
+import './StockStyle.css'
+const { Title, Text } = Typography
+
+export type IPurchaseStockType = {
+  purchaseRate: number
+  sellingPrice: number
+  totalPrice: number
+  quantity: number
+  totalStockPrice: number
+}
 
 type Props = {
   stockIn: IProduct[] | []
@@ -20,8 +34,8 @@ type Props = {
   onPaginationChange: (page: number, pageSize: number) => void
   isLoading: boolean
   searchTerm: string
-  setSearchTerm: any
-  shouldShowResetButton: any
+  setSearchTerm: (value: string) => void
+  shouldShowResetButton: boolean
   limit: number
   onTableChange: (pagination: any, filter: any, sorter: any) => void
 }
@@ -29,7 +43,6 @@ type Props = {
 const StockIn: React.FC<Props> = ({
   stockIn,
   resetFilters,
-
   onPaginationChange,
   isLoading,
   searchTerm,
@@ -39,15 +52,65 @@ const StockIn: React.FC<Props> = ({
   limit,
 }) => {
   const { role } = getUserInfo() as any
+  const total = stockIn?.length || 0
 
-  const total = stockIn?.length
-
-  // const meta = data?.meta
   const meta = {
     total,
     limit: 10,
   }
-  const products = stockIn
+  const products = Array.isArray(stockIn) ? stockIn : []
+
+  const { data } = useLastStockVariantsQuery({ limit: 100 })
+  const info = data?.data
+
+  const finalProduct = info?.map((data: IPurchaseStockType) => {
+    return products?.map((product: IProduct) => ({
+      ...product,
+      _totalStockPrice: data?.totalStockPrice,
+      _PurchasePrice: data?.sellingPrice,
+      _totalPrice: data?.totalPrice,
+    }))
+  })
+
+  // Log the flattened result
+  console.log(finalProduct?.flat())
+  // console.log(purchasePayloads)
+  console.log(data)
+
+  const purchaseRate =
+    data?.data?.reduce(
+      (acc: number, item: IPurchaseStockType) => acc + item.purchaseRate,
+      0
+    ) || 0
+  const totalStockPrice =
+    data?.data?.reduce(
+      (acc: number, item: IPurchaseStockType) => acc + item.totalStockPrice,
+      0
+    ) || 0
+
+  const sellingPrice =
+    data?.data?.reduce(
+      (acc: number, item: IPurchaseStockType) => acc + item.sellingPrice,
+      0
+    ) || 0
+
+  const totalPrice =
+    data?.data?.reduce(
+      (acc: number, item: IPurchaseStockType) => acc + item.totalPrice,
+      0
+    ) || 0
+
+  const quantity = data?.count
+
+  const paymentPayloads = {
+    totalPrice,
+    purchaseRate,
+    sellingPrice,
+    quantity,
+    totalStockPrice,
+  }
+
+  // console.log(finalProduct)
 
   const columns = [
     {
@@ -58,20 +121,41 @@ const StockIn: React.FC<Props> = ({
       title: 'Product Name',
       dataIndex: 'productName',
     },
+
     {
-      title: 'Brand Name',
-      dataIndex: 'brandName',
+      title: 'Stock amount',
+      dataIndex: 'purchases',
+      render: (_: any, record: IProduct) => {
+        const purchase = record.purchases?.[0]
+        return purchase
+          ? purchase.purchaseRate * (record.variants?.length || 1)
+          : 0
+      },
     },
     {
-      title: 'Model Name',
-      dataIndex: 'modelName',
+      title: 'Selling Price',
+      dataIndex: 'purchases',
+      render: (_: any, record: IProduct) => {
+        const purchase = record.purchases?.[0]
+        return purchase
+          ? purchase.sellingPrice * (record.variants?.length || 1)
+          : 0
+      },
+    },
+    {
+      title: 'Total Price',
+      dataIndex: 'purchases',
+      render: (_: any, record: IProduct) => {
+        const purchase = record.purchases?.[0]
+        return purchase ? purchase.totalPrice : 0
+      },
     },
     {
       title: 'Stock',
       dataIndex: 'variants',
       key: 'variants',
       render: (data: IVariant[]) => {
-        return data?.length
+        return data?.length || 0
       },
     },
     {
@@ -79,7 +163,7 @@ const StockIn: React.FC<Props> = ({
       dataIndex: 'createdAt',
       sorter: true,
       render: (data: string) => {
-        return data && dayjs(data).format('D MMM, YYYY hh:mm A')
+        return data ? dayjs(data).format('D MMM, YYYY hh:mm A') : ''
       },
     },
     {
@@ -120,6 +204,17 @@ const StockIn: React.FC<Props> = ({
 
   return (
     <div>
+      <StockChart paymentPayloads={paymentPayloads} />
+
+      <div className="product-card">
+        <div className="product-price">
+          <Text className="currency">{currencyName}</Text>
+          <Title level={1} className="price">
+            {numberConvert(totalStockPrice)}
+          </Title>
+        </div>
+      </div>
+
       <ActionBar title="List of stock in product">
         <Input
           type="text"
@@ -148,6 +243,24 @@ const StockIn: React.FC<Props> = ({
           showSizeChanger={true}
           onPaginationChange={onPaginationChange}
           onTableChange={onTableChange}
+          summary={() => (
+            <Table.Summary.Row>
+              <Table.Summary.Cell index={0}>Total Sum</Table.Summary.Cell>
+              <Table.Summary.Cell index={1} />
+
+              <Table.Summary.Cell index={2}>
+                {totalStockPrice.toFixed(2)}
+              </Table.Summary.Cell>
+              <Table.Summary.Cell index={3}>
+                {sellingPrice.toFixed(2)}
+              </Table.Summary.Cell>
+              <Table.Summary.Cell index={4}>
+                {totalPrice.toFixed(2)}
+              </Table.Summary.Cell>
+
+              <Table.Summary.Cell index={5}>{quantity}</Table.Summary.Cell>
+            </Table.Summary.Row>
+          )}
         />
       </div>
     </div>

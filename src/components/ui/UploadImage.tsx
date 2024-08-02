@@ -76,13 +76,7 @@ const UploadImage = ({ name, label }: IImageUpload) => {
           onChange={handleChange}
         >
           {imageUrl ? (
-            <Image
-              src={imageUrl}
-              alt="avatar"
-              width={100}
-              height={100}
-              style={{ width: '100%' }}
-            />
+            <Image src={imageUrl} alt="avatar" width={120} height={120} />
           ) : (
             uploadButton
           )}

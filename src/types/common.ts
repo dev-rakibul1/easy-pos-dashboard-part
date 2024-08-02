@@ -155,6 +155,20 @@ export type ICustomerPayment = {
   updatedAt: Date
 }
 
+type customerPurchase = {
+  id: string
+  quantity: number
+  totalPurchaseAmounts: number
+  totalDue: number
+  totalPay: number
+  paymentType: string // Add more payment types if needed
+  userId: string
+  customerId: string
+  sellGroupId: string
+  createdAt: string // If you're using a date object, this should be `Date`
+  updatedAt: string // If you're using a date object, this should be `Date`
+}
+
 export type ICustomer = {
   id: string
   firstName: string
@@ -169,7 +183,7 @@ export type ICustomer = {
   uniqueId: string
   purchaseHistory: ISell[]
   payments: ICustomerPayment[]
-
+  customerPurchase: customerPurchase[]
   createdAt: Date
   updatedAt: Date
 }
@@ -351,6 +365,18 @@ export interface ISupplierSells {
   id: string
   quantity: number
   totalSellAmounts: number
+  totalDue: number
+  totalPay: number
+  supplierId: string
+  userId: string
+  productId: string
+  createdAt: string // You can use Date if you prefer handling dates as Date objects
+  updatedAt: string // You can use Date if you prefer handling dates as Date objects
+}
+export interface ICustomerPurchase {
+  id: string
+  quantity: number
+  totalPurchaseAmounts: number
   totalDue: number
   totalPay: number
   supplierId: string

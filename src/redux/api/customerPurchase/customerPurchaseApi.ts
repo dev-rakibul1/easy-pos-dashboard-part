@@ -30,6 +30,15 @@ export const customerPurchasesApi = baseApi.injectEndpoints({
 
       providesTags: [tagTypes.customerPurchase],
     }),
+    // Get customer purchase by user id
+    getCustomerPurchaseByUserId: build.query({
+      query: (id: string) => ({
+        url: `${CUSTOMER_PURCHASE_URL}/get-by-user-id/${id}`,
+        method: 'GET',
+      }),
+
+      providesTags: [tagTypes.customerPurchase],
+    }),
   }),
 })
 
@@ -37,4 +46,5 @@ export const {
   useGetCustomerPurchasesByCustomerAndUserQuery,
   useGetSingleCustomerPurchaseQuery,
   useGetCustomerPurchaseByCurrentDateQuery,
+  useGetCustomerPurchaseByUserIdQuery,
 } = customerPurchasesApi

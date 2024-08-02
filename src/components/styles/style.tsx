@@ -84,3 +84,9 @@ export const warningIconWrap: CSSProperties = {
   justifyContent: 'center',
   alignItems: 'center',
 }
+export const ImageStyle: CSSProperties = {
+  marginBottom: 16,
+  width: '100px !important',
+  borderRadius: '100%',
+  objectFit: 'cover',
+}

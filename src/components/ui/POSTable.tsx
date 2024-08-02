@@ -11,6 +11,7 @@ type IPosTable = {
   onPaginationChange?: (page: number, pageSize: number) => void
   onTableChange?: (pagination: any, filter: any, sorter: any) => void
   showPagination?: boolean
+  summary?: (data: readonly any[]) => React.ReactNode
 }
 
 const POSTable = ({
@@ -23,6 +24,7 @@ const POSTable = ({
   totalPages,
   onPaginationChange,
   onTableChange,
+  summary,
 }: IPosTable) => {
   const paginationConfig = showPagination
     ? {
@@ -42,6 +44,7 @@ const POSTable = ({
       pagination={paginationConfig}
       onChange={onTableChange}
       bordered
+      summary={summary}
     />
   )
 }

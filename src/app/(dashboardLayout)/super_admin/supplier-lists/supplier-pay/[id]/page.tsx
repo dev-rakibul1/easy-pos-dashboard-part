@@ -25,6 +25,7 @@ import {
   Typography,
   message,
 } from 'antd'
+import Image from 'next/image'
 import React, { useEffect, useState } from 'react'
 
 const { Title, Text } = Typography
@@ -287,12 +288,15 @@ const SupplierPayPage: React.FC<Props> = ({ params }) => {
           <Card
             style={{ padding: '15px', position: 'relative' }}
             cover={
-              <img
+              <Image
                 alt="supplier"
+                width={120}
+                height={120}
+                // layout="responsive"
                 src={
                   data?.supplier?.profileImage
-                    ? `http://localhost:7000${data?.supplier?.profileImage}`
-                    : 'https://via.placeholder.com/300'
+                    ? `${data?.supplier?.profileImage}`
+                    : 'https://via.placeholder.com/120'
                 }
                 style={supplierAndCustomerCoverStyle}
               />
@@ -303,11 +307,14 @@ const SupplierPayPage: React.FC<Props> = ({ params }) => {
             onTabChange={onTabChange}
           >
             <div style={{ position: 'relative', zIndex: '10' }}>
-              <img
+              <Image
+                width={120}
+                height={120}
+                // layout="responsive"
                 src={
                   data?.supplier?.profileImage
-                    ? `http://localhost:7000${data?.supplier?.profileImage}`
-                    : 'https://via.placeholder.com/300'
+                    ? `${data?.supplier?.profileImage}`
+                    : 'https://via.placeholder.com/120'
                 }
                 alt=""
                 style={supplierAndCustomerStyle}

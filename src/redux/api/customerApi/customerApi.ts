@@ -63,6 +63,14 @@ export const customerApi = baseApi.injectEndpoints({
       }),
       providesTags: [tagTypes.customer],
     }),
+    // get customer api by user id
+    getCustomerByUserId: build.query({
+      query: (id: string) => ({
+        url: `${CUSTOMER_URL}/get-by-user-id/${id}`,
+        method: 'GET',
+      }),
+      providesTags: [tagTypes.customer],
+    }),
   }),
   overrideExisting: false,
 })
@@ -71,4 +79,5 @@ export const {
   useAddANewCustomerMutation,
   useGetAllCustomerQuery,
   useGetSingleCustomerQuery,
+  useGetCustomerByUserIdQuery,
 } = customerApi

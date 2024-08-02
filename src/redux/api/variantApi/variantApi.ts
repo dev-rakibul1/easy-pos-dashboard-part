@@ -37,6 +37,13 @@ export const variantApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: [tagTypes.variants],
     }),
+    lastStockVariants: build.query({
+      query: () => ({
+        url: `${VARIANT}/last-stock-variants-count/`,
+        method: 'GET',
+      }),
+      providesTags: [tagTypes.variants],
+    }),
   }),
 })
 
@@ -44,4 +51,5 @@ export const {
   useGetAllVariantsQuery,
   useGetSingleVariantQuery,
   useDeleteVariantMutation,
+  useLastStockVariantsQuery,
 } = variantApi

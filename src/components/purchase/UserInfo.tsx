@@ -6,9 +6,7 @@ import { useGetSingleUserQuery } from '@/redux/api/userApi/userApi'
 import { getUserInfo } from '@/services/auth.services'
 import { ISupplierSells } from '@/types'
 import numberConvert from '@/utils/numberConvert'
-import { UserOutlined } from '@ant-design/icons'
 import {
-  Avatar,
   Button,
   Card,
   Col,
@@ -21,10 +19,15 @@ import {
   message,
 } from 'antd'
 import millify from 'millify'
+import Image from 'next/image'
 import { useState } from 'react'
 import { useReactToPrint } from 'react-to-print'
 import DownloadModal from '../downloadModal/DownloadModal'
-import { userInfoSupplierPay, userInfoSupplierSpin } from '../styles/style'
+import {
+  ImageStyle,
+  userInfoSupplierPay,
+  userInfoSupplierSpin,
+} from '../styles/style'
 import { IFormValues } from './Purchase'
 
 const { Item } = Form
@@ -164,16 +167,19 @@ const UserInfo = ({
             <div>
               <Text strong>Seller information</Text>
               <Card style={{ textAlign: 'center', borderRadius: 10 }}>
-                <Avatar
-                  size={120}
-                  icon={<UserOutlined />}
+                <Image
+                  width={120}
+                  height={120}
+                  alt="customer"
+                  // layout="responsive"
                   src={
                     supplier?.profileImage
-                      ? `http://localhost:7000${supplier?.profileImage}`
-                      : 'https://via.placeholder.com/300'
+                      ? `${supplier?.profileImage}`
+                      : 'https://via.placeholder.com/120'
                   }
-                  style={{ marginBottom: 16 }}
+                  style={ImageStyle}
                 />
+
                 <Title level={4} style={{ marginBottom: 0 }}>
                   {`${supplier?.firstName} ${
                     supplier?.middleName ? supplier?.middleName : ''
@@ -233,16 +239,19 @@ const UserInfo = ({
             <div>
               <Text strong>Buyer information</Text>
               <Card style={{ textAlign: 'center', borderRadius: 10 }}>
-                <Avatar
-                  size={120}
-                  icon={<UserOutlined />}
+                <Image
+                  width={120}
+                  height={120}
+                  // layout="responsive"
+                  alt="supplier"
                   src={
                     data?.profileImage
-                      ? `http://localhost:7000${data?.profileImage}`
-                      : 'https://via.placeholder.com/300'
+                      ? `${data?.profileImage}`
+                      : 'https://via.placeholder.com/120'
                   }
-                  style={{ marginBottom: 16 }}
+                  style={ImageStyle}
                 />
+
                 <Title level={4} style={{ marginBottom: 0 }}>
                   {`${data?.firstName} ${data?.middleName} ${data?.lastName}`}
                 </Title>

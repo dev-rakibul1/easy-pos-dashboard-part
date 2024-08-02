@@ -11,7 +11,7 @@ import {
 } from '@/redux/api/brandApi/brandApi'
 import { useDebounced } from '@/redux/hooks'
 import { getUserInfo } from '@/services/auth.services'
-import { IBrandResponse } from '@/types'
+import { IBrandResponse, ITokenObj } from '@/types'
 import { TruncateDescription } from '@/utils/TruncateDescriptions'
 import { DeleteOutlined, EditOutlined, ReloadOutlined } from '@ant-design/icons'
 import { Button, Input, message } from 'antd'
@@ -20,7 +20,7 @@ import Link from 'next/link'
 import { useState } from 'react'
 
 const BrandLists = () => {
-  const { role } = getUserInfo() as any
+  const { role } = getUserInfo() as ITokenObj
   const [page, setPage] = useState<number>(1)
   const [limit, setLimit] = useState<number>(10)
   const [sortBy, setSortBy] = useState<string>('')

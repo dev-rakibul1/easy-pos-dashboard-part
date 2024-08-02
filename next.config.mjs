@@ -1,6 +1,11 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+
     images: {
+
+
+        domains: ['as1.ftcdn.net', "res.cloudinary.com", "via.placeholder.com"],
+
         remotePatterns: [
             {
                 protocol: 'http',

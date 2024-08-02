@@ -23,6 +23,7 @@ import {
   Typography,
   message,
 } from 'antd'
+import Image from 'next/image'
 import React, { useEffect, useState } from 'react'
 import { useCreateCustomerPayInUserMutation } from '../../../../../../redux/api/customerPayInUserApi/customerPayInUserApi'
 const { Item } = Form
@@ -296,12 +297,15 @@ const CustomerPayPage: React.FC<Props> = ({ params }) => {
             style={{ padding: '15px', position: 'relative' }}
             cover={
               // eslint-disable-next-line @next/next/no-img-element
-              <img
+              <Image
                 alt="customer"
+                width={120}
+                height={120}
+                // layout="responsive"
                 src={
                   data?.customer?.profileImage
-                    ? `http://localhost:7000${data?.customer?.profileImage}`
-                    : 'https://via.placeholder.com/300'
+                    ? `${data?.customer?.profileImage}`
+                    : 'https://via.placeholder.com/120'
                 }
                 style={supplierAndCustomerCoverStyle}
               />
@@ -312,11 +316,14 @@ const CustomerPayPage: React.FC<Props> = ({ params }) => {
             onTabChange={onTabChange}
           >
             <div style={{ position: 'relative', zIndex: '10' }}>
-              <img
+              <Image
+                width={120}
+                height={120}
+                // layout="responsive"
                 src={
                   data?.customer?.profileImage
-                    ? `http://localhost:7000${data?.customer?.profileImage}`
-                    : 'https://via.placeholder.com/300'
+                    ? `${data?.customer?.profileImage}`
+                    : 'https://via.placeholder.com/120'
                 }
                 alt=""
                 style={supplierAndCustomerStyle}

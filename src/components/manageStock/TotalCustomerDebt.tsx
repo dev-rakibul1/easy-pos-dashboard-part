@@ -1,11 +1,11 @@
 'use client'
 
 import { currencyName } from '@/constants/global'
-import { useGetSuppliersByUserIdQuery } from '@/redux/api/supplierApi/supplierApi'
-import { useGetSupplierSellsByUserIdQuery } from '@/redux/api/supplierSells/supplierSellApi'
+import { useGetCustomerByUserIdQuery } from '@/redux/api/customerApi/customerApi'
+import { useGetCustomerPurchaseByUserIdQuery } from '@/redux/api/customerPurchase/customerPurchaseApi'
 import { useGetSingleUserQuery } from '@/redux/api/userApi/userApi'
 import { getUserInfo } from '@/services/auth.services'
-import { ISupplier, ISupplierSells, ITokenObj } from '@/types'
+import { ICustomer, ICustomerPurchase, ITokenObj } from '@/types'
 import numberConvert from '@/utils/numberConvert'
 import { EyeOutlined } from '@ant-design/icons'
 import { Button, Row, Table, Tooltip, Typography } from 'antd'
@@ -20,11 +20,11 @@ const TotalCustomerDebt = () => {
   const { data: userInfo } = useGetSingleUserQuery(id)
 
   const userId = userInfo?.id
-  const { data, isLoading } = useGetSupplierSellsByUserIdQuery(userId, {
+  const { data, isLoading } = useGetCustomerPurchaseByUserIdQuery(userId, {
     skip: !userId, // Skip the query if userId is not defined
   })
 
-  const { data: supplierInfo } = useGetSuppliersByUserIdQuery(userId)
+  const { data: customerInfo } = useGetCustomerByUserIdQuery(userId)
 
   const columns = [
     {
@@ -44,8 +44,8 @@ const TotalCustomerDebt = () => {
     },
     {
       title: 'Total Sell Amounts',
-      dataIndex: 'totalSellAmounts',
-      key: 'totalSellAmounts',
+      dataIndex: 'totalPurchaseAmounts',
+      key: 'totalPurchaseAmounts',
     },
     {
       title: 'Total Pay',
@@ -63,7 +63,7 @@ const TotalCustomerDebt = () => {
       render: (data: any) => {
         return (
           <Tooltip title="Details">
-            <Link href={`/${role}/supplier-lists/details/${data?.key}`}>
+            <Link href={`/${role}/customers-list/details/${data?.key}`}>
               <Button style={{ margin: '0 3px' }} size="small" type="text">
                 <EyeOutlined />
               </Button>
@@ -76,20 +76,20 @@ const TotalCustomerDebt = () => {
 
   // Transform the data to be used in the table
   const transformedData =
-    supplierInfo?.map((supplier: ISupplier) => ({
+    customerInfo?.map((supplier: ICustomer) => ({
       key: supplier.id,
       name: `${supplier.firstName} ${supplier.middleName} ${supplier.lastName}`,
       email: supplier.email,
       phoneNo: supplier.phoneNo,
-      totalSellAmounts: supplier.supplierSell?.reduce(
-        (acc, curr) => acc + curr.totalSellAmounts,
+      totalPurchaseAmounts: supplier.customerPurchase?.reduce(
+        (acc, curr) => acc + curr.totalPurchaseAmounts,
         0
       ),
-      totalPay: supplier.supplierSell?.reduce(
+      totalPay: supplier.customerPurchase?.reduce(
         (acc, curr) => acc + curr.totalPay,
         0
       ),
-      totalDue: supplier.supplierSell?.reduce(
+      totalDue: supplier.customerPurchase?.reduce(
         (acc, curr) => acc + curr.totalDue,
         0
       ),
@@ -97,19 +97,19 @@ const TotalCustomerDebt = () => {
 
   const totalPrice =
     data?.reduce(
-      (acc: number, item: ISupplierSells) => acc + item.totalSellAmounts,
+      (acc: number, item: ICustomerPurchase) => acc + item.totalPurchaseAmounts,
       0
     ) || 0
 
   const dueAmount =
     data?.reduce(
-      (acc: number, item: ISupplierSells) => acc + item.totalDue,
+      (acc: number, item: ICustomerPurchase) => acc + item.totalDue,
       0
     ) || 0
 
   const totalPay =
     data?.reduce(
-      (acc: number, item: ISupplierSells) => acc + item.totalPay,
+      (acc: number, item: ICustomerPurchase) => acc + item.totalPay,
       0
     ) || 0
 

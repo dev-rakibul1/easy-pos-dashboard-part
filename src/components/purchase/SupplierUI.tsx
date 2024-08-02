@@ -1,5 +1,6 @@
-import { UserOutlined } from '@ant-design/icons'
-import { Avatar, Card, Col, Descriptions, Divider, Row, Typography } from 'antd'
+import { Card, Col, Descriptions, Divider, Row, Typography } from 'antd'
+import Image from 'next/image'
+import { ImageStyle } from '../styles/style'
 import './PurchaseStyle.css'
 
 const { Title, Text } = Typography
@@ -10,15 +11,17 @@ const SupplierUI = ({ purchase }: any) => {
     <Card className="profile-card" style={{ width: '100%', marginTop: '15px' }}>
       <Row justify="center" align="middle">
         <Col>
-          <Avatar
-            size={120}
-            icon={<UserOutlined />}
+          <Image
+            width={120}
+            height={120}
+            // layout="responsive"
+            alt="supplier"
             src={
               purchase?.suppliers?.profileImage
-                ? `http://localhost:7000${purchase?.suppliers?.profileImage}`
-                : 'https://via.placeholder.com/300'
+                ? `${purchase?.suppliers?.profileImage}`
+                : 'https://via.placeholder.com/120'
             }
-            style={{ marginBottom: 16 }}
+            style={ImageStyle}
           />
         </Col>
       </Row>

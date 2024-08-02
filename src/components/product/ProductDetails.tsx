@@ -1,6 +1,7 @@
 import { HeartOutlined, ShoppingCartOutlined } from '@ant-design/icons'
 import { Button, Card, Col, Descriptions, Image, Row, Typography } from 'antd'
 import 'antd/dist/reset.css' // Import Ant Design styles by default
+// import Image from 'next/image'
 import ActionBar from '../ui/ActionBar'
 import ProductVariants from './ProductVariants'
 
@@ -14,13 +15,16 @@ const ProductDetails = ({ product, variant }: any) => {
           <Card
             cover={
               <Image
+                width={500}
+                height={450}
+                // layout="responsive"
                 alt={product?.productName ? product?.productName : 'N/A'}
                 src={
                   product?.productImage
-                    ? `http://localhost:7000${product?.productImage}`
-                    : 'https://via.placeholder.com/300'
+                    ? `${product?.productImage}`
+                    : 'https://via.placeholder.com/500'
                 }
-                style={{ width: '100%' }}
+                // style={ImageStyle}
               />
             }
           >
@@ -40,9 +44,9 @@ const ProductDetails = ({ product, variant }: any) => {
           <Title level={2}>
             {product?.productName ? product?.productName : 'N/A'}
           </Title>
-          <Paragraph>
+          {/* <Paragraph>
             {product?.description ? product?.description : 'N/A'}
-          </Paragraph>
+          </Paragraph> */}
           <Descriptions bordered column={1} size="small">
             <Descriptions.Item label="Brand">
               {product?.brandName ? product?.brandName : 'N/A'}

@@ -1,6 +1,7 @@
 import { HeartOutlined, ShoppingCartOutlined } from '@ant-design/icons'
 import { Button, Card, Col, Descriptions, Image, Row, Typography } from 'antd'
 import 'antd/dist/reset.css' // Import Ant Design styles by default
+import { ImageStyle } from '../styles/style'
 import SupplierUI from './SupplierUI'
 
 const { Title, Paragraph } = Typography
@@ -13,13 +14,15 @@ const PurchaseDetails = ({ purchase }: any) => {
           <Card
             cover={
               <Image
+                width={120}
+                height={120}
                 alt={purchase?.productName ? purchase?.productName : 'N/A'}
                 src={
                   purchase?.products?.productImage
                     ? `http://localhost:7000${purchase?.products?.productImage}`
-                    : 'https://via.placeholder.com/300'
+                    : 'https://via.placeholder.com/120'
                 }
-                style={{ width: '100%' }}
+                style={ImageStyle}
               />
             }
           >

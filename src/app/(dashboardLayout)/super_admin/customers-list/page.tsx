@@ -89,14 +89,14 @@ const CustomersList = () => {
         return (
           <>
             <Tooltip title="Details">
-              <Link href={`/${role}/customers-list/details/${data.id}`}>
+              <Link href={`/${role}/customers-list/details/${data?.id}`}>
                 <Button style={{ margin: '0 3px' }} size="small" type="text">
                   <EyeOutlined />
                 </Button>
               </Link>
             </Tooltip>
             <Tooltip title="Edit">
-              <Link href={`/${role}/supplier-lists/edit/${data.id}`}>
+              <Link href={`/${role}/supplier-lists/edit/${data?.id}`}>
                 <Button style={{ margin: '0 3px' }} size="small" type="text">
                   <EditOutlined />
                 </Button>
