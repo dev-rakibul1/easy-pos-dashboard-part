@@ -1,3 +1,4 @@
+import { placeholderImage } from '@/utils/placeholderImage/placeholderImage'
 import { Card, Col, Descriptions, Divider, Row, Typography } from 'antd'
 import Image from 'next/image'
 import { ImageStyle, textCapitalize } from '../styles/style'
@@ -25,7 +26,7 @@ const SupplierUI = ({ supplier }: any) => {
               src={
                 supplier?.profileImage
                   ? `${supplier?.profileImage}`
-                  : 'https://via.placeholder.com/120'
+                  : placeholderImage
               }
               style={ImageStyle}
             />

@@ -11,6 +11,7 @@ import { useCreatePayInSupplierMutation } from '@/redux/api/payInSupplier/payInS
 import { useGetSinglePurchaseGroupQuery } from '@/redux/api/purchaseGroup/purchaseGroupApi'
 import { useGetSingleSupplierSellQuery } from '@/redux/api/supplierSells/supplierSellApi'
 import { getUserInfo } from '@/services/auth.services'
+import { placeholderImage } from '@/utils/placeholderImage/placeholderImage'
 import { HomeOutlined, MailOutlined, PhoneOutlined } from '@ant-design/icons'
 import {
   Button,
@@ -296,7 +297,7 @@ const SupplierPayPage: React.FC<Props> = ({ params }) => {
                 src={
                   data?.supplier?.profileImage
                     ? `${data?.supplier?.profileImage}`
-                    : 'https://via.placeholder.com/120'
+                    : placeholderImage
                 }
                 style={supplierAndCustomerCoverStyle}
               />
@@ -314,7 +315,7 @@ const SupplierPayPage: React.FC<Props> = ({ params }) => {
                 src={
                   data?.supplier?.profileImage
                     ? `${data?.supplier?.profileImage}`
-                    : 'https://via.placeholder.com/120'
+                    : placeholderImage
                 }
                 alt=""
                 style={supplierAndCustomerStyle}

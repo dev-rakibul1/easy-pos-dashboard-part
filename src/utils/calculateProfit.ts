@@ -5,8 +5,9 @@ export const calculateProfit = (
   expenseAmount: number = 0 // Default value of 0 for expenseAmount
 ): { profits: number[]; totalProfit: number; totalCost: number } => {
   const profits = sells?.map(sell => {
+    const discountAmount = (sell?.sellingPrice * sell?.discounts) / 100
     const vatAmount = (sell?.sellingPrice * sell?.vats) / 100
-    const balanceAfterVat = sell?.totalSellPrice - vatAmount
+    const balanceAfterVat = sell?.sellingPrice + vatAmount - discountAmount
     const profit = balanceAfterVat - sell?.purchaseRate
     const profitToFixed = parseFloat(profit.toFixed(2))
 

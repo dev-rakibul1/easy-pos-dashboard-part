@@ -9,6 +9,7 @@ const SuperAdminPage = () => {
   const { role, uniqueId: id } = getUserInfo() as any
 
   const { data } = useGetSingleUserQuery(id)
+  console.log(data)
 
   return (
     <div>

@@ -11,6 +11,7 @@ import { useCreateAdditionalMoneyBackToUserMutation } from '@/redux/api/addition
 import { useGetSingleReturnGroupQuery } from '@/redux/api/returnGroupApi/returnGroupApi'
 import { useGetSingleSupplierReturnPaymentQuery } from '@/redux/api/supplierReturnPayment/supplierReturnPayemntApi'
 import { getUserInfo } from '@/services/auth.services'
+import { placeholderImage } from '@/utils/placeholderImage/placeholderImage'
 import { HomeOutlined, MailOutlined, PhoneOutlined } from '@ant-design/icons'
 import {
   Button,
@@ -296,7 +297,7 @@ const ReturnToPay: React.FC<Props> = ({ params }) => {
                 src={
                   data?.user?.profileImage
                     ? `${data?.user?.profileImage}`
-                    : 'https://via.placeholder.com/120'
+                    : placeholderImage
                 }
                 style={supplierAndCustomerCoverStyle}
               />
@@ -314,7 +315,7 @@ const ReturnToPay: React.FC<Props> = ({ params }) => {
                 src={
                   data?.user?.profileImage
                     ? `${data?.user?.profileImage}`
-                    : 'https://via.placeholder.com/120'
+                    : placeholderImage
                 }
                 alt=""
                 style={supplierAndCustomerStyle}

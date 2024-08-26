@@ -209,9 +209,7 @@ const StockIn: React.FC<Props> = ({
       <div className="product-card">
         <div className="product-price">
           <Text className="currency">{currencyName}</Text>
-          <Title level={1} className="price">
-            {numberConvert(totalStockPrice)}
-          </Title>
+          <h1 className="price">{numberConvert(totalStockPrice)}</h1>
         </div>
       </div>
 

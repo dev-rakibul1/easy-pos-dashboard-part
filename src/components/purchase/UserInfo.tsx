@@ -6,6 +6,7 @@ import { useGetSingleUserQuery } from '@/redux/api/userApi/userApi'
 import { getUserInfo } from '@/services/auth.services'
 import { ISupplierSells } from '@/types'
 import numberConvert from '@/utils/numberConvert'
+import { placeholderImage } from '@/utils/placeholderImage/placeholderImage'
 import {
   Button,
   Card,
@@ -175,7 +176,7 @@ const UserInfo = ({
                   src={
                     supplier?.profileImage
                       ? `${supplier?.profileImage}`
-                      : 'https://via.placeholder.com/120'
+                      : placeholderImage
                   }
                   style={ImageStyle}
                 />
@@ -247,7 +248,7 @@ const UserInfo = ({
                   src={
                     data?.profileImage
                       ? `${data?.profileImage}`
-                      : 'https://via.placeholder.com/120'
+                      : placeholderImage
                   }
                   style={ImageStyle}
                 />

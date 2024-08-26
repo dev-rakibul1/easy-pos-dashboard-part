@@ -2,6 +2,7 @@ import { HeartOutlined, ShoppingCartOutlined } from '@ant-design/icons'
 import { Button, Card, Col, Descriptions, Image, Row, Typography } from 'antd'
 import 'antd/dist/reset.css' // Import Ant Design styles by default
 // import Image from 'next/image'
+import { placeholderImage } from '@/utils/placeholderImage/placeholderImage'
 import ActionBar from '../ui/ActionBar'
 import ProductVariants from './ProductVariants'
 
@@ -22,7 +23,7 @@ const ProductDetails = ({ product, variant }: any) => {
                 src={
                   product?.productImage
                     ? `${product?.productImage}`
-                    : 'https://via.placeholder.com/500'
+                    : placeholderImage
                 }
                 // style={ImageStyle}
               />

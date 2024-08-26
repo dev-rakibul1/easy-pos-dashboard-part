@@ -14,7 +14,7 @@ interface IInput {
   validate?: object
   label?: string
   addonAfter?: React.ReactNode
-  required: boolean
+  required?: boolean
 }
 
 const inputStyle = {

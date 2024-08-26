@@ -9,6 +9,7 @@ import { currencyName, payments } from '@/constants/global'
 import { useGetSingleCustomerPurchaseQuery } from '@/redux/api/customerPurchase/customerPurchaseApi'
 import { useGetSingleSellGroupQuery } from '@/redux/api/sellGroups/sellGroupApi'
 import { getUserInfo } from '@/services/auth.services'
+import { placeholderImage } from '@/utils/placeholderImage/placeholderImage'
 import { HomeOutlined, MailOutlined, PhoneOutlined } from '@ant-design/icons'
 import {
   Button,
@@ -305,7 +306,7 @@ const CustomerPayPage: React.FC<Props> = ({ params }) => {
                 src={
                   data?.customer?.profileImage
                     ? `${data?.customer?.profileImage}`
-                    : 'https://via.placeholder.com/120'
+                    : placeholderImage
                 }
                 style={supplierAndCustomerCoverStyle}
               />
@@ -323,7 +324,7 @@ const CustomerPayPage: React.FC<Props> = ({ params }) => {
                 src={
                   data?.customer?.profileImage
                     ? `${data?.customer?.profileImage}`
-                    : 'https://via.placeholder.com/120'
+                    : placeholderImage
                 }
                 alt=""
                 style={supplierAndCustomerStyle}

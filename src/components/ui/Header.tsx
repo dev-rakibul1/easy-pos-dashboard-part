@@ -4,13 +4,13 @@ import { authKey } from '@/constants/storageKey'
 import { useGetSingleUserQuery } from '@/redux/api/userApi/userApi'
 import { getUserInfo, isLoggedOut } from '@/services/auth.services'
 import { ITokenObj } from '@/types'
+import { placeholderImage } from '@/utils/placeholderImage/placeholderImage'
 import { LogoutOutlined } from '@ant-design/icons'
 import { Dropdown, Layout, MenuProps, Row, Space, Spin, Typography } from 'antd'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { RiProfileLine } from 'react-icons/ri'
-import { ImageStyle } from '../styles/style'
 const { Header: AntdHeader } = Layout
 
 const { Text } = Typography
@@ -82,19 +82,32 @@ const Header = () => {
       <Row justify="end" align="middle" style={{ height: '100%' }}>
         <Dropdown menu={{ items }}>
           {/* <a href=""> */}
-          <Space wrap size={16} style={{ cursor: 'pointer' }}>
+          <Space
+            wrap
+            size={16}
+            style={{
+              cursor: 'pointer',
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              lineHeight: '0px !important',
+            }}
+          >
             {/* <Avatar size="small" icon={<UserOutlined />} /> */}
             <Image
-              width={80}
-              height={80}
+              width={40}
+              height={40}
               // layout="responsive"
               alt="supplier"
               src={
-                data?.profileImage
-                  ? `${data?.profileImage}`
-                  : 'https://via.placeholder.com/80'
+                data?.profileImage ? `${data?.profileImage}` : placeholderImage
               }
-              style={ImageStyle}
+              style={{
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                borderRadius: '100%',
+              }}
             />
           </Space>
           {/* </a> */}

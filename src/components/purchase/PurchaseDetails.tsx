@@ -1,6 +1,8 @@
+import { placeholderImage } from '@/utils/placeholderImage/placeholderImage'
 import { HeartOutlined, ShoppingCartOutlined } from '@ant-design/icons'
-import { Button, Card, Col, Descriptions, Image, Row, Typography } from 'antd'
+import { Button, Card, Col, Descriptions, Row, Typography } from 'antd'
 import 'antd/dist/reset.css' // Import Ant Design styles by default
+import Image from 'next/image'
 import { ImageStyle } from '../styles/style'
 import SupplierUI from './SupplierUI'
 
@@ -19,8 +21,8 @@ const PurchaseDetails = ({ purchase }: any) => {
                 alt={purchase?.productName ? purchase?.productName : 'N/A'}
                 src={
                   purchase?.products?.productImage
-                    ? `http://localhost:7000${purchase?.products?.productImage}`
-                    : 'https://via.placeholder.com/120'
+                    ? `${purchase?.products?.productImage}`
+                    : placeholderImage
                 }
                 style={ImageStyle}
               />

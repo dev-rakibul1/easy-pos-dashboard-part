@@ -165,6 +165,7 @@ const ReturnToSupplier = () => {
   }, [selectProduct])
 
   // Create variants info
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   let variantIds = []
   variantIds.push(selectVariant && selectVariant)
 

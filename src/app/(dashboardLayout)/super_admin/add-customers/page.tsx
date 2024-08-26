@@ -95,6 +95,7 @@ const AddCustomers = () => {
                 lg={{ span: 6 }}
               >
                 <FormInput
+                  required
                   type="text"
                   name="firstName"
                   size="large"
@@ -125,6 +126,7 @@ const AddCustomers = () => {
                 lg={{ span: 6 }}
               >
                 <FormInput
+                  required
                   type="text"
                   name="lastName"
                   size="large"
@@ -140,6 +142,7 @@ const AddCustomers = () => {
                 lg={{ span: 6 }}
               >
                 <FormInput
+                  required
                   type="text"
                   name="email"
                   size="large"
@@ -155,6 +158,7 @@ const AddCustomers = () => {
                 lg={{ span: 6 }}
               >
                 <FormInput
+                  required
                   type="number"
                   name="phoneNo"
                   size="large"

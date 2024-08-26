@@ -1,3 +1,4 @@
+import { placeholderImage } from '@/utils/placeholderImage/placeholderImage'
 import { Card, Col, Descriptions, Divider, Row, Typography } from 'antd'
 import Image from 'next/image'
 import { ImageStyle, textCapitalize } from '../styles/style'
@@ -22,11 +23,7 @@ const UserUi = ({ user }: any) => {
               height={120}
               // layout="responsive"
               alt="supplier"
-              src={
-                user?.profileImage
-                  ? `${user?.profileImage}`
-                  : 'https://via.placeholder.com/120'
-              }
+              src={user?.profileImage ? user?.profileImage : placeholderImage}
               style={ImageStyle}
             />
           </Col>

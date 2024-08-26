@@ -1,3 +1,4 @@
+import { placeholderImage } from '@/utils/placeholderImage/placeholderImage'
 import { Card, Col, Descriptions, Divider, Row, Typography } from 'antd'
 import Image from 'next/image'
 import { ImageStyle } from '../styles/style'
@@ -23,7 +24,7 @@ const CustomerUi = ({ customer }: any) => {
               src={
                 customer?.profileImage
                   ? `${customer?.profileImage}`
-                  : 'https://via.placeholder.com/120'
+                  : placeholderImage
               }
               style={ImageStyle}
             />

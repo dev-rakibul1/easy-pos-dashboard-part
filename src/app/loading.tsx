@@ -1,15 +1,14 @@
 'use client'
 
-import { authKey } from '@/constants/storageKey'
 import { getUserInfo } from '@/services/auth.services'
 import { ITokenObj } from '@/types'
 import { Spin } from 'antd'
-import { redirect, useRouter } from 'next/navigation'
+import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 
 const LoadingPage = () => {
   const router = useRouter()
-  const [isLoading, setIsLoading] = useState<boolean>(false)
+  const [isLoading, setIsLoading] = useState<boolean>(true)
   const decoded = getUserInfo() as ITokenObj
 
   const isTokenExpired = (decoded: ITokenObj) => {
@@ -19,24 +18,25 @@ const LoadingPage = () => {
 
   const isTokenExpiredIn = isTokenExpired(decoded)
 
-  // console.log(isTokenExpiredIn)
-
   useEffect(() => {
-    if (isTokenExpiredIn !== true) {
-      return (
-        <div
-          style={{ display: 'grid', placeItems: 'center', minHeight: '100vh' }}
-        >
-          <Spin size="small" />
-        </div>
-      )
+    if (isTokenExpiredIn === true) {
+      router.push('/login')
     } else {
-      return redirect('/login')
+      setIsLoading(false)
     }
-    setIsLoading(true)
-  }, [router, isLoading, isTokenExpiredIn])
+  }, [isTokenExpiredIn, router])
 
-  
+  if (isLoading) {
+    return (
+      <div
+        style={{ display: 'grid', placeItems: 'center', minHeight: '100vh' }}
+      >
+        <Spin size="small" />
+      </div>
+    )
+  }
+
+  return null
 }
 
 export default LoadingPage

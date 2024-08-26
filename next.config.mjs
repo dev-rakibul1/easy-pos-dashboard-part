@@ -1,12 +1,14 @@
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
 
     images: {
 
 
-        domains: ['as1.ftcdn.net', "res.cloudinary.com", "via.placeholder.com"],
+        domains: ["picsum.photos", "placehold.co", 'as1.ftcdn.net', "res.cloudinary.com", "via.placeholder.com", "fastly.picsum.photos"],
 
         remotePatterns: [
+
             {
                 protocol: 'http',
                 hostname: 'localhost',
