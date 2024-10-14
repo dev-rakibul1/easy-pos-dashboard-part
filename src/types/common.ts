@@ -428,3 +428,103 @@ export type ITokenObj = {
   iat: number
   exp: number
 }
+
+// types/warranty.ts
+
+// Customer Type
+export interface Customer {
+  id: string
+  firstName: string
+  middleName: string | null
+  lastName: string
+  email: string
+  phoneNo: string
+  nid: string
+  presentAddress: string
+  permanentAddress: string
+  profileImage: string
+  uniqueId: string
+  createdAt: string
+  updatedAt: string
+}
+
+// User Type
+export interface User {
+  id: string
+  firstName: string
+  middleName: string
+  lastName: string
+  email: string
+  phoneNo: string
+  gender: string
+  nid: string
+  presentAddress: string
+  permanentAddress: string
+  profileImage: string
+  role: string
+  password: string
+  uniqueId: string
+  status: boolean
+  createdAt: string
+  updatedAt: string
+}
+
+// Customer Purchase Variants Type
+export interface CustomerPurchaseVariants {
+  id: string
+  imeiNumber: string
+  ram: string
+  rom: string
+  color: string
+  customerPurchaseProductId: string
+  createdAt: string
+  updatedAt: string
+}
+
+// Customer Purchase Product Type
+export interface CustomerPurchaseProduct {
+  id: string
+  productName: string
+  brandName: string
+  modelName: string
+  processor: string
+  unit: string
+  category: string
+  reOrderAlert: number
+  productImage: string
+  description: string
+  productStock: number | null
+  othersStock: number | null
+  customerId: string
+  userId: string
+  productId: string
+  sellGroupId: string
+  createdAt: string
+  updatedAt: string
+}
+
+// Main Warranty Data Type
+export interface WarrantyData {
+  id: string
+  productName: string
+  modelName: string
+  vats: number
+  discounts: number
+  sellingPrice: number
+  totalSellPrice: number
+  uniqueId: string
+  quantity: number
+  purchaseRate: number
+  variantId: string
+  productId: string
+  customerPurchaseProductId: string
+  customerPurchaseVariantId: string
+  userId: string
+  customerId: string
+  createdAt: string
+  updatedAt: string
+  customer: Customer
+  user: User
+  customerPurchaseVariants: CustomerPurchaseVariants
+  customerPurchaseProduct: CustomerPurchaseProduct
+}

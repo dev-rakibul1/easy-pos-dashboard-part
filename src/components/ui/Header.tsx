@@ -4,13 +4,16 @@ import { authKey } from '@/constants/storageKey'
 import { useGetSingleUserQuery } from '@/redux/api/userApi/userApi'
 import { getUserInfo, isLoggedOut } from '@/services/auth.services'
 import { ITokenObj } from '@/types'
-import { placeholderImage } from '@/utils/placeholderImage/placeholderImage'
 import { LogoutOutlined } from '@ant-design/icons'
-import { Dropdown, Layout, MenuProps, Row, Space, Spin, Typography } from 'antd'
-import Image from 'next/image'
+import { Layout, MenuProps, Row, Spin, Typography } from 'antd'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { RiProfileLine } from 'react-icons/ri'
+import Profile from '../profile/Profile'
+import { NavbarHeaderStyle } from '../styles/style'
+
+import Message from '@/app/(dashboardLayout)/super_admin/message/page'
+import NotificationDropdown from './Notification'
 const { Header: AntdHeader } = Layout
 
 const { Text } = Typography
@@ -71,47 +74,43 @@ const Header = () => {
   ]
 
   return (
-    <AntdHeader
-      style={{
-        backgroundColor: 'rgb(233 233 233)',
-        display: 'flex',
-        justifyContent: 'end',
-        alignItems: 'center',
-      }}
-    >
-      <Row justify="end" align="middle" style={{ height: '100%' }}>
-        <Dropdown menu={{ items }}>
-          {/* <a href=""> */}
-          <Space
-            wrap
-            size={16}
-            style={{
-              cursor: 'pointer',
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'center',
-              lineHeight: '0px !important',
-            }}
-          >
-            {/* <Avatar size="small" icon={<UserOutlined />} /> */}
-            <Image
-              width={40}
-              height={40}
-              // layout="responsive"
-              alt="supplier"
-              src={
-                data?.profileImage ? `${data?.profileImage}` : placeholderImage
-              }
-              style={{
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
-                borderRadius: '100%',
-              }}
-            />
-          </Space>
-          {/* </a> */}
-        </Dropdown>
+    <AntdHeader style={NavbarHeaderStyle}>
+      <Row
+        style={{
+          display: 'flex',
+          justifyContent: 'end',
+          alignItems: 'center',
+          height: '100%',
+          width: '100%',
+        }}
+        // justify="end"
+        // align="middle"
+      >
+        <div
+          style={{
+            height: '100%',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            margin: '0 15px',
+          }}
+        >
+          <Message />
+        </div>
+        <div
+          style={{
+            height: '100%',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            margin: '0 15px',
+          }}
+        >
+          <NotificationDropdown />
+        </div>
+        <div style={{ marginLeft: '15px' }}>
+          <Profile />
+        </div>
       </Row>
     </AntdHeader>
   )

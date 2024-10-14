@@ -90,3 +90,23 @@ export const ImageStyle: CSSProperties = {
   borderRadius: '100%',
   objectFit: 'cover',
 }
+export const NavbarStyle: CSSProperties = {
+  cursor: 'pointer',
+  display: 'flex',
+  justifyContent: 'center',
+  alignItems: 'center',
+  lineHeight: '0px !important',
+  margin: '0 5px',
+}
+export const NavbarDropdown: CSSProperties = {
+  display: 'flex',
+  justifyContent: 'center',
+  alignItems: 'center',
+  borderRadius: '100%',
+}
+export const NavbarHeaderStyle: CSSProperties = {
+  backgroundColor: 'rgb(233 233 233)',
+  display: 'flex',
+  justifyContent: 'end',
+  alignItems: 'center',
+}

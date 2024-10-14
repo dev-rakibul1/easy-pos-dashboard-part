@@ -2,8 +2,8 @@ import LoginInfoPage from '@/components/loginInfo/LoginInfoPage'
 import { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'Login | Easy POS',
-  description: 'Easy pos for mobile shop | login page',
+  title: 'LOGIN | EASY POS',
+  description: 'Easy POS for mobile shop | login page',
 }
 const LoginPage = () => {
   return (

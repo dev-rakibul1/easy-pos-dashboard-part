@@ -5,9 +5,8 @@ import FormInput from '@/components/form/FormInput'
 import { useUserLoginMutation } from '@/redux/api/authApi'
 import { CreateLoginAuthValidation } from '@/schemas/authSchema/login'
 import { storeUserInfo } from '@/services/auth.services'
-import CustomButton from '@/utils/Button'
 import { yupResolver } from '@hookform/resolvers/yup'
-import { Col, Divider, Row, Typography, message } from 'antd'
+import { Button, Col, Divider, Row, Typography, message, theme } from 'antd'
 import { useRouter } from 'next/navigation'
 import { SubmitHandler } from 'react-hook-form'
 
@@ -21,6 +20,7 @@ type IFormValues = {
 const LoginInfoPage = () => {
   const router = useRouter()
   const [userLogin] = useUserLoginMutation()
+  const { token } = theme.useToken();
 
   // Login info
   const onSubmit: SubmitHandler<IFormValues> = async (data: any) => {
@@ -47,7 +47,11 @@ const LoginInfoPage = () => {
           sm={8}
           md={8}
           lg={8}
-          style={{ border: '1px solid #ddd', padding: '15px' }}
+          style={{
+            border: `1px solid ${token.colorBorder}`,
+            padding: '15px',
+            borderRadius: '5px',
+          }}
         >
           <Form
             submitHandler={onSubmit}
@@ -87,9 +91,9 @@ const LoginInfoPage = () => {
               />
             </div>
 
-            <CustomButton htmlType="submit" type="primary">
+            <Button htmlType="submit" type="primary">
               Login
-            </CustomButton>
+            </Button>
           </Form>
         </Col>
       </Row>

@@ -220,7 +220,7 @@ const sidebarItems = (role: string) => {
           icon: <FaArrowRightLong />,
         },
         {
-          label: <Link href={`/${role}/Warranty-list`}>Warranty list</Link>,
+          label: <Link href={`/${role}/warranty-list`}>Warranty list</Link>,
           key: `/${role}/warranty-list`,
           icon: <FaArrowRightLong />,
         },

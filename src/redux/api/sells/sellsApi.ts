@@ -66,6 +66,15 @@ export const sellsApi = baseApi.injectEndpoints({
       }),
       providesTags: [tagTypes.sell],
     }),
+
+    // get sell by imei number api
+    getSellByImeiNumber: build.query({
+      query: (id: string) => ({
+        url: `${SELLS_URL}/warranty/${id}`,
+        method: 'GET',
+      }),
+      providesTags: [tagTypes.sell],
+    }),
   }),
   overrideExisting: false,
 })
@@ -78,4 +87,5 @@ export const {
   useGetSellByCurrentMonthQuery,
   useGetSellByCurrentYearQuery,
   useGetSingleSellQuery,
+  useGetSellByImeiNumberQuery,
 } = sellsApi
