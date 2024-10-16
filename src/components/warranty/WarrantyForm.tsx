@@ -1,5 +1,4 @@
-'use client'
-
+import { useAddANewWarrantyMutation } from '@/redux/api/warranty/warrantyApi'
 import { WarrantyData } from '@/types'
 import {
   Button,
@@ -12,19 +11,22 @@ import {
 } from 'antd'
 import dayjs from 'dayjs'
 import { useEffect, useState } from 'react'
-const { Title } = Typography
 
+const { Title } = Typography
 const { Option } = Select
 
 type IProps = {
   data: WarrantyData
+  setImei: (item: string) => void
 }
 
-const WarrantyForm = ({ data }: IProps) => {
+const WarrantyForm = ({ data, setImei }: IProps) => {
   const [form] = Form.useForm()
   const [loading, setLoading] = useState(false)
 
-  // Use useEffect to set initial form values with the API data
+  const [addANewWarranty] = useAddANewWarrantyMutation()
+
+  // Use useEffect to set form values
   useEffect(() => {
     if (data) {
       form.setFieldsValue({
@@ -33,25 +35,38 @@ const WarrantyForm = ({ data }: IProps) => {
         email: data.customer.email,
         model: `${data.productName} - ${data.modelName}`,
         imei: data.customerPurchaseVariants.imeiNumber,
-        purchaseDate: data.createdAt, // Convert to dayjs object
-        purchasePlace: dayjs(), // Default to current date
+        purchaseDate: data.createdAt,
+        issueSubmitDate: dayjs(),
+        purchasePlace: 'Track For Creativity LLC',
       })
     }
   }, [data, form])
 
-  const handleSubmit = (values: any) => {
-    // Convert the purchasePlace date to the desired format
-    const purchasePlaceDate = values.purchasePlace
-      ? values.purchasePlace.toISOString()
-      : null
+  // Handle form submission
+  const handleSubmit = async (values: any) => {
+    try {
+      const formattedIssueSubmitDate = values.issueSubmitDate
+        ? dayjs(values.issueSubmitDate).toISOString() // Ensure conversion
+        : null
 
-    console.log('Form Submitted:', {
-      ...values,
-      purchasePlace: purchasePlaceDate,
-    })
+      const warrantyInfo = {
+        ...values,
+        issueSubmitDate: formattedIssueSubmitDate,
+      }
 
-    message.success('Warranty claim submitted successfully!')
-    form.resetFields()
+      const res = await addANewWarranty(warrantyInfo)
+
+      if (res.data) {
+        message.success('Warranty claim submitted successfully!')
+        form.resetFields()
+        setImei('')
+      }
+
+      console.log('Form res:', res)
+      console.log('Form Submitted:', warrantyInfo)
+    } catch (error) {
+      message.error('Error submitting the form.')
+    }
   }
 
   return data ? (
@@ -115,20 +130,25 @@ const WarrantyForm = ({ data }: IProps) => {
           { required: true, message: 'Please select the date of purchase' },
         ]}
       >
-        <Input placeholder="Please enter the date of purchase " />
+        <Input placeholder="Date of purchase" />
       </Form.Item>
 
       <Form.Item
-        label="Place of Purchase Date"
+        label="Purchase Place"
         name="purchasePlace"
+        rules={[{ required: true, message: 'Name of purchase place' }]}
+      >
+        <Input placeholder="Enter the purchase place" />
+      </Form.Item>
+
+      <Form.Item
+        label="Issue Submit Date"
+        name="issueSubmitDate"
         rules={[
-          {
-            required: true,
-            message: 'Please enter the place of purchase date',
-          },
+          { required: true, message: 'Please enter the issue submit date' },
         ]}
       >
-        <DatePicker style={{ width: '100%' }} />
+        <DatePicker style={{ width: '100%' }} showTime />
       </Form.Item>
 
       <Form.Item

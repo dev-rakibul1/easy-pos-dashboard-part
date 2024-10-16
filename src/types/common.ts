@@ -528,3 +528,42 @@ export interface WarrantyData {
   customerPurchaseVariants: CustomerPurchaseVariants
   customerPurchaseProduct: CustomerPurchaseProduct
 }
+
+// Warranty Type Definition
+export interface IWarranties {
+  id: string
+  status: boolean
+  uniqueId: string
+  imei: string
+  email: string
+  model: string
+  name: string
+  issueSubmitDate: string
+  phone: string
+  purchaseDate: string
+  purchasePlace: string
+  repairHistory: string
+  issue: string
+  createdAt: string
+  updatedAt: string
+}
+// Warranty Type Definition
+export interface IWarrantiesForm {
+  status: boolean
+  uniqueId: string
+  imei: string
+  email: string
+  model: string
+  name: string
+  issueSubmitDate: Date
+  phone: string
+  purchaseDate: string
+  purchasePlace: string
+  repairHistory: string
+  issue: string
+}
+
+export interface IWarrantiesWithMeta {
+  warranties?: IWarranties[]
+  meta?: IMeta
+}

@@ -26,7 +26,6 @@ const BrandLists = () => {
   const [sortBy, setSortBy] = useState<string>('')
   const [sortOrder, setSortOrder] = useState<string>('')
   const [searchTerm, setSearchTerm] = useState<string>('')
-  // const [deleteId, setDeleteId] = useState<string | null>(null)
 
   //Create Search debouncedTerms
   const debouncedSearchTerm = useDebounced({
