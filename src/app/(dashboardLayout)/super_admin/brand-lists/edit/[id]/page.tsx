@@ -10,6 +10,7 @@ import {
 } from '@/redux/api/brandApi/brandApi'
 import { UpdateBrandYupValidation } from '@/schemas/brandSchema/brandSchema'
 import { getUserInfo } from '@/services/auth.services'
+import { ITokenObj } from '@/types'
 import { yupResolver } from '@hookform/resolvers/yup'
 import { Button, Col, Row, message } from 'antd'
 import { useRouter } from 'next/navigation'
@@ -20,7 +21,7 @@ type IBrandData = {
 }
 
 const BrandEditPage = ({ params }: any) => {
-  const { role } = getUserInfo() as any
+  const { role } = getUserInfo() as ITokenObj
   const { id } = params
   const { data } = useGetSingleBrandQuery(id)
   const [updateBrand] = useUpdateBrandMutation()

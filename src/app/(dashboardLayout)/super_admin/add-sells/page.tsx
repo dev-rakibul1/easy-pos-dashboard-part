@@ -5,10 +5,11 @@ import PosSidebar from '@/components/POS/PosSidebar'
 import PosBreadcrumb from '@/components/breadcrumb/PosBreadcrumb'
 import ActionBar from '@/components/ui/ActionBar'
 import { getUserInfo } from '@/services/auth.services'
+import { ITokenObj } from '@/types'
 import { Col, Row } from 'antd'
 
 const AddSells = () => {
-  const { role } = getUserInfo() as any
+  const { role } = getUserInfo() as ITokenObj
 
   return (
     <div>

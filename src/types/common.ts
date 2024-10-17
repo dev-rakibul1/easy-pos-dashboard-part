@@ -567,3 +567,33 @@ export interface IWarrantiesWithMeta {
   warranties?: IWarranties[]
   meta?: IMeta
 }
+
+export type ShopFormData = {
+  shopName: string
+  location: string
+  owner: string
+  phone: string
+  email: string
+  website?: string
+  hours: any
+  type: string
+  products?: string
+  establishedDate: any
+  aboutShop?: string
+}
+export type IShopFormAPIs = {
+  id: string
+  shopName: string
+  location: string
+  owner: string
+  phone: string
+  email: string
+  website?: string
+  hours: any
+  type: string
+  products?: string
+  establishedDate: any
+  aboutShop?: string
+  createdAt: string
+  updatedAt: string
+}

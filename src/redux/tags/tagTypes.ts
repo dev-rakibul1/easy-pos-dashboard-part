@@ -29,6 +29,7 @@ export enum tagTypes {
   additionalMoneyBack = 'additionalMoneyBack',
   additionalExpense = 'additionalExpense',
   warranty = 'warranty',
+  shop = 'shop',
 }
 
 export const tagTypeLists = [
@@ -63,4 +64,5 @@ export const tagTypeLists = [
   tagTypes.additionalMoneyBack,
   tagTypes.additionalExpense,
   tagTypes.warranty,
+  tagTypes.shop,
 ]

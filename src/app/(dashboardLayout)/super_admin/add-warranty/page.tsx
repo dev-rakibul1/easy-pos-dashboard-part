@@ -5,6 +5,7 @@ import ActionBar from '@/components/ui/ActionBar'
 import WarrantyForm from '@/components/warranty/WarrantyForm'
 import { useGetSellByImeiNumberQuery } from '@/redux/api/sells/sellsApi'
 import { getUserInfo } from '@/services/auth.services'
+import { ITokenObj } from '@/types'
 import { getWarrantyDate } from '@/utils/warranty/warrantyDate'
 import { BarcodeOutlined, SearchOutlined } from '@ant-design/icons'
 import {
@@ -19,19 +20,11 @@ import {
   Typography,
 } from 'antd'
 import dayjs from 'dayjs'
-import React, { useState } from 'react'
+import { useState } from 'react'
 const { Title } = Typography
 
-interface ImeiSearchProps {
-  onSearch: (imei: string) => void
-}
-
-let singleCustomerById = {
-  name: 'ac',
-}
-
-const WarrantyPage: React.FC<ImeiSearchProps> = () => {
-  const { role } = getUserInfo() as any
+const WarrantyPage = () => {
+  const { role } = getUserInfo() as ITokenObj
   const [imei, setImei] = useState<string>('')
   const id = imei
 
@@ -43,8 +36,6 @@ const WarrantyPage: React.FC<ImeiSearchProps> = () => {
       message.error('Invalid IMEI number. Please enter a IMEI number.')
       return
     }
-
-    console.log('Entered IMEI:', imei)
 
     setImei('')
   }

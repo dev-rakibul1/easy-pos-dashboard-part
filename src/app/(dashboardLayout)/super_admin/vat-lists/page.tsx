@@ -11,7 +11,7 @@ import {
 } from '@/redux/api/vatApi/vatApi'
 import { useDebounced } from '@/redux/hooks'
 import { getUserInfo } from '@/services/auth.services'
-import { IVats } from '@/types'
+import { ITokenObj, IVats } from '@/types'
 import { DeleteOutlined, EditOutlined, ReloadOutlined } from '@ant-design/icons'
 import { Button, Input, message } from 'antd'
 import dayjs from 'dayjs'
@@ -19,7 +19,7 @@ import Link from 'next/link'
 import { useState } from 'react'
 
 const VatListPage = () => {
-  const { role } = getUserInfo() as any
+  const { role } = getUserInfo() as ITokenObj
   const [page, setPage] = useState<number>(1)
   const [limit, setLimit] = useState<number>(10)
   const [sortBy, setSortBy] = useState<string>('')

@@ -1,5 +1,6 @@
+import { useGetFirstShopQuery } from '@/redux/api/shop/shopApi'
 import { ICustomer, ISupplier, IUser } from '@/types'
-import { Col, Row, Typography } from 'antd'
+import { Col, Row, Spin, Typography } from 'antd'
 
 const { Title, Text } = Typography
 
@@ -26,19 +27,27 @@ type ReportTitle = {
 }
 
 const ReportTitle = ({ buyer, title, invoiceType }: ReportTitle) => {
+  const { data, isLoading } = useGetFirstShopQuery({ limit: 10 })
+
   return (
     <div>
       <Row gutter={[16, 16]} style={{ textAlign: 'center' }}>
-        <Col span={24}>
-          <Title level={4} style={{ margin: '0', padding: '0' }}>
-            Track For Creativity LLC
-          </Title>
-          <Text>Email: admin@gmail.com</Text>
-          <br />
-          <Text>Phone: +96894803010</Text>
-          <br />
-          <Text>Address: sur souq sultanate of oman</Text>
-        </Col>
+        {isLoading ? (
+          <div>
+            <Spin size="small" />
+          </div>
+        ) : (
+          <Col span={24}>
+            <Title level={4} style={{ margin: '0', padding: '0' }}>
+              {data?.shopName || 'N/A'}
+            </Title>
+            <Text>Email: {data?.email || 'N/A'}</Text>
+            <br />
+            <Text>Phone: {data?.phone || 'N/A'}</Text>
+            <br />
+            <Text>Address: {data?.location || 'N/A'}</Text>
+          </Col>
+        )}
       </Row>
       <div style={{ marginTop: '15px', padding: '0 10px' }}>
         <Col span={24} style={{ textAlign: 'center' }}>

@@ -275,6 +275,13 @@ const sidebarItems = (role: string) => {
       icon: <ReconciliationOutlined />,
       children: [
         {
+          label: (
+            <Link href={`/${role}/shop-information`}>Shop/Company info</Link>
+          ),
+          key: `/${role}/shop-information`,
+          icon: <FaArrowRightLong />,
+        },
+        {
           label: <Link href={`/${role}/sells-report`}>Sells report</Link>,
           key: `/${role}/sells-report`,
           icon: <FaArrowRightLong />,
