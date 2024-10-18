@@ -110,7 +110,7 @@ const Delivery = () => {
 
   return (
     <div>
-      <ActionBar title="Warranty pending list">
+      <ActionBar title="Warranty delivery list">
         <Input
           type="text"
           size="large"

@@ -10,14 +10,9 @@ import {
 } from '@/redux/api/warranty/warrantyApi'
 import { getUserInfo } from '@/services/auth.services'
 import { Tabs, TabsProps, Typography } from 'antd'
-import React from 'react'
 const { Title } = Typography
 
-interface ImeiSearchProps {
-  onSearch: (imei: string) => void
-}
-
-const WarrantyList: React.FC<ImeiSearchProps> = () => {
+const WarrantyList = () => {
   const { role } = getUserInfo() as any
   const { data: pending, isLoading: pLoading } = useGetAllPendingWarrantyQuery({
     limit: 100,
