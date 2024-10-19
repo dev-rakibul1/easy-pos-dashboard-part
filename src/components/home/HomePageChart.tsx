@@ -4,6 +4,7 @@ import { useGetAllAdditionalExpenseByCurrentMonthQuery } from '@/redux/api/addit
 import { useGetAllPurchaseByCurrentMonthQuery } from '@/redux/api/purchaseApi/PurchaseApi'
 import { useGetAllReturnsByCurrentMonthQuery } from '@/redux/api/returnApi/returnApi'
 import { useGetSellByCurrentMonthQuery } from '@/redux/api/sells/sellsApi'
+import { Spin } from 'antd'
 
 import {
   CategoryScale,
@@ -122,18 +123,35 @@ const SalesLineChart = () => {
     }))
   }, [returns])
 
+  // const additionalCost = useMemo<ChartDataPoint[]>(() => {
+  //   if (!additionalExpense?.expenses) return []
+  //   // @ts-ignore
+  //   return additionalExpense?.expenses?.map(
+  //     (data: {
+  //       createdAt: string | number | dayjs.Dayjs | Date | null | undefined
+  //       expenseAmount: any
+  //     }) => ({
+  //       date: dayjs(data.createdAt).format('YYYY-MM-DD'),
+  //       amount: data.expenseAmount,
+  //     })
+  //   )
+  // }, [additionalExpense])
+
+  // @ts-ignore
   const additionalCost = useMemo<ChartDataPoint[]>(() => {
-    if (!additionalExpense?.expenses) return []
+    if (!additionalExpense) return []
     // @ts-ignore
-    return additionalExpense?.expenses?.map(
-      (data: {
-        createdAt: string | number | dayjs.Dayjs | Date | null | undefined
-        expenseAmount: any
-      }) => ({
-        date: dayjs(data.createdAt).format('YYYY-MM-DD'),
-        amount: data.expenseAmount,
-      })
-    )
+    const groupedByDate = additionalExpense?.expenses?.reduce<
+      Record<string, number>
+    >((acc: any, data: IExpense) => {
+      const date = dayjs(data.createdAt).format('YYYY-MM-DD')
+      acc[date] = (acc[date] || 0) + data.expenseAmount
+      return acc
+    }, {})
+    return Object.entries(groupedByDate).map(([date, amount]) => ({
+      date,
+      amount,
+    }))
   }, [additionalExpense])
 
   useEffect(() => {
@@ -170,7 +188,7 @@ const SalesLineChart = () => {
           fill: true,
         },
         {
-          label: 'Returns',
+          label: 'Return',
           data: returnDataset,
           borderColor: 'magenta',
           backgroundColor: 'rgba(255, 0, 255, 0.2)',
@@ -178,7 +196,7 @@ const SalesLineChart = () => {
           fill: true,
         },
         {
-          label: 'Costs',
+          label: 'A. Cost',
           data: costDataset,
           borderColor: 'rgb(250, 84, 28)',
           backgroundColor: 'rgba(250, 84, 28, 0.2)',
@@ -189,7 +207,12 @@ const SalesLineChart = () => {
     })
   }, [salesInfo, purchaseInfo, returnInfo, additionalCost])
 
-  if (!chartData) return <div>Loading...</div>
+  if (!chartData)
+    return (
+      <div>
+        <Spin size="small" />
+      </div>
+    )
 
   return (
     <div>
@@ -220,7 +243,7 @@ const SalesLineChart = () => {
               text: 'Monthly Sales, Purchases, Returns, and Costs',
               color: '#FF6384',
               font: {
-                size: 14,
+                size: 16,
                 // family: 'Arial',
                 weight: 200,
               },
@@ -242,7 +265,9 @@ const SalesLineChart = () => {
                 size: 12,
                 // family: 'Arial',
               },
+              // @ts-ignore
               titleColor: '#FF6384',
+              // @ts-ignore
               bodyColor: '#000',
             },
           },

@@ -4,9 +4,10 @@ import PosBreadcrumb from '@/components/breadcrumb/PosBreadcrumb'
 import ActionBar from '@/components/ui/ActionBar'
 import { useGetSingleUserQuery } from '@/redux/api/userApi/userApi'
 import { getUserInfo } from '@/services/auth.services'
+import { ITokenObj } from '@/types'
 
 const SuperAdminPage = () => {
-  const { role, uniqueId: id } = getUserInfo() as any
+  const { role, uniqueId: id } = getUserInfo() as ITokenObj
 
   const { data } = useGetSingleUserQuery(id)
   console.log(data)

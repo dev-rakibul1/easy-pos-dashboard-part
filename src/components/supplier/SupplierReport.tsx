@@ -4,6 +4,7 @@ import { ISupplier, IVariant } from '@/types'
 import { Col, Row, Spin, Table, Typography } from 'antd'
 import dayjs from 'dayjs'
 import React from 'react'
+import ReportTitle from '../companyReportTitle/ReportTitle'
 import { flexCenter } from '../styles/style'
 
 const { Title, Text } = Typography
@@ -206,48 +207,14 @@ const SupplierInvoice: React.FC<SupplierInvoiceProps> = ({
       style={{ padding: '15px', border: '1px solid #ddd' }}
       ref={componentRef}
     >
-      <Row gutter={[16, 16]} style={{ textAlign: 'center' }}>
-        <Col span={24}>
-          <Title level={4} style={{ margin: '0', padding: '0' }}>
-            Track For Creativity LLC
-          </Title>
-          <Text>Email: admin@gmail.com</Text>
-          <br />
-          <Text>Phone: +96894803010</Text>
-          <br />
-          <Text>Address: sur souq sultanate of oman</Text>
-        </Col>
-      </Row>
-      <div style={{ marginTop: '15px', padding: '0 10px' }}>
-        <Col span={24} style={{ textAlign: 'center' }}>
-          <Title level={4}>TAX INVOICE</Title>
-        </Col>
-        <Row gutter={[16, 16]} style={{ border: '1px solid #ddd' }}>
-          <Col span={12}>
-            <Text strong>Supplier Info</Text>
-            <br />
-            <Text>Name: {supplier?.firstName}</Text>
-            <br />
-            <Text>Phone: {supplier?.phoneNo}</Text>
-            <br />
-            <Text>Email: {supplier?.email}</Text>
-            <br />
-            <Text>Address: {supplier?.presentAddress}</Text>
-          </Col>
-          <Col span={12} style={{ borderLeft: '1px solid #ddd' }}>
-            <Text strong>Invoice Info</Text>
-            <br />
-            <Text>Invoice No: {data?.uniqueId}</Text>
-            <br />
-            <Text>
-              Invoice Date:{' '}
-              {dayjs(data.createdAt).format('D MMM, YYYY, hh:mm A')}
-            </Text>
-            <br />
-            {/* <Text>Due Pay Date: </Text> */}
-          </Col>
-        </Row>
-      </div>
+      <ReportTitle
+        buyer={supplier}
+        title="Supplier information"
+        invoiceType="Purchase invoice"
+        invoiceNo={data?.uniqueId}
+        invoiceDate={data?.createdAt}
+      />
+
       <Table
         style={{ marginTop: '15px' }}
         dataSource={dataSource}

@@ -1,6 +1,7 @@
 import { useGetFirstShopQuery } from '@/redux/api/shop/shopApi'
 import { ICustomer, ISupplier, IUser } from '@/types'
 import { Col, Row, Spin, Typography } from 'antd'
+import dayjs from 'dayjs'
 
 const { Title, Text } = Typography
 
@@ -24,9 +25,17 @@ type ReportTitle = {
   buyer: IUser | ICustomer | ISupplier
   title: string
   invoiceType: string
+  invoiceNo?: string
+  invoiceDate?: string
 }
 
-const ReportTitle = ({ buyer, title, invoiceType }: ReportTitle) => {
+const ReportTitle = ({
+  buyer,
+  title,
+  invoiceType,
+  invoiceDate,
+  invoiceNo,
+}: ReportTitle) => {
   const { data, isLoading } = useGetFirstShopQuery({ limit: 10 })
 
   return (
@@ -69,11 +78,16 @@ const ReportTitle = ({ buyer, title, invoiceType }: ReportTitle) => {
           </Col>
           <Col span={12} style={{ borderLeft: '1px solid #ddd' }}>
             <Text strong>Invoice Info</Text>
-
             <br />
-            <Text>Invoice Date: {getCurrentDateTime()}</Text>
+            {invoiceNo && <Text>Invoice No: {invoiceNo}</Text>}
             <br />
-            {/* <Text>Due Pay Date: </Text> */}
+            <Text>
+              Invoice Date:{' '}
+              {invoiceDate
+                ? dayjs(invoiceDate).format('D MMM, YYYY hh:mm A')
+                : getCurrentDateTime()}
+            </Text>
+            <br />
           </Col>
         </Row>
       </div>

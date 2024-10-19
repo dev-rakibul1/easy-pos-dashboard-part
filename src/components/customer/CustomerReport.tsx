@@ -7,6 +7,7 @@ import { Col, Row, Spin, Table, Typography } from 'antd'
 import { ColumnsType } from 'antd/es/table'
 import dayjs from 'dayjs'
 import React from 'react'
+import ReportTitle from '../companyReportTitle/ReportTitle'
 import { flexCenter } from '../styles/style'
 
 const { Title, Text } = Typography
@@ -242,48 +243,13 @@ const CustomerReport: React.FC<SupplierInvoiceProps> = ({
       className="invoice-container"
       style={{ padding: '15px', border: '1px solid #ddd' }}
     >
-      <Row gutter={[16, 16]} style={{ textAlign: 'center' }}>
-        <Col span={24}>
-          <Title level={4} style={{ margin: '0', padding: '0' }}>
-            Track For Creativity LLC
-          </Title>
-          <Text>Email: admin@gmail.com</Text>
-          <br />
-          <Text>Phone: +96894803010</Text>
-          <br />
-          <Text>Address: sur souq sultanate of oman</Text>
-        </Col>
-      </Row>
-      <div style={{ marginTop: '15px', padding: '0 10px' }}>
-        <Col span={24} style={{ textAlign: 'center' }}>
-          <Title level={4}>TAX INVOICE</Title>
-        </Col>
-        <Row gutter={[16, 16]} style={{ border: '1px solid #ddd' }}>
-          <Col span={12}>
-            <Text strong>Customer Information</Text>
-            <br />
-            <Text>Name: {customer?.firstName}</Text>
-            <br />
-            <Text>Phone: {customer?.phoneNo}</Text>
-            <br />
-            <Text>Email: {customer?.email}</Text>
-            <br />
-            <Text>Address: {customer?.presentAddress}</Text>
-          </Col>
-          <Col span={12} style={{ borderLeft: '1px solid #ddd' }}>
-            <Text strong>Invoice Information</Text>
-            <br />
-            <Text>Invoice No: {data?.uniqueId}</Text>
-            <br />
-            <Text>
-              Invoice Date:{' '}
-              {dayjs(data.createdAt).format('D MMM, YYYY, hh:mm A')}
-            </Text>
-            <br />
-            {/* <Text>Due Pay Date: </Text> */}
-          </Col>
-        </Row>
-      </div>
+      <ReportTitle
+        buyer={customer}
+        title="Customer information"
+        invoiceType="Selling invoice"
+        invoiceNo={data?.uniqueId}
+        invoiceDate={data?.createdAt}
+      />
 
       <div style={{ marginTop: '15x' }}>
         <Table
