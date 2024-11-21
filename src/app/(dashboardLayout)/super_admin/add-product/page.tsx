@@ -61,9 +61,11 @@ const FormSunEditor = ({ name, label }: any) => {
 
 const AddProduct = () => {
   const { role } = getUserInfo() as any
+  const [responseServerError, setResponseServerError] = useState('')
   const methods = useForm()
-  const [addANewProduct] = useAddANewProductMutation()
   const [form] = AntdForm.useForm()
+  const [addANewProduct, { isLoading, isError, error, data, isSuccess }] =
+    useAddANewProductMutation()
 
   const onSubmit = async (values: any) => {
     const obj = { ...values }
@@ -73,21 +75,58 @@ const AddProduct = () => {
     const formData = new FormData()
     formData.append('file', file as Blob)
     formData.append('data', data)
-    // console.log(file)
+
     message.loading({ content: 'Creating product...', key: 'creating' })
+
     try {
       const res = await addANewProduct(formData)
+      console.log(res)
 
-      if (res.data) {
+      if (res?.data) {
         message.success('Product created successfully!')
-        form.resetFields()
+        form.resetFields() // Reset form if needed
       } else {
-        message.error('Product created fail!')
+        message.error('Product creation failed!')
       }
     } catch (error: any) {
-      console.error(error.message)
+      console.error('Error occurred:', error)
+      message.error('An error occurred while creating the product.')
     }
   }
+
+  // useEffect(() => {
+  //   if (isError && error) {
+  //     let errorMessage = 'Something went wrong' // Default error message
+
+  //     // RTK Query can return errors in various ways. Check how your server sends them.
+  //     if (error?.data) {
+  //       // Assuming the error structure returned from your API
+  //       const serverError = error.data
+  //       errorMessage = serverError.message || 'Unknown server error'
+
+  //       // If you have validation errors, display them
+  //       if (
+  //         serverError?.errorMessages &&
+  //         serverError?.errorMessages.length > 0
+  //       ) {
+  //         errorMessage = serverError.errorMessages
+  //           .map(
+  //             (err: { path: string; message: string }) =>
+  //               `${err.path}: ${err.message}`
+  //           )
+  //           .join(', ')
+  //       }
+  //     } else if (error?.error) {
+  //       // Handle more generic errors (like network errors)
+  //       errorMessage = error.error
+  //     }
+
+  //     console.log('Extracted error message:', errorMessage)
+  //     message.error(errorMessage) // Display error in a message
+  //   }
+  // }, [isError, error])
+
+  // console.log(isError, error)
 
   // Fetch options for selects
   const { data: unitData } = useGetAllUnitQuery({ limit: 100, page: 1 })

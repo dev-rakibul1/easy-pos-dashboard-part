@@ -1,4 +1,5 @@
 'use client'
+import { ordersData } from '@/constants/global'
 import { ShoppingCartOutlined } from '@ant-design/icons'
 import {
   Avatar,
@@ -18,34 +19,6 @@ import HomeDailyChart from './homeChart/DailyChart'
 
 const { Content } = Layout
 const { Title, Text } = Typography
-
-// Sample data for orders
-const ordersData = [
-  {
-    key: '1',
-    customer: {
-      name: 'John Doe',
-      image: 'https://randomuser.me/api/portraits/men/32.jpg',
-    },
-    orderId: '1001',
-    status: 'Pending',
-    totalItems: 5,
-    price: 250,
-    orderDate: '2024-10-18T10:30:00',
-  },
-  {
-    key: '2',
-    customer: {
-      name: 'Jane Smith',
-      image: 'https://randomuser.me/api/portraits/women/44.jpg',
-    },
-    orderId: '1002',
-    status: 'On Hold',
-    totalItems: 3,
-    price: 150,
-    orderDate: '2024-10-17T12:00:00',
-  },
-]
 
 // Table columns configuration
 const columns: ColumnsType<any> = [

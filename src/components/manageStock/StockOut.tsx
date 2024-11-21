@@ -3,7 +3,7 @@
 import ActionBar from '@/components/ui/ActionBar'
 import POSTable from '@/components/ui/POSTable'
 import { getUserInfo } from '@/services/auth.services'
-import { IProduct, IVariant } from '@/types'
+import { IMeta, IProduct, IVariant } from '@/types'
 import {
   DeleteOutlined,
   EditOutlined,
@@ -15,7 +15,8 @@ import dayjs from 'dayjs'
 import Link from 'next/link'
 
 type Props = {
-  stockOut: IProduct[] | []
+  data: IProduct[] | []
+  meta: IMeta
   resetFilters: () => void
   onPaginationChange: (page: number, pageSize: number) => void
   isLoading: boolean
@@ -27,7 +28,6 @@ type Props = {
 }
 
 const StockOut: React.FC<Props> = ({
-  stockOut,
   resetFilters,
   onPaginationChange,
   isLoading,
@@ -36,17 +36,13 @@ const StockOut: React.FC<Props> = ({
   shouldShowResetButton,
   onTableChange,
   limit,
+  data,
+  meta,
 }) => {
   const { role } = getUserInfo() as any
 
-  const total = stockOut?.length
-
-  // const meta = data?.meta
-  const meta = {
-    total,
-    limit: 10,
-  }
-  const products = stockOut
+  // @ts-ignore
+  const products = data?.products
 
   const columns = [
     {
@@ -142,7 +138,7 @@ const StockOut: React.FC<Props> = ({
           loading={isLoading}
           columns={columns}
           dataSource={products}
-          pageSize={limit}
+          pageSize={meta?.limit ? Number(meta?.limit) : 0}
           totalPages={meta?.total ? Number(meta.total) : 0}
           showSizeChanger={true}
           onPaginationChange={onPaginationChange}

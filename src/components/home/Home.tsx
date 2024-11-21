@@ -6,6 +6,7 @@ import {
   ShopOutlined,
 } from '@ant-design/icons'
 
+// @ts-ignore
 import { ProfitAndCost } from '@/app/(dashboardLayout)/super_admin/monthly-transaction/page'
 import { currencyName } from '@/constants/global'
 import { useGetAllAdditionalExpenseByCurrentMonthQuery } from '@/redux/api/additionalExpense/additionalExpenseApi'
@@ -93,6 +94,7 @@ const HomeDesign: React.FC = () => {
 
   // Accumulate VAT, Discount, and Selling Price
   const totalPurchasePriceWithVatsDiscounts =
+    // @ts-ignore
     purchaseInfo?.reduce(
       (acc: any, item: any) => acc + (item?.totalPrice || 0),
       0
@@ -100,6 +102,7 @@ const HomeDesign: React.FC = () => {
 
   // Calculate VAT and Discount
   const calculatePurchaseVatDiscount =
+    // @ts-ignore
     purchaseCalculatePriceWithVAT(purchaseInfo)
 
   const purchaseTotals = purchaseGroupsInfo?.reduce(
@@ -113,6 +116,7 @@ const HomeDesign: React.FC = () => {
   )
 
   const totalPurchase =
+    // @ts-ignore
     purchaseInfo?.reduce(
       (acc: any, item: any) => acc + (item?.purchaseRate || 0),
       0

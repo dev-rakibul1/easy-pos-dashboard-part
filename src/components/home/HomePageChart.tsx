@@ -32,7 +32,7 @@ ChartJS.register(
 )
 
 // Helper function: Generate an array of dates for the current month
-const getDaysInMonth = () => {
+export const getDaysInMonth = () => {
   const now = dayjs()
   const daysInMonth = now.daysInMonth()
   return Array.from({ length: daysInMonth }, (_, i) =>
@@ -42,7 +42,7 @@ const getDaysInMonth = () => {
 
 // Define type for chart data points
 // Type for individual chart data points
-interface ChartDataPoint {
+export interface ChartDataPoint {
   date: string
   amount: number
 }
@@ -122,20 +122,6 @@ const SalesLineChart = () => {
       amount: data.price,
     }))
   }, [returns])
-
-  // const additionalCost = useMemo<ChartDataPoint[]>(() => {
-  //   if (!additionalExpense?.expenses) return []
-  //   // @ts-ignore
-  //   return additionalExpense?.expenses?.map(
-  //     (data: {
-  //       createdAt: string | number | dayjs.Dayjs | Date | null | undefined
-  //       expenseAmount: any
-  //     }) => ({
-  //       date: dayjs(data.createdAt).format('YYYY-MM-DD'),
-  //       amount: data.expenseAmount,
-  //     })
-  //   )
-  // }, [additionalExpense])
 
   // @ts-ignore
   const additionalCost = useMemo<ChartDataPoint[]>(() => {

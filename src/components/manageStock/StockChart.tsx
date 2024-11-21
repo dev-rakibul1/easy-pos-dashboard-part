@@ -21,7 +21,7 @@ const StockChart = ({ paymentPayloads: amount }: Props) => {
         <Pie
           data={data}
           dataKey="value"
-          startAngle={180}
+          startAngle={360}
           endAngle={0}
           cx="50%"
           cy="50%"

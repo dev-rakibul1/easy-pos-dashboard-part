@@ -5,6 +5,7 @@ import PosBreadcrumb from '@/components/breadcrumb/PosBreadcrumb'
 import ActionBar from '@/components/ui/ActionBar'
 import { useAddANewAdditionalExpenseMutation } from '@/redux/api/additionalExpense/additionalExpenseApi'
 import { getUserInfo } from '@/services/auth.services'
+import { ITokenObj } from '@/types'
 import { Button, Form, Input, InputNumber, message } from 'antd'
 import { useRouter } from 'next/navigation'
 
@@ -14,7 +15,7 @@ type IExpenseResponse = {
 }
 
 const AdditionalExpense = () => {
-  const { role } = getUserInfo() as any
+  const { role } = getUserInfo() as ITokenObj
   const [addANewAdditionalExpense] = useAddANewAdditionalExpenseMutation()
   const [form] = Form.useForm()
 

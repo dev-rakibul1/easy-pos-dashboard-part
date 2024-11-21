@@ -13,7 +13,7 @@ import {
   EyeOutlined,
   ReloadOutlined,
 } from '@ant-design/icons'
-import { Button, Input, Table, Tooltip, Typography } from 'antd'
+import { Button, Col, Input, Row, Table, Tooltip, Typography } from 'antd'
 import dayjs from 'dayjs'
 import Link from 'next/link'
 import StockChart from './StockChart'
@@ -29,7 +29,7 @@ export type IPurchaseStockType = {
 }
 
 type Props = {
-  stockIn: IProduct[] | []
+  data: IProduct[] | []
   resetFilters: () => void
   onPaginationChange: (page: number, pageSize: number) => void
   isLoading: boolean
@@ -41,7 +41,7 @@ type Props = {
 }
 
 const StockIn: React.FC<Props> = ({
-  stockIn,
+  data,
   resetFilters,
   onPaginationChange,
   isLoading,
@@ -52,16 +52,17 @@ const StockIn: React.FC<Props> = ({
   limit,
 }) => {
   const { role } = getUserInfo() as any
-  const total = stockIn?.length || 0
+  const total = data?.length || 0
 
   const meta = {
     total,
     limit: 10,
   }
-  const products = Array.isArray(stockIn) ? stockIn : []
+  const products = Array.isArray(data) ? data : []
 
-  const { data } = useLastStockVariantsQuery({ limit: 100 })
-  const info = data?.data
+  const { data: variantQ } = useLastStockVariantsQuery({ limit: 100 })
+  const info = variantQ?.data
+  // console.log(info)
 
   const finalProduct = info?.map((data: IPurchaseStockType) => {
     return products?.map((product: IProduct) => ({
@@ -73,34 +74,88 @@ const StockIn: React.FC<Props> = ({
   })
 
   // Log the flattened result
-  console.log(finalProduct?.flat())
-  // console.log(purchasePayloads)
-  console.log(data)
+  // console.log(finalProduct?.flat())
+  // // console.log(purchasePayloads)
+  // console.log(data)
+
+  // -------------------------------------
+  // demo
+  // console.log(products)
+  const uniqueIds = new Set()
+
+  // Filter products to only those with non-empty variants arrays
+  const isStockInProduct = products.filter(pro => pro.variants?.length! > 0)
+
+  // Collect all unique purchase IDs
+  isStockInProduct?.forEach(pro => {
+    pro.variants?.forEach(va => {
+      uniqueIds.add(va.purchaseId)
+    })
+  })
+
+  // Convert the Set to an array if needed
+  const uniqueIdsArray = Array.from(uniqueIds)
+  // console.log(uniqueIdsArray)
+
+  // Map over each unique ID and count occurrences in the variants
+  const idsCount = uniqueIdsArray
+    .map(id => {
+      let count = 0
+
+      // Count how many times the current ID appears in all variants
+      products?.forEach(pro => {
+        count += pro.variants?.filter(va => va.purchaseId === id).length || 0
+      })
+
+      return count > 0 ? { id, count } : null
+    })
+    .filter(Boolean) // Remove any null entries where count was 0
+
+  // console.log(idsCount)
+
+  const getActualStockIn = products?.filter(pro =>
+    pro.purchases?.map(pur => {
+      idsCount?.map(match => match?.id === pur.id)
+    })
+  )
+
+  getActualStockIn.map(product => {
+    const lent = product.variants?.length
+    product.purchases?.map(pur => {
+      const singlePrice = pur.totalPrice / pur.totalStock
+      const lastStockPrice = singlePrice * lent || 0
+      // console.log(lastStockPrice)
+    })
+  })
+
+  // console.log(getActualStockIn)
+
+  // -------------------------------------
 
   const purchaseRate =
-    data?.data?.reduce(
+    variantQ?.data?.reduce(
       (acc: number, item: IPurchaseStockType) => acc + item.purchaseRate,
       0
     ) || 0
   const totalStockPrice =
-    data?.data?.reduce(
+    variantQ?.data?.reduce(
       (acc: number, item: IPurchaseStockType) => acc + item.totalStockPrice,
       0
     ) || 0
 
   const sellingPrice =
-    data?.data?.reduce(
+    variantQ?.data?.reduce(
       (acc: number, item: IPurchaseStockType) => acc + item.sellingPrice,
       0
     ) || 0
 
   const totalPrice =
-    data?.data?.reduce(
+    variantQ?.data?.reduce(
       (acc: number, item: IPurchaseStockType) => acc + item.totalPrice,
       0
     ) || 0
 
-  const quantity = data?.count
+  const quantity = variantQ?.count
 
   const paymentPayloads = {
     totalPrice,
@@ -202,65 +257,80 @@ const StockIn: React.FC<Props> = ({
     },
   ]
 
+  // console.log(products)
+
   return (
     <div>
-      <StockChart paymentPayloads={paymentPayloads} />
+      <Row
+        gutter={16}
+        style={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'end',
+        }}
+      >
+        {/* ActionBar, Product Card, and Search Input */}
+        <Col xs={24} md={12}>
+          <div className="product-card" style={{ marginBottom: '60px' }}>
+            <div className="product-price">
+              <Text className="currency">{currencyName}</Text>
+              <h1 className="price">{numberConvert(totalStockPrice)}</h1>
+            </div>
+          </div>
+          <ActionBar title="List of stock in product">
+            <Input
+              type="text"
+              size="large"
+              placeholder="Search..."
+              value={searchTerm}
+              style={{ width: '100%', marginTop: '10px' }}
+              onChange={event => setSearchTerm(event.target.value)}
+            />
+            {shouldShowResetButton && (
+              <Button type="primary" onClick={resetFilters}>
+                <ReloadOutlined />
+              </Button>
+            )}
+          </ActionBar>
+        </Col>
 
-      <div className="product-card">
-        <div className="product-price">
-          <Text className="currency">{currencyName}</Text>
-          <h1 className="price">{numberConvert(totalStockPrice)}</h1>
-        </div>
-      </div>
+        {/* StockChart */}
+        <Col xs={24} md={12}>
+          <StockChart paymentPayloads={paymentPayloads} />
+        </Col>
+      </Row>
 
-      <ActionBar title="List of stock in product">
-        <Input
-          type="text"
-          size="large"
-          placeholder="Search..."
-          value={searchTerm}
-          style={{ width: '50%', maxWidth: '100%', marginTop: '10px' }}
-          onChange={event => setSearchTerm(event.target.value)}
-        />
-        <div>
-          {shouldShowResetButton ? (
-            <Button type="primary" onClick={resetFilters}>
-              <ReloadOutlined />
-            </Button>
-          ) : null}
-        </div>
-      </ActionBar>
-
-      <div style={{ marginTop: '15px' }}>
-        <POSTable
-          loading={isLoading}
-          columns={columns}
-          dataSource={products}
-          pageSize={limit}
-          totalPages={meta?.total ? Number(meta.total) : 0}
-          showSizeChanger={true}
-          onPaginationChange={onPaginationChange}
-          onTableChange={onTableChange}
-          summary={() => (
-            <Table.Summary.Row>
-              <Table.Summary.Cell index={0}>Total Sum</Table.Summary.Cell>
-              <Table.Summary.Cell index={1} />
-
-              <Table.Summary.Cell index={2}>
-                {totalStockPrice.toFixed(2)}
-              </Table.Summary.Cell>
-              <Table.Summary.Cell index={3}>
-                {sellingPrice.toFixed(2)}
-              </Table.Summary.Cell>
-              <Table.Summary.Cell index={4}>
-                {totalPrice.toFixed(2)}
-              </Table.Summary.Cell>
-
-              <Table.Summary.Cell index={5}>{quantity}</Table.Summary.Cell>
-            </Table.Summary.Row>
-          )}
-        />
-      </div>
+      {/* Table with responsive adjustments */}
+      <Row style={{ marginTop: '15px' }}>
+        <Col xs={24}>
+          <POSTable
+            loading={isLoading}
+            columns={columns}
+            dataSource={products}
+            pageSize={limit}
+            totalPages={meta?.total ? Number(meta.total) : 0}
+            showSizeChanger={true}
+            onPaginationChange={onPaginationChange}
+            onTableChange={onTableChange}
+            summary={() => (
+              <Table.Summary.Row>
+                <Table.Summary.Cell index={0}>Total Sum</Table.Summary.Cell>
+                <Table.Summary.Cell index={1} />
+                <Table.Summary.Cell index={2}>
+                  {totalStockPrice.toFixed(2)}
+                </Table.Summary.Cell>
+                <Table.Summary.Cell index={3}>
+                  {sellingPrice.toFixed(2)}
+                </Table.Summary.Cell>
+                <Table.Summary.Cell index={4}>
+                  {totalPrice.toFixed(2)}
+                </Table.Summary.Cell>
+                <Table.Summary.Cell index={5}>{quantity}</Table.Summary.Cell>
+              </Table.Summary.Row>
+            )}
+          />
+        </Col>
+      </Row>
     </div>
   )
 }

@@ -22,8 +22,9 @@ instance.interceptors.request.use(
     return config
   },
   function (error) {
+    return error
     // Do something with request error
-    return Promise.reject(error)
+    // return Promise.reject(error)
   }
 )
 
@@ -46,11 +47,20 @@ instance.interceptors.response.use(
     // Do something with response error
 
     const responseObject: IGenericErrorResponse = {
-      statusCode: error?.message?.data?.statusCode || 500,
-      message: error?.message?.data?.message || 'Something went wrong.',
-      errorMessages: error?.message?.data?.errorMessages,
+      statusCode: error?.response?.data?.statusCode || 500,
+      message: error?.response?.data?.message || 'Something went wrong.',
+      errorMessages: error?.response?.data?.errorMessages || [],
+      messageType: error?.response?.data?.errorMessages || [],
+      success: error?.response?.data?.success || false,
+      error: error?.response,
     }
-    return responseObject
+
+    return {
+      // message: responseObject,
+      error: Promise.reject({ responseObject }),
+      // error_22: error,
+    }
+
     // return Promise.reject(error)
   }
 )

@@ -18,6 +18,9 @@ export type IGenericErrorResponse = {
   statusCode: number
   message: string
   errorMessages: IGenericErrorMessage[]
+  messageType?: string
+  success?: boolean
+  error?: any
 }
 
 export type IUnitDataResponse = {
@@ -52,6 +55,7 @@ export type ICategoryResponse = {
 }
 
 export type IVariant = {
+  purchaseId: string
   id: string
   imeiNumber: string
   ram: string

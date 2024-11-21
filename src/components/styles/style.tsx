@@ -105,7 +105,6 @@ export const NavbarDropdown: CSSProperties = {
   borderRadius: '100%',
 }
 export const NavbarHeaderStyle: CSSProperties = {
-  backgroundColor: 'rgb(233 233 233)',
   display: 'flex',
   justifyContent: 'end',
   alignItems: 'center',

@@ -1,0 +1,13 @@
+/* ------------LOGO----------- */
+.logoContainer {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1px;
+  transform: rotate(45deg);
+  width: 16px;
+}
+
+.square {
+  width: 8px;
+  height: 8px;
+}

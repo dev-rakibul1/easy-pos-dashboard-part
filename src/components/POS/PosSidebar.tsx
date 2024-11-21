@@ -1,7 +1,7 @@
 import { useGetAllStockInProductQuery } from '@/redux/api/productApi/productApi'
 import { useGetAllVariantsQuery } from '@/redux/api/variantApi/variantApi'
 import { IProduct, IVariant } from '@/types'
-import { List, Modal, Spin, Typography } from 'antd'
+import { Descriptions, List, Modal, Spin, Typography } from 'antd'
 import { useEffect, useState } from 'react'
 import { ImWarning } from 'react-icons/im'
 import {
@@ -126,14 +126,28 @@ const PosSidebar = () => {
         ) : (
           <div>
             <Title level={4}>Stock in product</Title>
-            <Text strong> Product stock: </Text>
-            {actualProductVariants?.length} pics
-            <br />
-            <Text strong>Others stock: </Text>
-            {otherStock?.length} pics
-            <br />
-            <Text strong>Total stock: </Text>
-            {variantData?.meta?.total} pics
+            <Descriptions
+              bordered
+              column={1}
+              size="small"
+              style={{
+                width: '100%',
+                maxWidth: '100%',
+                margin: '1px auto',
+              }}
+              contentStyle={{ padding: '2px 2px' }}
+              labelStyle={{ padding: '2px 2px', fontWeight: 'bold' }}
+            >
+              <Descriptions.Item label="Product stock">
+                {actualProductVariants?.length + ' ' + 'Pics' || 'N/A'}
+              </Descriptions.Item>
+              <Descriptions.Item label="Others stock">
+                {otherStock?.length + ' ' + 'Pics' || 'N/A'}
+              </Descriptions.Item>
+              <Descriptions.Item label="Total stock">
+                {variantData?.meta?.total + ' ' + 'Pics' || 'N/A'}
+              </Descriptions.Item>
+            </Descriptions>
             <br />
             <List
               itemLayout="horizontal"

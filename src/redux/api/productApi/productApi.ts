@@ -79,6 +79,40 @@ export const productApi = baseApi.injectEndpoints({
       }),
       providesTags: [tagTypes.product],
     }),
+
+    // stock in get by status
+    getStockInProductDependStatus: build.query({
+      query: (arg: Record<string, any>) => ({
+        url: `${PRODUCT_URL}/stock-in-product`,
+        method: 'GET',
+        params: arg,
+      }),
+
+      transformResponse: (response: IProduct, meta: IMeta) => {
+        return {
+          products: response,
+          meta: meta,
+        }
+      },
+      providesTags: [tagTypes.product],
+    }),
+
+    // stock out get by status
+    getStockOutProductDependStatus: build.query({
+      query: (arg: Record<string, any>) => ({
+        url: `${PRODUCT_URL}/stock-out-product`,
+        method: 'GET',
+        params: arg,
+      }),
+
+      transformResponse: (response: IProduct, meta: IMeta) => {
+        return {
+          products: response,
+          meta: meta,
+        }
+      },
+      providesTags: [tagTypes.product],
+    }),
   }),
   overrideExisting: false,
 })
@@ -90,4 +124,6 @@ export const {
   useGetSingleProductQuery,
   useUpdateProductMutation,
   useGetAllStockInProductQuery,
+  useGetStockInProductDependStatusQuery,
+  useGetStockOutProductDependStatusQuery,
 } = productApi

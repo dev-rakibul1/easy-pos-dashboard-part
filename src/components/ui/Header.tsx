@@ -5,7 +5,7 @@ import { useGetSingleUserQuery } from '@/redux/api/userApi/userApi'
 import { getUserInfo, isLoggedOut } from '@/services/auth.services'
 import { ITokenObj } from '@/types'
 import { LogoutOutlined } from '@ant-design/icons'
-import { Layout, MenuProps, Row, Spin, Typography } from 'antd'
+import { Layout, MenuProps, Row, Spin, Typography, theme } from 'antd'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { RiProfileLine } from 'react-icons/ri'
@@ -19,6 +19,7 @@ const { Header: AntdHeader } = Layout
 const { Text } = Typography
 
 const Header = () => {
+  const { token } = theme.useToken()
   const [isLoading, setIsLoading] = useState<boolean>(true)
   const router = useRouter()
   const { role, uniqueId: id } = getUserInfo() as ITokenObj
@@ -74,7 +75,15 @@ const Header = () => {
   ]
 
   return (
-    <AntdHeader style={NavbarHeaderStyle}>
+    <AntdHeader
+      style={{
+        ...NavbarHeaderStyle,
+        // @ts-ignore
+        background: token.colorPrimaryLight,
+        // @ts-ignore
+        borderBottom: `1px solid ${token?.colorCustom}`,
+      }}
+    >
       <Row
         style={{
           display: 'flex',

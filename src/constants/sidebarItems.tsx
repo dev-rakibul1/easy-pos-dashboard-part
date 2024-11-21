@@ -130,7 +130,7 @@ const sidebarItems = (role: string) => {
   // Add Customer
   const manageCustomersItems: MenuProps['items'] = [
     {
-      label: 'Manage customers',
+      label: 'Customers',
       key: 'customer',
       icon: <CustomerServiceOutlined />,
       children: [
@@ -150,7 +150,7 @@ const sidebarItems = (role: string) => {
   // Add User
   const manageUsersItems: MenuProps['items'] = [
     {
-      label: 'Manage users',
+      label: 'Users',
       key: 'user',
       icon: <UsergroupAddOutlined />,
       children: [
@@ -270,7 +270,7 @@ const sidebarItems = (role: string) => {
   // Add reports
   const manageReportItems: MenuProps['items'] = [
     {
-      label: 'Manage reports',
+      label: 'Reports',
       key: 'report',
       icon: <ReconciliationOutlined />,
       children: [
@@ -299,7 +299,7 @@ const sidebarItems = (role: string) => {
   // Stock
   const manageStockItems: MenuProps['items'] = [
     {
-      label: 'Manage Stock',
+      label: 'Stock',
       key: 'stock',
       icon: <ReconciliationOutlined />,
       children: [

@@ -10,10 +10,13 @@ import {
   warningIconStyle,
   warningIconWrap,
 } from '@/components/styles/style'
-import { useGetAllProductQuery } from '@/redux/api/productApi/productApi'
+import {
+  useGetStockInProductDependStatusQuery,
+  useGetStockOutProductDependStatusQuery,
+} from '@/redux/api/productApi/productApi'
 import { useDebounced } from '@/redux/hooks'
 import { getUserInfo } from '@/services/auth.services'
-import { IProduct, ITokenObj } from '@/types'
+import { IMeta, IProduct, ITokenObj } from '@/types'
 import { Modal, Tabs, TabsProps, Typography } from 'antd'
 import { useEffect, useState } from 'react'
 import { ImWarning } from 'react-icons/im'
@@ -43,10 +46,16 @@ const ManageStockPage = () => {
     searchTerm: debouncedSearchTerm,
   }
 
-  const { data, isLoading } = useGetAllProductQuery(query)
+  const { data, isLoading } = useGetStockInProductDependStatusQuery(query)
+  const { data: stockOut, isLoading: isOutLoading } =
+    useGetStockOutProductDependStatusQuery(query)
   // @ts-ignore
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const products: IProduct[] = data?.products || []
+  // @ts-ignore
+  const stockInMeta: IMeta = data?.meta
+  // @ts-ignore
+  const stockOutMeta: IMeta = stockOut?.meta
 
   const resetFilters = () => {
     setSortBy('')
@@ -70,37 +79,19 @@ const ManageStockPage = () => {
   }
 
   // filter product for stock in
-  const isArrayType = Array.isArray(products)
-  let stockIn
-  if (isArrayType) {
-    stockIn =
-      products?.length &&
-      products?.filter(
-        (product: IProduct) => product?.variants && product?.variants.length
-      )
-  }
-
-  // filter product for stock out
-  let stockOut
-  if (isArrayType) {
-    stockOut =
-      products?.length &&
-      products?.filter(
-        (product: IProduct) =>
-          product?.variants && product?.variants.length === 0
-      )
-  }
 
   const items: TabsProps['items'] = [
     {
       key: '1',
       // @ts-ignore
-      label: `Stock in (${stockIn?.length ? stockIn?.length : 0})`,
+      label: `Stock in (${stockInMeta?.total ? stockInMeta?.total : 0})`,
       children: (
         <div style={{ padding: '15px' }}>
           <StockIn
             // @ts-ignore
-            stockIn={stockIn}
+            data={products}
+            // @ts-ignore
+            meta={stockInMeta}
             onPaginationChange={onPaginationChange}
             isLoading={isLoading}
             resetFilters={resetFilters}
@@ -116,13 +107,14 @@ const ManageStockPage = () => {
     {
       key: '2',
       // @ts-ignore
-      label: `Stock out (${stockOut?.length ? stockOut?.length : 0})`,
+      label: `Stock out (${stockOutMeta?.total ? stockOutMeta?.total : 0})`,
       children: (
         <StockOut
           // @ts-ignore
-          stockOut={stockOut}
+          data={stockOut}
+          meta={stockOutMeta}
           onPaginationChange={onPaginationChange}
-          isLoading={isLoading}
+          isLoading={isOutLoading}
           resetFilters={resetFilters}
           shouldShowResetButton={shouldShowResetButton}
           searchTerm={searchTerm}
@@ -147,7 +139,6 @@ const ManageStockPage = () => {
   ]
 
   // Re-order label alert
-
   const showReOrderLabelAlertModal = () => {
     setIsModalVisible(true)
   }
