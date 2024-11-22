@@ -99,6 +99,31 @@ export const sellGroupApi = baseApi.injectEndpoints({
 
       providesTags: [tagTypes.purchaseGroup],
     }),
+
+    // Sell group filter by start and end date
+    sellGroupFilterByStartAndEndDate: build.query({
+      query: ({
+        startDate,
+        endDate,
+      }: {
+        startDate: string
+        endDate: string
+      }) => ({
+        url: `${SELL_GROUP_URL}/filter-by-start-end-date`,
+        method: 'GET',
+        params: {
+          startDate,
+          endDate,
+        },
+      }),
+      transformResponse: (response: any, meta: IMeta) => {
+        return {
+          sellGroups: response,
+          meta: meta,
+        }
+      },
+      providesTags: [tagTypes.sellGroup],
+    }),
   }),
 })
 
@@ -110,4 +135,5 @@ export const {
   useGetSellGroupByCurrentMonthQuery,
   useGetSellGroupByCurrentYearQuery,
   useGetSingleSellGroupByOwnIdQuery,
+  useSellGroupFilterByStartAndEndDateQuery,
 } = sellGroupApi
