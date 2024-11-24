@@ -91,6 +91,31 @@ export const purchaseGroupApi = baseApi.injectEndpoints({
       },
       providesTags: [tagTypes.purchaseGroup],
     }),
+
+    // purchase group filter by start and end date
+    purchaseGroupFilterByStartAndEndDate: build.query({
+      query: ({
+        startDate,
+        endDate,
+      }: {
+        startDate: string
+        endDate: string
+      }) => ({
+        url: `${PURCHASE_GROUP_URL}/filter-by-start-end-date`,
+        method: 'GET',
+        params: {
+          startDate,
+          endDate,
+        },
+      }),
+      transformResponse: (response: any, meta: IMeta) => {
+        return {
+          purchaseGroups: response,
+          meta: meta,
+        }
+      },
+      providesTags: [tagTypes.purchaseGroup],
+    }),
   }),
 })
 
@@ -100,4 +125,5 @@ export const {
   useGetPurchaseGroupByCurrentWeekQuery,
   useGetPurchaseGroupByCurrentMonthQuery,
   useGetPurchaseGroupByCurrentYearQuery,
+  usePurchaseGroupFilterByStartAndEndDateQuery,
 } = purchaseGroupApi

@@ -1,13 +1,20 @@
-import { Button, Space, Table } from 'antd'
+import { DownloadOutlined, PrinterOutlined } from '@ant-design/icons'
+import { Button, Space, Table, Typography, theme } from 'antd'
 import { parse } from 'json2csv' // For CSV export
 import jsPDF from 'jspdf'
 import autoTable from 'jspdf-autotable' // For PDF table generation
+import { useRef } from 'react'
+import { useReactToPrint } from 'react-to-print'
+import ReportTitle from '../companyReportTitle/ReportTitle'
+
+const { Title } = Typography
 
 type IProps = {
   salesFilter: any
   loading: boolean
 }
 const SellReports = ({ salesFilter, loading }: IProps) => {
+  const { token } = theme.useToken()
   const data = salesFilter ? salesFilter?.sellGroups : []
 
   // Function to calculate total for each product
@@ -32,10 +39,12 @@ const SellReports = ({ salesFilter, loading }: IProps) => {
     return total.toFixed(2)
   }
 
+  // console.log(data)
+
   // Table columns
   const columns = [
     {
-      title: 'Transaction',
+      title: 'TXN',
       render: (_: any, __: any, index: number) => (
         <strong>TXN-{index + 1}</strong>
       ),
@@ -44,13 +53,17 @@ const SellReports = ({ salesFilter, loading }: IProps) => {
       title: 'Name',
       dataIndex: 'customerPurchaseProducts',
       key: 'customerPurchaseProducts',
-      render: (products: any) =>
-        products.map((pro: any) => (
-          <ul key={pro.productName}>
-            <li>{pro.productName}</li>
-          </ul>
-        )),
+      render: (products: any) => (
+        <ul>
+          {products.map((pro: any, i: number) => (
+            <li key={pro.id}>
+              {i + 1}. {pro?.productName} | {pro?.modelName}
+            </li>
+          ))}
+        </ul>
+      ),
     },
+
     {
       title: 'Selling Price',
       dataIndex: 'customerPurchaseProducts',
@@ -247,25 +260,91 @@ const SellReports = ({ salesFilter, loading }: IProps) => {
     doc.save('Sell-reports.pdf')
   }
 
+  // Print
+  const componentRef = useRef()
+  const handlePrint = useReactToPrint({
+    // @ts-ignore
+    content: () => componentRef.current,
+  })
+
   return (
     <div>
       <Space style={{ marginBottom: 16 }}>
         <Button onClick={handleDownloadCSV} type="primary">
-          Download CSV
+          Download CSV <DownloadOutlined />
         </Button>
         <Button onClick={handleDownloadPDF} type="default">
-          Download PDF
+          Download PDF <DownloadOutlined />
         </Button>
-        <Button type="default">Print</Button>
+        <Button onClick={handlePrint} type="default">
+          Print <PrinterOutlined />
+        </Button>
       </Space>
-      <Table
-        columns={columns}
-        dataSource={data}
-        rowKey={record => record.id}
-        pagination={false}
-        bordered
-        loading={loading}
-      />
+
+      <div
+        // @ts-ignore
+        ref={componentRef}
+        style={{
+          // @ts-ignore
+          border: `1px solid ${token?.colorPrimaryLight}`,
+          borderRadius: '5px',
+        }}
+      >
+        <ReportTitle invoiceType="sales Reports" active={false} />
+        <Title
+          level={5}
+          style={{ textAlign: 'center', textTransform: 'uppercase' }}
+        >
+          Sales Report
+        </Title>
+
+        <Table
+          columns={columns}
+          dataSource={data}
+          rowKey={record => record.id}
+          pagination={false}
+          bordered
+          loading={loading}
+          summary={pageData => {
+            let totalVA = 0
+            let totalDA = 0
+            let totalSubTotal = 0
+
+            // Calculate totals
+            pageData.forEach((row: any) => {
+              const products = row.customerPurchaseProducts || []
+              products.forEach((pro: any) => {
+                totalVA +=
+                  (pro?.sell?.sellingPrice * pro?.sell?.vats) / 100 || 0
+                totalDA +=
+                  (pro?.sell?.sellingPrice * pro?.sell?.discounts) / 100 || 0
+              })
+              totalSubTotal += parseFloat(calculateSubTotal(products)) || 0
+            })
+
+            return (
+              <Table.Summary.Row>
+                {/* @ts-ignore */}
+                <Table.Summary.Cell colSpan={6} style={{ textAlign: 'right' }}>
+                  <strong>Grand Total</strong>
+                </Table.Summary.Cell>
+                <Table.Summary.Cell index={1}>
+                  <strong>{totalVA.toFixed(2)}</strong>
+                </Table.Summary.Cell>
+                <Table.Summary.Cell index={2} />
+                <Table.Summary.Cell index={3}>
+                  <strong>{totalDA.toFixed(2)}</strong>
+                </Table.Summary.Cell>
+                <Table.Summary.Cell index={4} />
+
+                <Table.Summary.Cell index={5}>
+                  <strong>{totalSubTotal.toFixed(2)}</strong>
+                </Table.Summary.Cell>
+              </Table.Summary.Row>
+            )
+          }}
+        />
+      </div>
     </div>
   )
 }

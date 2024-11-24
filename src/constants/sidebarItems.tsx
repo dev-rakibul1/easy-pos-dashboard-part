@@ -288,7 +288,7 @@ const sidebarItems = (role: string) => {
         },
         {
           label: (
-            <Link href={`/${role}/transaction-weekly`}>Purchase report</Link>
+            <Link href={`/${role}/purchase-reports`}>Purchase report</Link>
           ),
           key: `/${role}/purchase-report`,
           icon: <FaArrowRightLong />,

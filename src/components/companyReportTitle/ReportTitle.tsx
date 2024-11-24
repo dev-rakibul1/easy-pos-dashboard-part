@@ -22,11 +22,12 @@ const getCurrentDateTime = (): string => {
 }
 
 type ReportTitle = {
-  buyer: IUser | ICustomer | ISupplier
-  title: string
-  invoiceType: string
+  buyer?: IUser | ICustomer | ISupplier
+  title?: string
+  invoiceType?: string
   invoiceNo?: string
   invoiceDate?: string
+  active?: boolean
 }
 
 const ReportTitle = ({
@@ -35,6 +36,7 @@ const ReportTitle = ({
   invoiceType,
   invoiceDate,
   invoiceNo,
+  active = true,
 }: ReportTitle) => {
   const { data, isLoading } = useGetFirstShopQuery({ limit: 10 })
 
@@ -58,39 +60,41 @@ const ReportTitle = ({
           </Col>
         )}
       </Row>
-      <div style={{ marginTop: '15px', padding: '0 10px' }}>
-        <Col span={24} style={{ textAlign: 'center' }}>
-          <Title level={4} style={{ textTransform: 'uppercase' }}>
-            {invoiceType ? invoiceType : 'N/A'}
-          </Title>
-        </Col>
-        <Row gutter={[16, 16]} style={{ border: '1px solid #ddd' }}>
-          <Col span={12}>
-            <Text strong>{title ? title : 'N/A'}</Text>
-            <br />
-            <Text>Name: {buyer?.firstName}</Text>
-            <br />
-            <Text>Phone: {buyer?.phoneNo}</Text>
-            <br />
-            <Text>Email: {buyer?.email}</Text>
-            <br />
-            <Text>Address: {buyer?.presentAddress}</Text>
+      {active ? (
+        <div style={{ marginTop: '15px', padding: '0 10px' }}>
+          <Col span={24} style={{ textAlign: 'center' }}>
+            <Title level={4} style={{ textTransform: 'uppercase' }}>
+              {invoiceType ? invoiceType : 'N/A'}
+            </Title>
           </Col>
-          <Col span={12} style={{ borderLeft: '1px solid #ddd' }}>
-            <Text strong>Invoice Info</Text>
-            <br />
-            {invoiceNo && <Text>Invoice No: {invoiceNo}</Text>}
-            <br />
-            <Text>
-              Invoice Date:{' '}
-              {invoiceDate
-                ? dayjs(invoiceDate).format('D MMM, YYYY hh:mm A')
-                : getCurrentDateTime()}
-            </Text>
-            <br />
-          </Col>
-        </Row>
-      </div>
+          <Row gutter={[16, 16]} style={{ border: '1px solid #ddd' }}>
+            <Col span={12}>
+              <Text strong>{title ? title : 'N/A'}</Text>
+              <br />
+              <Text>Name: {buyer?.firstName}</Text>
+              <br />
+              <Text>Phone: {buyer?.phoneNo}</Text>
+              <br />
+              <Text>Email: {buyer?.email}</Text>
+              <br />
+              <Text>Address: {buyer?.presentAddress}</Text>
+            </Col>
+            <Col span={12} style={{ borderLeft: '1px solid #ddd' }}>
+              <Text strong>Invoice Info</Text>
+              <br />
+              {invoiceNo && <Text>Invoice No: {invoiceNo}</Text>}
+              <br />
+              <Text>
+                Invoice Date:{' '}
+                {invoiceDate
+                  ? dayjs(invoiceDate).format('D MMM, YYYY hh:mm A')
+                  : getCurrentDateTime()}
+              </Text>
+              <br />
+            </Col>
+          </Row>
+        </div>
+      ) : null}
     </div>
   )
 }
