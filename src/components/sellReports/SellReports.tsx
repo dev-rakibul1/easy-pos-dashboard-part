@@ -1,9 +1,12 @@
+'use client'
+
+import { IDateRange } from '@/types'
 import { DownloadOutlined, PrinterOutlined } from '@ant-design/icons'
-import { Button, Space, Table, Typography, theme } from 'antd'
+import { Button, Empty, Space, Switch, Table, Typography, theme } from 'antd'
 import { parse } from 'json2csv' // For CSV export
 import jsPDF from 'jspdf'
 import autoTable from 'jspdf-autotable' // For PDF table generation
-import { useRef } from 'react'
+import { useRef, useState } from 'react'
 import { useReactToPrint } from 'react-to-print'
 import ReportTitle from '../companyReportTitle/ReportTitle'
 
@@ -12,10 +15,15 @@ const { Title } = Typography
 type IProps = {
   salesFilter: any
   loading: boolean
+  dateRange: IDateRange | null
 }
-const SellReports = ({ salesFilter, loading }: IProps) => {
+const SellReports = ({ salesFilter, loading, dateRange }: IProps) => {
   const { token } = theme.useToken()
   const data = salesFilter ? salesFilter?.sellGroups : []
+  const [variantActive, setVariantActive] = useState<boolean>(true)
+  const onChange = (checked: boolean) => {
+    setVariantActive(checked)
+  }
 
   // Function to calculate total for each product
   const calculateTotal = (product: any) => {
@@ -39,7 +47,7 @@ const SellReports = ({ salesFilter, loading }: IProps) => {
     return total.toFixed(2)
   }
 
-  // console.log(data)
+  console.log(data)
 
   // Table columns
   const columns = [
@@ -55,9 +63,21 @@ const SellReports = ({ salesFilter, loading }: IProps) => {
       key: 'customerPurchaseProducts',
       render: (products: any) => (
         <ul>
-          {products.map((pro: any, i: number) => (
-            <li key={pro.id}>
-              {i + 1}. {pro?.productName} | {pro?.modelName}
+          {products?.map((pro: any, i: number) => (
+            <li key={pro.id || `product-${i}`}>
+              {i + 1}. {pro?.productName || 'N/A'} | {pro?.modelName || 'N/A'}
+              {/* Render only the variants of the current product */}
+              {variantActive && pro?.variants?.length ? (
+                <ul>
+                  {pro.variants.map((va: any, j: number) => (
+                    <li key={va?.id || `variant-${j}`}>
+                      - {va?.imeiNumber || 'N/A'} |{' '}
+                      {va?.color?.split(' ')[0] || 'N/A'} | {va?.ram || 'N/A'}/
+                      {va?.rom || 'N/A'}
+                    </li>
+                  ))}
+                </ul>
+              ) : null}
             </li>
           ))}
         </ul>
@@ -268,84 +288,111 @@ const SellReports = ({ salesFilter, loading }: IProps) => {
   })
 
   return (
-    <div>
-      <Space style={{ marginBottom: 16 }}>
-        <Button onClick={handleDownloadCSV} type="primary">
-          Download CSV <DownloadOutlined />
-        </Button>
-        <Button onClick={handleDownloadPDF} type="default">
-          Download PDF <DownloadOutlined />
-        </Button>
-        <Button onClick={handlePrint} type="default">
-          Print <PrinterOutlined />
-        </Button>
-      </Space>
+    <>
+      {data.length === 0 ? (
+        <Empty description="Record does not exist." />
+      ) : (
+        <div>
+          <Space style={{ marginBottom: 16 }}>
+            <Button onClick={handleDownloadCSV} type="primary">
+              Download CSV <DownloadOutlined />
+            </Button>
+            <Button onClick={handleDownloadPDF} type="default">
+              Download PDF <DownloadOutlined />
+            </Button>
+            <Button onClick={handlePrint} type="default">
+              Print <PrinterOutlined />
+            </Button>
 
-      <div
-        // @ts-ignore
-        ref={componentRef}
-        style={{
-          // @ts-ignore
-          border: `1px solid ${token?.colorPrimaryLight}`,
-          borderRadius: '5px',
-        }}
-      >
-        <ReportTitle invoiceType="sales Reports" active={false} />
-        <Title
-          level={5}
-          style={{ textAlign: 'center', textTransform: 'uppercase' }}
-        >
-          Sales Report
-        </Title>
+            <Switch
+              defaultChecked
+              checkedChildren="Hide Variants"
+              unCheckedChildren="Show Variants"
+              onChange={onChange}
+              style={{ marginLeft: 'auto' }}
+            />
+          </Space>
 
-        <Table
-          columns={columns}
-          dataSource={data}
-          rowKey={record => record.id}
-          pagination={false}
-          bordered
-          loading={loading}
-          summary={pageData => {
-            let totalVA = 0
-            let totalDA = 0
-            let totalSubTotal = 0
+          <div
+            // @ts-ignore
+            ref={componentRef}
+            style={{
+              // @ts-ignore
+              border: `1px solid ${token?.colorPrimaryLight}`,
+              borderRadius: '5px',
+            }}
+          >
+            <div style={{ marginBottom: '20px' }}>
+              <ReportTitle invoiceType="sales Reports" active={false} />
+              <Title
+                level={5}
+                style={{ textAlign: 'center', textTransform: 'uppercase' }}
+              >
+                Sales Report
+              </Title>
+            </div>
+            <p
+              style={{
+                fontStyle: 'italic',
+                textAlign: 'left',
+                padding: '1px 15px',
+              }}
+            >{`Date range: ${dateRange?.startDate} - ${dateRange?.endDate}`}</p>
 
-            // Calculate totals
-            pageData.forEach((row: any) => {
-              const products = row.customerPurchaseProducts || []
-              products.forEach((pro: any) => {
-                totalVA +=
-                  (pro?.sell?.sellingPrice * pro?.sell?.vats) / 100 || 0
-                totalDA +=
-                  (pro?.sell?.sellingPrice * pro?.sell?.discounts) / 100 || 0
-              })
-              totalSubTotal += parseFloat(calculateSubTotal(products)) || 0
-            })
+            <Table
+              columns={columns}
+              dataSource={data}
+              rowKey={record => record.id}
+              pagination={false}
+              bordered
+              loading={loading}
+              summary={pageData => {
+                let totalVA = 0
+                let totalDA = 0
+                let totalSubTotal = 0
 
-            return (
-              <Table.Summary.Row>
-                {/* @ts-ignore */}
-                <Table.Summary.Cell colSpan={6} style={{ textAlign: 'right' }}>
-                  <strong>Grand Total</strong>
-                </Table.Summary.Cell>
-                <Table.Summary.Cell index={1}>
-                  <strong>{totalVA.toFixed(2)}</strong>
-                </Table.Summary.Cell>
-                <Table.Summary.Cell index={2} />
-                <Table.Summary.Cell index={3}>
-                  <strong>{totalDA.toFixed(2)}</strong>
-                </Table.Summary.Cell>
-                <Table.Summary.Cell index={4} />
+                // Calculate totals
+                pageData.forEach((row: any) => {
+                  const products = row.customerPurchaseProducts || []
+                  products.forEach((pro: any) => {
+                    totalVA +=
+                      (pro?.sell?.sellingPrice * pro?.sell?.vats) / 100 || 0
+                    totalDA +=
+                      (pro?.sell?.sellingPrice * pro?.sell?.discounts) / 100 ||
+                      0
+                  })
+                  totalSubTotal += parseFloat(calculateSubTotal(products)) || 0
+                })
 
-                <Table.Summary.Cell index={5}>
-                  <strong>{totalSubTotal.toFixed(2)}</strong>
-                </Table.Summary.Cell>
-              </Table.Summary.Row>
-            )
-          }}
-        />
-      </div>
-    </div>
+                return (
+                  <Table.Summary.Row>
+                    <Table.Summary.Cell
+                      colSpan={6}
+                      //@ts-ignore
+                      style={{ textAlign: 'right' }}
+                    >
+                      <strong>Grand Total</strong>
+                    </Table.Summary.Cell>
+                    <Table.Summary.Cell index={1}>
+                      <strong>{totalVA.toFixed(2)}</strong>
+                    </Table.Summary.Cell>
+                    <Table.Summary.Cell index={2} />
+                    <Table.Summary.Cell index={3}>
+                      <strong>{totalDA.toFixed(2)}</strong>
+                    </Table.Summary.Cell>
+                    <Table.Summary.Cell index={4} />
+
+                    <Table.Summary.Cell index={5}>
+                      <strong>{totalSubTotal.toFixed(2)}</strong>
+                    </Table.Summary.Cell>
+                  </Table.Summary.Row>
+                )
+              }}
+            />
+          </div>
+        </div>
+      )}
+    </>
   )
 }
 

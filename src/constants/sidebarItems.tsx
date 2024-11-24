@@ -293,6 +293,16 @@ const sidebarItems = (role: string) => {
           key: `/${role}/purchase-report`,
           icon: <FaArrowRightLong />,
         },
+        {
+          label: <Link href={`/${role}/return-reports`}>Return report</Link>,
+          key: `/${role}/return-reports`,
+          icon: <FaArrowRightLong />,
+        },
+        {
+          label: <Link href={`/${role}/expense-reports`}>Expense report</Link>,
+          key: `/${role}/expense-reports`,
+          icon: <FaArrowRightLong />,
+        },
       ],
     },
   ]

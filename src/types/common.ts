@@ -601,3 +601,8 @@ export type IShopFormAPIs = {
   createdAt: string
   updatedAt: string
 }
+
+export type IDateRange = {
+  startDate: string
+  endDate: string
+}

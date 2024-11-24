@@ -1,9 +1,9 @@
 'use client'
 
 import PosBreadcrumb from '@/components/breadcrumb/PosBreadcrumb'
-import SellReportsUI from '@/components/sellReports/SellReports'
+import ExpenseReportUI from '@/components/expenseReport/ExpenseReports'
 import ActionBar from '@/components/ui/ActionBar'
-import { useSellGroupFilterByStartAndEndDateQuery } from '@/redux/api/sellGroups/sellGroupApi'
+import { useAdditionalExpenseFilterByStartAndEndDateQuery } from '@/redux/api/additionalExpense/additionalExpenseApi'
 import { getUserInfo } from '@/services/auth.services'
 import { ITokenObj } from '@/types'
 import {
@@ -20,7 +20,7 @@ import { useState } from 'react'
 
 const { RangePicker } = DatePicker
 
-const SellReports = () => {
+const ExpenseReports = () => {
   const { role } = getUserInfo() as ITokenObj
 
   const [form] = Form.useForm()
@@ -33,7 +33,9 @@ const SellReports = () => {
   const skipQuery = !dates?.startDate || !dates?.endDate
 
   const { data, isFetching, isLoading } =
-    useSellGroupFilterByStartAndEndDateQuery(queryArgs, { skip: skipQuery })
+    useAdditionalExpenseFilterByStartAndEndDateQuery(queryArgs, {
+      skip: skipQuery,
+    })
 
   const onFinish = (values: any) => {
     const [startDate, endDate] = values.dates || []
@@ -49,7 +51,7 @@ const SellReports = () => {
 
   const onReset = () => {
     form.resetFields()
-    setDates(null)
+    setDates(null) // Reset dates to clear the query
   }
 
   return (
@@ -57,11 +59,11 @@ const SellReports = () => {
       <PosBreadcrumb
         items={[
           { label: `${role}`, link: `/${role}` },
-          { label: 'Sales report', link: `/${role}/sells-report` },
+          { label: 'Expense report', link: `/${role}/expense-reports` },
         ]}
       />
 
-      <ActionBar title="Sales report filter by start date & end date.">
+      <ActionBar title="Expense report filter by start date & end date.">
         <Form
           form={form}
           layout="vertical"
@@ -117,17 +119,13 @@ const SellReports = () => {
       <Divider />
 
       {/* Display Results */}
-      {dates ? (
-        <SellReportsUI
-          salesFilter={data}
-          loading={isLoading}
-          dateRange={dates}
-        />
+      {!dates ? (
+        <Empty description="Please filter expense reports" />
       ) : (
-        <Empty description="Please filter sales report" />
+        <ExpenseReportUI expense={data} loading={isLoading} dateRange={dates} />
       )}
     </div>
   )
 }
 
-export default SellReports
+export default ExpenseReports

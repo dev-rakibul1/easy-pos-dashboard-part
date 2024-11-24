@@ -86,6 +86,31 @@ export const returnGroupApi = baseApi.injectEndpoints({
       },
       providesTags: [tagTypes.returnGroup],
     }),
+
+    // Return group filter by start and end date
+    returnGroupFilterByStartAndEndDate: build.query({
+      query: ({
+        startDate,
+        endDate,
+      }: {
+        startDate: string
+        endDate: string
+      }) => ({
+        url: `${RETURN_GROUP_URL}/filter-by-start-end-date`,
+        method: 'GET',
+        params: {
+          startDate,
+          endDate,
+        },
+      }),
+      transformResponse: (response: any, meta: IMeta) => {
+        return {
+          returnGroups: response,
+          meta: meta,
+        }
+      },
+      providesTags: [tagTypes.returnGroup],
+    }),
   }),
 })
 
@@ -96,4 +121,5 @@ export const {
   useGetAllReturnGroupByCurrentWeekQuery,
   useGetAllReturnGroupByCurrentMonthQuery,
   useGetAllReturnGroupByCurrentYearQuery,
+  useReturnGroupFilterByStartAndEndDateQuery,
 } = returnGroupApi

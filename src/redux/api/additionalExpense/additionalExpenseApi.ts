@@ -124,6 +124,31 @@ export const additionalExpenseApi = baseApi.injectEndpoints({
       }),
       providesTags: [tagTypes.additionalExpense],
     }),
+
+    // additional expense filter by start and end date
+    additionalExpenseFilterByStartAndEndDate: build.query({
+      query: ({
+        startDate,
+        endDate,
+      }: {
+        startDate: string
+        endDate: string
+      }) => ({
+        url: `${ADDITIONAL_EXPENSE_URL}/filter-by-start-end-date`,
+        method: 'GET',
+        params: {
+          startDate,
+          endDate,
+        },
+      }),
+      transformResponse: (response: any, meta: IMeta) => {
+        return {
+          additionalExpense: response,
+          meta: meta,
+        }
+      },
+      providesTags: [tagTypes.additionalExpense],
+    }),
   }),
   overrideExisting: false,
 })
@@ -138,4 +163,5 @@ export const {
   useDeleteAdditionalExpenseMutation,
   useUpdateAdditionalExpenseMutation,
   useGetAllAdditionalExpenseQuery,
+  useAdditionalExpenseFilterByStartAndEndDateQuery,
 } = additionalExpenseApi

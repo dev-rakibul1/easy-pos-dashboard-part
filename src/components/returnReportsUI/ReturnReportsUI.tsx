@@ -11,13 +11,13 @@ import ReportTitle from '../companyReportTitle/ReportTitle'
 const { Title } = Typography
 
 type IProps = {
-  purchaseFilter: any
+  returnFilter: any
   loading: boolean
-  dateRange: IDateRange
+  dateRange: IDateRange | null
 }
-const PurchaseReportUI = ({ purchaseFilter, loading, dateRange }: IProps) => {
+const ReturnReportsUI = ({ returnFilter, loading, dateRange }: IProps) => {
   const { token } = theme.useToken()
-  const data = purchaseFilter ? purchaseFilter?.purchaseGroups : []
+  const data = returnFilter ? returnFilter?.returnGroups : []
 
   // Function to calculate total for each product
   const calculateTotal = (product: any) => {
@@ -33,20 +33,41 @@ const PurchaseReportUI = ({ purchaseFilter, loading, dateRange }: IProps) => {
     return total.toFixed(2)
   }
 
-  // Function to calculate subtotal
+  // Function to calculate total
   const calculateSubTotal = (products: any) => {
     if (!Array.isArray(products)) return '0.00' // Ensure it's an array
+
     const total = products.reduce((acc: number, pro: any) => {
+      // Calculate total for individual product
       const productTotal = parseFloat(calculateTotal(pro)) || 0
-      return acc + productTotal
+
+      // Sum up nested "returns" prices if present
+      const returnsTotal =
+        pro?.userReturnProducts?.reduce((returnAcc: number, returnPro: any) => {
+          return (
+            returnAcc +
+            (returnPro?.returns?.reduce((itemAcc: number, item: any) => {
+              return itemAcc + (item?.price || 0)
+            }, 0) || 0)
+          )
+        }, 0) || 0
+
+      return acc + productTotal + returnsTotal
     }, 0)
-    return total.toFixed(2)
+
+    return total.toFixed(2) // Return total as a string with 2 decimal places
   }
 
-  // console.log(data)
   const [variantActive, setVariantActive] = useState<boolean>(true)
   const onChange = (checked: boolean) => {
     setVariantActive(checked)
+  }
+
+  const aQty = (pro: any) => {
+    const sum = pro?.reduce((acc: any, item: any) => {
+      return acc + (item?.supplierReturnPayments?.quantity || 0)
+    }, 0)
+    return sum
   }
 
   // Table columns
@@ -59,8 +80,8 @@ const PurchaseReportUI = ({ purchaseFilter, loading, dateRange }: IProps) => {
     },
     {
       title: 'Name',
-      dataIndex: 'supplierSellProducts',
-      key: 'supplierSellProducts',
+      dataIndex: 'userReturnProducts',
+      key: 'userReturnProducts',
       render: (products: any) => (
         <>
           <ul>
@@ -70,9 +91,9 @@ const PurchaseReportUI = ({ purchaseFilter, loading, dateRange }: IProps) => {
                   {i + 1}. {pro?.productName} | {pro?.modelName}
                 </strong>
                 {/* Render only the variants of the current product */}
-                {variantActive && pro?.variants?.length ? (
+                {variantActive && pro?.returns?.length ? (
                   <ul>
-                    {pro.variants.map((va: any, j: number) => (
+                    {pro.returns.map((va: any, j: number) => (
                       <li key={va?.id}>
                         - {va?.imeiNumber} | {va?.color?.split(' ')[0]} |{' '}
                         {va?.ram}/{va?.rom}
@@ -88,114 +109,54 @@ const PurchaseReportUI = ({ purchaseFilter, loading, dateRange }: IProps) => {
     },
 
     {
-      title: 'Purchase p',
-      dataIndex: 'supplierSellProducts',
-      key: 'supplierSellProducts',
+      title: 'Purchase rate',
+      dataIndex: 'userReturnProducts',
+      key: 'userReturnProducts',
       render: (products: any) =>
         products?.map((pro: any) => (
-          <ul key={pro.purchase?.purchaseRate}>
-            <li>{pro.purchase?.purchaseRate?.toFixed(2)}</li>
+          <ul key={pro?.returns?.price}>
+            <li>{pro?.returns?.price?.toFixed(2)}</li>
+
+            {/* Render only the variants of the current product */}
+            {pro.returns.map((va: any, j: number) => (
+              <li key={va?.id}>{va?.price}</li>
+            ))}
           </ul>
         )),
     },
     {
-      title: 'Qty',
-      dataIndex: 'supplierSellProducts',
-      key: 'supplierSellProducts',
-      render: (products: any) =>
-        products?.map((pro: any) => (
-          <ul key={pro.productName}>
-            <li>{pro?.variants?.length}</li>
-          </ul>
-        )),
+      title: 'Quantity',
+      dataIndex: 'supplierReturnPayments',
+      key: 'supplierReturnPayments',
+      render: (products: any) => (
+        <ul key={products?.id}>
+          <li>{products?.quantity}</li>
+        </ul>
+      ),
     },
-    {
-      title: 'Amount',
-      dataIndex: 'supplierSellProducts',
-      key: 'supplierSellProducts',
-      render: (products: any) =>
-        products?.map((pro: any) => (
-          <ul key={pro.productName}>
-            <li>
-              {(pro?.variants?.length * pro.purchase?.purchaseRate)?.toFixed(2)}
-            </li>
-          </ul>
-        )),
-    },
-    {
-      title: 'Vats',
-      dataIndex: 'supplierSellProducts',
-      key: 'supplierSellProducts',
-      render: (products: any) =>
-        products?.map((pro: any) => (
-          <ul key={pro.productName}>
-            <li>{pro?.purchase?.vats?.toFixed(2)}%</li>
-          </ul>
-        )),
-    },
-    {
-      title: 'VA',
-      dataIndex: 'supplierSellProducts',
-      key: 'supplierSellProducts',
-      render: (products: any) =>
-        products?.map((pro: any) => (
-          <ul key={pro.productName}>
-            <li>
-              {(
-                ((pro?.purchase?.purchaseRate * pro?.purchase?.vats) / 100) *
-                pro?.variants?.length
-              )?.toFixed(2)}
-            </li>
-          </ul>
-        )),
-    },
-    {
-      title: 'Discounts',
-      dataIndex: 'supplierSellProducts',
-      key: 'supplierSellProducts',
-      render: (products: any) =>
-        products?.map((pro: any) => (
-          <ul key={pro.id}>
-            <li>{pro?.purchase?.discounts?.toFixed(2)}%</li>
-          </ul>
-        )),
-    },
-    {
-      title: 'DA',
-      dataIndex: 'supplierSellProducts',
-      key: 'supplierSellProducts',
-      render: (products: any) =>
-        products?.map((pro: any) => (
-          <ul key={pro.id}>
-            <li>
-              {(
-                ((pro?.purchase?.purchaseRate * pro?.purchase?.discounts) /
-                  100) *
-                pro?.variants?.length
-              )?.toFixed(2)}
-            </li>
-          </ul>
-        )),
-    },
+
     {
       title: 'Total',
-      dataIndex: 'supplierSellProducts',
-      key: 'supplierSellProducts',
-      render: (products: any) =>
-        products?.map((pro: any) => {
-          const total = calculateTotal(pro)
-          return (
-            <ul key={pro.id}>
-              <li>{total}</li>
-            </ul>
+      dataIndex: 'userReturnProducts',
+      key: 'userReturnProducts',
+      render: (products: any) => {
+        if (!products || !Array.isArray(products)) return null
+
+        // Calculate the total purchase rate
+        const total = products.reduce((sum: number, pro: any) => {
+          const variantTotal = pro.returns?.reduce(
+            (variantSum: number, va: any) => {
+              return variantSum + (va?.price || 0)
+            },
+            0
           )
-        }),
-    },
-    {
-      title: 'Sub Total',
-      dataIndex: 'supplierSellProducts',
-      key: 'supplierSellProducts',
-      render: (products: any) => <span>{calculateSubTotal(products)}</span>,
+
+          return sum + (variantTotal || 0)
+        }, 0)
+
+        // Render the values with the total
+        return <>{total.toFixed(2)}</>
+      },
     },
   ]
 
@@ -203,7 +164,7 @@ const PurchaseReportUI = ({ purchaseFilter, loading, dateRange }: IProps) => {
   const prepareExportData = () => {
     return data
       .map((row: any, index: number) => {
-        const products = row.supplierSellProducts || []
+        const products = row.userReturnProducts || []
         return products?.map((pro: any) => ({
           Transaction: `TXN-${index + 1}`,
           Name: pro.productName,
@@ -223,7 +184,7 @@ const PurchaseReportUI = ({ purchaseFilter, loading, dateRange }: IProps) => {
             100
           )?.toFixed(2),
           Total: calculateTotal(pro),
-          SubTotal: calculateSubTotal(products),
+          SubTotal: '',
         }))
       })
       .flat()
@@ -356,10 +317,9 @@ const PurchaseReportUI = ({ purchaseFilter, loading, dateRange }: IProps) => {
                 level={5}
                 style={{ textAlign: 'center', textTransform: 'uppercase' }}
               >
-                Purchase Reports
+                Return Reports
               </Title>
             </div>
-
             <p
               style={{
                 fontStyle: 'italic',
@@ -367,7 +327,6 @@ const PurchaseReportUI = ({ purchaseFilter, loading, dateRange }: IProps) => {
                 padding: '1px 15px',
               }}
             >{`Date range: ${dateRange?.startDate} - ${dateRange?.endDate}`}</p>
-
             <Table
               columns={columns}
               dataSource={data}
@@ -375,58 +334,25 @@ const PurchaseReportUI = ({ purchaseFilter, loading, dateRange }: IProps) => {
               pagination={false}
               bordered
               loading={loading}
-              summary={pageData => {
-                let totalVA = 0
-                let totalDA = 0
-                let totalSubTotal = 0
-                let totalQuantity = 0
-
-                // Calculate totals
-                pageData.forEach((row: any) => {
-                  const products = row.supplierSellProducts || []
-                  products.forEach((pro: any) => {
-                    totalVA +=
-                      ((pro?.purchase?.purchaseRate * pro?.purchase?.vats ||
-                        0) /
-                        100) *
-                      pro?.variants?.length
-                    totalDA +=
-                      ((pro?.purchase?.purchaseRate *
-                        pro?.purchase?.discounts || 0) /
-                        100) *
-                      pro?.variants?.length
-                    totalQuantity += pro?.variants?.length || 0 // Sum quantity here
-                  })
-                  totalSubTotal += parseFloat(calculateSubTotal(products)) || 0
-                })
-
+              summary={() => {
                 return (
                   <Table.Summary.Row>
                     <Table.Summary.Cell
-                      colSpan={3}
+                      colSpan={2}
                       index={1}
                       // @ts-ignore
                       style={{ textAlign: 'right' }}
                     >
                       <strong>Grand Total</strong>
                     </Table.Summary.Cell>
-                    <Table.Summary.Cell index={2}>
-                      <strong>{totalQuantity}</strong>{' '}
-                      {/* Display total quantity */}
-                    </Table.Summary.Cell>
-                    <Table.Summary.Cell index={3} />
-                    <Table.Summary.Cell index={4} />
-                    <Table.Summary.Cell index={3}>
-                      <strong>{totalVA?.toFixed(2)}</strong>
-                    </Table.Summary.Cell>
-                    <Table.Summary.Cell index={5} />
-                    <Table.Summary.Cell index={6}>
-                      <strong>{totalDA?.toFixed(2)}</strong>
-                    </Table.Summary.Cell>
 
                     <Table.Summary.Cell index={7} />
+                    <Table.Summary.Cell index={2}>
+                      <strong>{aQty(data)}</strong>{' '}
+                      {/* Display total quantity */}
+                    </Table.Summary.Cell>
                     <Table.Summary.Cell index={8}>
-                      <strong>{totalSubTotal?.toFixed(2)}</strong>
+                      <strong>{calculateSubTotal(data)}</strong>
                     </Table.Summary.Cell>
                   </Table.Summary.Row>
                 )
@@ -439,4 +365,4 @@ const PurchaseReportUI = ({ purchaseFilter, loading, dateRange }: IProps) => {
   )
 }
 
-export default PurchaseReportUI
+export default ReturnReportsUI

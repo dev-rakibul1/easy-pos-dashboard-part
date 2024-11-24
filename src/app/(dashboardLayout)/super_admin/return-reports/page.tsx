@@ -1,9 +1,9 @@
 'use client'
 
 import PosBreadcrumb from '@/components/breadcrumb/PosBreadcrumb'
-import SellReportsUI from '@/components/sellReports/SellReports'
+import ReturnReportsUI from '@/components/returnReportsUI/ReturnReportsUI'
 import ActionBar from '@/components/ui/ActionBar'
-import { useSellGroupFilterByStartAndEndDateQuery } from '@/redux/api/sellGroups/sellGroupApi'
+import { useReturnGroupFilterByStartAndEndDateQuery } from '@/redux/api/returnGroupApi/returnGroupApi'
 import { getUserInfo } from '@/services/auth.services'
 import { ITokenObj } from '@/types'
 import {
@@ -20,7 +20,7 @@ import { useState } from 'react'
 
 const { RangePicker } = DatePicker
 
-const SellReports = () => {
+const ReturnReports = () => {
   const { role } = getUserInfo() as ITokenObj
 
   const [form] = Form.useForm()
@@ -33,7 +33,7 @@ const SellReports = () => {
   const skipQuery = !dates?.startDate || !dates?.endDate
 
   const { data, isFetching, isLoading } =
-    useSellGroupFilterByStartAndEndDateQuery(queryArgs, { skip: skipQuery })
+    useReturnGroupFilterByStartAndEndDateQuery(queryArgs, { skip: skipQuery })
 
   const onFinish = (values: any) => {
     const [startDate, endDate] = values.dates || []
@@ -52,16 +52,18 @@ const SellReports = () => {
     setDates(null)
   }
 
+  console.log(data)
+
   return (
     <div>
       <PosBreadcrumb
         items={[
           { label: `${role}`, link: `/${role}` },
-          { label: 'Sales report', link: `/${role}/sells-report` },
+          { label: 'Return report', link: `/${role}/return-reports` },
         ]}
       />
 
-      <ActionBar title="Sales report filter by start date & end date.">
+      <ActionBar title="Return report filter by start date & end date.">
         <Form
           form={form}
           layout="vertical"
@@ -118,16 +120,16 @@ const SellReports = () => {
 
       {/* Display Results */}
       {dates ? (
-        <SellReportsUI
-          salesFilter={data}
+        <ReturnReportsUI
+          returnFilter={data}
           loading={isLoading}
           dateRange={dates}
         />
       ) : (
-        <Empty description="Please filter sales report" />
+        <Empty description="Please filter return reports" />
       )}
     </div>
   )
 }
 
-export default SellReports
+export default ReturnReports

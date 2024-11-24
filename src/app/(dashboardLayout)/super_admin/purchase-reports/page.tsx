@@ -52,8 +52,6 @@ const PurchaseReports = () => {
     setDates(null)
   }
 
-  console.log(data)
-
   return (
     <div>
       <PosBreadcrumb
@@ -119,8 +117,12 @@ const PurchaseReports = () => {
       <Divider />
 
       {/* Display Results */}
-      {data ? (
-        <PurchaseReportUI purchaseFilter={data} loading={isLoading} />
+      {dates ? (
+        <PurchaseReportUI
+          purchaseFilter={data}
+          loading={isLoading}
+          dateRange={dates}
+        />
       ) : (
         <Empty description="Please filter purchase reports" />
       )}
