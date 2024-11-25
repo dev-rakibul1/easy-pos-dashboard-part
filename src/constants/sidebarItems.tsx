@@ -303,6 +303,16 @@ const sidebarItems = (role: string) => {
           key: `/${role}/expense-reports`,
           icon: <FaArrowRightLong />,
         },
+        {
+          label: <Link href={`/${role}/loss-reports`}>Loss report</Link>,
+          key: `/${role}/loss-reports`,
+          icon: <FaArrowRightLong />,
+        },
+        {
+          label: <Link href={`/${role}/profit-reports`}>Profit report</Link>,
+          key: `/${role}/profit-reports`,
+          icon: <FaArrowRightLong />,
+        },
       ],
     },
   ]

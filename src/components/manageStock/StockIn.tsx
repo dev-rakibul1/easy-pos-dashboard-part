@@ -119,14 +119,14 @@ const StockIn: React.FC<Props> = ({
     })
   )
 
-  getActualStockIn.map(product => {
-    const lent = product.variants?.length
-    product.purchases?.map(pur => {
-      const singlePrice = pur.totalPrice / pur.totalStock
-      const lastStockPrice = singlePrice * lent || 0
-      // console.log(lastStockPrice)
-    })
-  })
+  // getActualStockIn.map(product => {
+  //   const lent = product.variants?.length
+  //   product.purchases?.map(pur => {
+  //     const singlePrice = pur.totalPrice / pur.totalStock
+  //     const lastStockPrice = singlePrice * lent || 0
+  //     // console.log(lastStockPrice)
+  //   })
+  // })
 
   // console.log(getActualStockIn)
 

@@ -1,4 +1,5 @@
 import { tagTypes } from '@/redux/tags/tagTypes'
+import { IMeta } from '@/types'
 import { baseApi } from '../baseApi'
 
 const SELLS_URL = '/sell'
@@ -75,6 +76,55 @@ export const sellsApi = baseApi.injectEndpoints({
       }),
       providesTags: [tagTypes.sell],
     }),
+
+    // loss sell group filter by start and end date
+    sellsLossFilterByStartAndEndDate: build.query({
+      query: ({
+        startDate,
+        endDate,
+      }: {
+        startDate: string
+        endDate: string
+      }) => ({
+        url: `${SELLS_URL}/filter-loss-by-start-end-date`,
+        method: 'GET',
+        params: {
+          startDate,
+          endDate,
+        },
+      }),
+      transformResponse: (response: any, meta: IMeta) => {
+        return {
+          sells: response,
+          meta: meta,
+        }
+      },
+      providesTags: [tagTypes.sell],
+    }),
+    // loss sell group filter by start and end date
+    sellsProfitFilterByStartAndEndDate: build.query({
+      query: ({
+        startDate,
+        endDate,
+      }: {
+        startDate: string
+        endDate: string
+      }) => ({
+        url: `${SELLS_URL}/filter-profit-by-start-end-date`,
+        method: 'GET',
+        params: {
+          startDate,
+          endDate,
+        },
+      }),
+      transformResponse: (response: any, meta: IMeta) => {
+        return {
+          sells: response,
+          meta: meta,
+        }
+      },
+      providesTags: [tagTypes.sell],
+    }),
   }),
   overrideExisting: false,
 })
@@ -88,4 +138,6 @@ export const {
   useGetSellByCurrentYearQuery,
   useGetSingleSellQuery,
   useGetSellByImeiNumberQuery,
+  useSellsLossFilterByStartAndEndDateQuery,
+  useSellsProfitFilterByStartAndEndDateQuery,
 } = sellsApi
