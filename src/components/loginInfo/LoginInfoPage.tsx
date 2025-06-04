@@ -20,7 +20,7 @@ type IFormValues = {
 const LoginInfoPage = () => {
   const router = useRouter()
   const [userLogin] = useUserLoginMutation()
-  const { token } = theme.useToken();
+  const { token } = theme.useToken()
 
   // Login info
   const onSubmit: SubmitHandler<IFormValues> = async (data: any) => {
@@ -41,12 +41,17 @@ const LoginInfoPage = () => {
   }
 
   return (
-    <div>
+    <div
+      style={{
+        width: '400px',
+        maxWidth: '100%',
+      }}
+    >
       <Row align="middle" justify="center" style={{ minHeight: '100vh' }}>
         <Col
-          sm={8}
-          md={8}
-          lg={8}
+          sm={24}
+          md={24}
+          lg={24}
           style={{
             border: `1px solid ${token.colorBorder}`,
             padding: '15px',

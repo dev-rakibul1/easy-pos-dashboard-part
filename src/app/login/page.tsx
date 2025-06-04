@@ -7,7 +7,13 @@ export const metadata: Metadata = {
 }
 const LoginPage = () => {
   return (
-    <div>
+    <div
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+      }}
+    >
       <LoginInfoPage />
     </div>
   )
